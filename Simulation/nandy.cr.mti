@@ -1,0 +1,106 @@
+C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_edgegate.v {1 {vlog -work work -stats=none C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_edgegate.v
+Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+-- Compiling module tb_edgegate
+
+Top level modules:
+	tb_edgegate
+
+} {} {}} C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_selmux.v {1 {vlog -work work -stats=none C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_selmux.v
+Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+-- Compiling module tb_selmux
+
+Top level modules:
+	tb_selmux
+
+} {} {}} C:/Users/grahambd/Documents/Nandy/Simulation/src/selmux.v {1 {vlog -work work -stats=none C:/Users/grahambd/Documents/Nandy/Simulation/src/selmux.v
+Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+-- Compiling module selmux
+
+Top level modules:
+	selmux
+
+} {} {}} C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_dff.v {1 {vlog -work work -stats=none C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_dff.v
+Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+-- Compiling module tb_dff
+
+Top level modules:
+	tb_dff
+
+} {} {}} C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_adder8.v {1 {vlog -work work -stats=none C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_adder8.v
+Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+-- Compiling module tb_adder8
+
+Top level modules:
+	tb_adder8
+
+} {} {}} C:/Users/grahambd/Documents/Nandy/Simulation/src/adder8.v {1 {vlog -work work -stats=none C:/Users/grahambd/Documents/Nandy/Simulation/src/adder8.v
+Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+-- Compiling module adder8
+
+Top level modules:
+	adder8
+
+} {} {}} C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_nand00.v {1 {vlog -work work -stats=none C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_nand00.v
+Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+-- Compiling module tb_nand00
+
+Top level modules:
+	tb_nand00
+
+} {} {}} C:/Users/grahambd/Documents/Nandy/Simulation/src/nand00.v {1 {vlog -work work -stats=none C:/Users/grahambd/Documents/Nandy/Simulation/src/nand00.v
+Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+-- Compiling module nand00
+
+Top level modules:
+	nand00
+
+} {} {}} C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_xornand.v {1 {vlog -work work -stats=none C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_xornand.v
+Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+-- Compiling module tb_xornand
+
+Top level modules:
+	tb_xornand
+
+} {} {}} C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_fulladder.v {1 {vlog -work work -stats=none C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_fulladder.v
+Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+-- Compiling module tb_fulladder
+
+Top level modules:
+	tb_fulladder
+
+} {} {}} C:/Users/grahambd/Documents/Nandy/Simulation/src/dff.v {1 {vlog -work work -stats=none C:/Users/grahambd/Documents/Nandy/Simulation/src/dff.v
+Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+-- Compiling module dff
+
+Top level modules:
+	dff
+
+} {} {}} C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_nand10.v {1 {vlog -work work -stats=none C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_nand10.v
+Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+-- Compiling module tb_nand10
+
+Top level modules:
+	tb_nand10
+
+} {} {}} C:/Users/grahambd/Documents/Nandy/Simulation/src/nand10.v {1 {vlog -work work -stats=none C:/Users/grahambd/Documents/Nandy/Simulation/src/nand10.v
+Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+-- Compiling module nand10
+
+Top level modules:
+	nand10
+
+} {} {}} C:/Users/grahambd/Documents/Nandy/Simulation/src/xornand.v {1 {vlog -work work -stats=none C:/Users/grahambd/Documents/Nandy/Simulation/src/xornand.v
+Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+-- Compiling module xornand
+
+Top level modules:
+	xornand
+
+} {} {}} C:/Users/grahambd/Documents/Nandy/Simulation/src/fulladder.v {1 {vlog -work work -stats=none C:/Users/grahambd/Documents/Nandy/Simulation/src/fulladder.v
+Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+-- Compiling module fulladder
+
+Top level modules:
+	fulladder
+
+} {} {}}

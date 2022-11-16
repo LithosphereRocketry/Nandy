@@ -1,0 +1,346 @@
+m255
+K4
+z2
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+Z0 dC:/Users/grahambd/Documents/Nandy/Simulation
+vadder8
+Z1 !s110 1668562708
+!i10b 1
+!s100 QB5zd69lT`zfl<IOIBO>90
+IGSn5mSBhk:O=QaXVJM<^j3
+Z2 VDg1SIo80bB@j0V0VzS_@n1
+R0
+Z3 w1668537554
+8C:/Users/grahambd/Documents/Nandy/Simulation/src/adder8.v
+FC:/Users/grahambd/Documents/Nandy/Simulation/src/adder8.v
+L0 3
+Z4 OV;L;10.5b;63
+r1
+!s85 0
+31
+Z5 !s108 1668562708.000000
+!s107 C:/Users/grahambd/Documents/Nandy/Simulation/src/adder8.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/grahambd/Documents/Nandy/Simulation/src/adder8.v|
+!i113 1
+Z6 o-work work
+Z7 tCvgOpt 0
+vdff
+Z8 !s110 1668571388
+!i10b 1
+!s100 62=bcDMTa_;AKOmM@k1zJ0
+Ih88FbbViW;YHjVGX<ObVj2
+R2
+R0
+Z9 w1668571239
+8C:/Users/grahambd/Documents/Nandy/Simulation/src/dff.v
+FC:/Users/grahambd/Documents/Nandy/Simulation/src/dff.v
+L0 11
+R4
+r1
+!s85 0
+31
+Z10 !s108 1668571388.000000
+!s107 C:/Users/grahambd/Documents/Nandy/Simulation/src/dff.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/grahambd/Documents/Nandy/Simulation/src/dff.v|
+!i113 1
+R6
+R7
+vedgegate
+!s110 1668571520
+!i10b 1
+!s100 HlMj<lH4[B[Ih?bMgc>;63
+InXld1lC>5o]Qb1<_E7>2G3
+R2
+R0
+w1668571517
+8C:/Users/grahambd/Documents/Nandy/Simulation/src/edgegate.v
+FC:/Users/grahambd/Documents/Nandy/Simulation/src/edgegate.v
+L0 3
+R4
+r1
+!s85 0
+31
+!s108 1668571520.000000
+!s107 C:/Users/grahambd/Documents/Nandy/Simulation/src/edgegate.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/grahambd/Documents/Nandy/Simulation/src/edgegate.v|
+!i113 1
+R6
+R7
+vfulladder
+Z11 !s110 1668562707
+!i10b 1
+!s100 cNM^zXzGB>Am]^C?ZW^W60
+I2IMoZUj;FDFiFfzS7kRJP2
+R2
+R0
+R3
+8C:/Users/grahambd/Documents/Nandy/Simulation/src/fulladder.v
+FC:/Users/grahambd/Documents/Nandy/Simulation/src/fulladder.v
+L0 3
+R4
+r1
+!s85 0
+31
+Z12 !s108 1668562707.000000
+!s107 C:/Users/grahambd/Documents/Nandy/Simulation/src/fulladder.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/grahambd/Documents/Nandy/Simulation/src/fulladder.v|
+!i113 1
+R6
+R7
+vnand00
+R11
+!i10b 1
+!s100 @2?^jN>JVIM@ez=PLbG[]1
+I0BWd;A6<Y^mi<FZbAE>Mg3
+R2
+R0
+Z13 w1668537555
+8C:/Users/grahambd/Documents/Nandy/Simulation/src/nand00.v
+FC:/Users/grahambd/Documents/Nandy/Simulation/src/nand00.v
+Z14 L0 13
+R4
+r1
+!s85 0
+31
+R12
+!s107 C:/Users/grahambd/Documents/Nandy/Simulation/src/nand00.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/grahambd/Documents/Nandy/Simulation/src/nand00.v|
+!i113 1
+R6
+R7
+vnand10
+R11
+!i10b 1
+!s100 `nJCg896ReLm:bdFH<SVg0
+IKSIQD?`4XSl^ACl88YUB10
+R2
+R0
+R3
+8C:/Users/grahambd/Documents/Nandy/Simulation/src/nand10.v
+FC:/Users/grahambd/Documents/Nandy/Simulation/src/nand10.v
+R14
+R4
+r1
+!s85 0
+31
+R12
+!s107 C:/Users/grahambd/Documents/Nandy/Simulation/src/nand10.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/grahambd/Documents/Nandy/Simulation/src/nand10.v|
+!i113 1
+R6
+R7
+vselmux
+R11
+!i10b 1
+!s100 ^R[:M4o;@NNmcPJG84>2N2
+I2=4VjPTbP5@D:AE;IW;Tf1
+R2
+R0
+R3
+8C:/Users/grahambd/Documents/Nandy/Simulation/src/selmux.v
+FC:/Users/grahambd/Documents/Nandy/Simulation/src/selmux.v
+Z15 L0 14
+R4
+r1
+!s85 0
+31
+R12
+!s107 C:/Users/grahambd/Documents/Nandy/Simulation/src/selmux.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/grahambd/Documents/Nandy/Simulation/src/selmux.v|
+!i113 1
+R6
+R7
+vtb_adder8
+R1
+!i10b 1
+!s100 ekCI?5=M10bPoX:3zN2ej1
+IF_dD;a?z5gQoRCW8S[I731
+R2
+R0
+R3
+8C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_adder8.v
+FC:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_adder8.v
+L0 3
+R4
+r1
+!s85 0
+31
+R5
+!s107 C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_adder8.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_adder8.v|
+!i113 1
+R6
+R7
+vtb_dff
+R8
+!i10b 1
+!s100 Y5=U<KM<[ZM1H`k5R6>@i1
+IkS?=i]^f@;dnXl_8JBKEF3
+R2
+R0
+R9
+8C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_dff.v
+FC:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_dff.v
+L0 3
+R4
+r1
+!s85 0
+31
+R10
+!s107 C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_dff.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_dff.v|
+!i113 1
+R6
+R7
+vtb_edgegate
+!s110 1668571446
+!i10b 1
+!s100 TP16bLA?SfBV=V0:i2=zA1
+I32hOa2cmabSF79fN8W0c83
+R2
+R0
+R9
+8C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_edgegate.v
+FC:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_edgegate.v
+L0 3
+R4
+r1
+!s85 0
+31
+!s108 1668571446.000000
+!s107 C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_edgegate.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_edgegate.v|
+!i113 1
+R6
+R7
+vtb_fulladder
+R11
+!i10b 1
+!s100 EP3GKXR9B@Nl?64Gb97GV1
+IzO<Gz6Fa6G6PXB`h7;3m=2
+R2
+R0
+R13
+8C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_fulladder.v
+FC:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_fulladder.v
+L0 3
+R4
+r1
+!s85 0
+31
+R12
+!s107 C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_fulladder.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_fulladder.v|
+!i113 1
+R6
+R7
+vtb_nand00
+R11
+!i10b 1
+!s100 PP>4;LR3k?<dQ>GNo>T8D2
+IPiP3XaaB1j?iH9d5o1Hza3
+R2
+R0
+R13
+8C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_nand00.v
+FC:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_nand00.v
+L0 3
+R4
+r1
+!s85 0
+31
+R12
+!s107 C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_nand00.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_nand00.v|
+!i113 1
+R6
+R7
+vtb_nand10
+R1
+!i10b 1
+!s100 lNchdFzXE_9[=FG7X:ZCQ1
+I_QHVZdcD88nMC`dN2MULG0
+R2
+R0
+R13
+8C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_nand10.v
+FC:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_nand10.v
+L0 3
+R4
+r1
+!s85 0
+31
+R12
+!s107 C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_nand10.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_nand10.v|
+!i113 1
+R6
+R7
+vtb_selmux
+R1
+!i10b 1
+!s100 Nz]Y2^hKW5OSnBDelBfPH1
+I]iKGg_o<f?=_UQ;;in7Hc1
+R2
+R0
+R13
+8C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_selmux.v
+FC:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_selmux.v
+L0 3
+R4
+r1
+!s85 0
+31
+R5
+!s107 C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_selmux.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_selmux.v|
+!i113 1
+R6
+R7
+vtb_xornand
+R11
+!i10b 1
+!s100 2oi;0UVYZMJjAfmJdh>;I3
+I?J18[44h[c_T:ROkWA7jY2
+R2
+R0
+R3
+8C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_xornand.v
+FC:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_xornand.v
+L0 3
+R4
+r1
+!s85 0
+31
+R12
+!s107 C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_xornand.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/grahambd/Documents/Nandy/Simulation/src/tests/tb_xornand.v|
+!i113 1
+R6
+R7
+vxornand
+R11
+!i10b 1
+!s100 TR:aVCXRRP^2_g8];zcbk0
+I2?0>BW4U:]o[WA<3jcelO1
+R2
+R0
+R3
+8C:/Users/grahambd/Documents/Nandy/Simulation/src/xornand.v
+FC:/Users/grahambd/Documents/Nandy/Simulation/src/xornand.v
+R15
+R4
+r1
+!s85 0
+31
+R12
+!s107 C:/Users/grahambd/Documents/Nandy/Simulation/src/xornand.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/grahambd/Documents/Nandy/Simulation/src/xornand.v|
+!i113 1
+R6
+R7
