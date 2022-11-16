@@ -1,5 +1,15 @@
 `timescale 1ns/1ps
 
+/*
+Positive-edge gate
+
+Only allows positive edges to occur if enable input is high
+
+Sources:
+Basedd on D flip-flop by Wikipedia user Nolanjshettle:
+https://en.wikipedia.org/wiki/Flip-flop_(electronics)#/media/File:Edge_triggered_D_flip_flop.svg
+*/
+
 module edgegate(
         input clk,
         input en,
