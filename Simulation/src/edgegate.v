@@ -13,8 +13,60 @@ https://en.wikipedia.org/wiki/Flip-flop_(electronics)#/media/File:Edge_triggered
 module edgegate(
         input clk,
         input en,
-        output clkout
+        output reg testclkout,
+        output clkout,
+        output refclkout
     );
+
+    always @(*) begin
+        if(!clk) begin
+            testclkout = 0;
+        end else begin
+            if(!testclkout && en) begin
+                testclkout = 1;
+            end
+        end
+    end
+
+    wire nclk;
+    wire nclkout;
+
+    wire latchUp;
+    
+    wire latchq;
+    wire latchnq;
+
+    nand00 clkinv(
+        .a(clk),
+        .b(1),
+        .q(nclk)
+    );
+    nand00 latchen(
+        .a(en),
+        .b(nclk),
+        .q(latchUp)
+    );
+    nand00 latchp(
+        .a(latchUp),
+        .b(latchnq),
+        .q(latchq)
+    );
+    nand00 latchn(
+        .a(en),
+        .b(latchq),
+        .q(latchnq)
+    );
+    nand00 gate(
+        .a(clk),
+        .b(latchq),
+        .q(nclkout)
+    );
+    nand00 clkoutinv(
+        .a(nclkout),
+        .b(1),
+        .q(clkout)
+    );
+
 
     wire dl_q;
     wire dl_nq;
@@ -46,10 +98,10 @@ module edgegate(
     nand00 g_q(
         .a(ndl_nq),
         .b(nq),
-        .q(clkout)
+        .q(refclkout)
     );
     nand00 g_nq(
-        .a(clkout),
+        .a(refclkout),
         .b(clk),
         .q(nq)
     );

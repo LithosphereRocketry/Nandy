@@ -2,29 +2,41 @@
 
 module tb_edgegate();
     reg clk, en;
-    wire clkout;
+    wire clkout, refclkout;
 
     edgegate testGate(
         .clk(clk),
         .en(en),
-        .clkout(clkout)
+        .clkout(clkout),
+        .refclkout(refclkout)
     );
 
     initial begin
         clk = 1;
-        repeat(12) begin
+        repeat(16) begin
             #500;
             clk = !clk;
         end
     end
     initial begin
         en <= 0;
-        #2100;
-        en <= 1;
-        #2200;
+        #1100;
+        en <= 1; // blip in clk
+        #200;
         en <= 0;
-        #100;
-        en <= 1;
+        #1300;
+        en <= 1; // blip in !clk
+        #200;
+        en <= 0;
+        #500;
+        en <= 1; // up in clk
+        #1000;
+        en <= 0; // down in clk
+        #1500;
+        en <= 1; // up in !clk
+        #1000;
+        en <= 0; // down in clk
+        #1200;
     end
 
 endmodule
