@@ -1,5 +1,9 @@
 `timescale 1ns/1ps
 
+/*
+1-bit, 2-input full adder
+*/
+
 module fulladder(
         input a,
         input b,
