@@ -1,19 +1,29 @@
 #include "ListCommand.h"
 
-bool ListCommand::assemble() {
-    for(int i = 0; i < cmds.size(); i++) {
-        if(!cmds[i]->assemble()) {
-            return false;
-        }
-    }
-    return true;
+std::vector<std::string> ListCommand::getLabels() {
+    return std::vector<std::string>();
 }
 
-bool ListCommand::execute() {
+int ListCommand::execute() {
+    int count = 0;
     for(int i = 0; i < cmds.size(); i++) {
-        if(!cmds[i]->execute()) {
-            return false;
-        }
+        count += cmds[i]->execute();
     }
-    return true;
+    return count;
+}
+
+int ListCommand::executeLabel(std::string label) {
+
+}
+
+int ListCommand::assemble() {
+    int count = 0;
+    for(int i = 0; i < cmds.size(); i++) {
+        count += cmds[i]->assemble();
+    }
+    return count;
+}
+
+void ListCommand::trace(int depth) {
+
 }

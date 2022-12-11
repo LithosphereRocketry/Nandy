@@ -1,0 +1,31 @@
+# Fibonacci calculator using stack pointer abuse
+
+fibonacci:
+            isp -1
+            swd
+            strs 0
+            swd
+            sws
+            swd
+            lui 0x0
+            swd
+            stra   # prepare for SP abuse
+            lui 0b0000
+            addi 1
+
+fibloop:    add
+            swd
+            isp -1
+            jif fibloop
+
+            sws
+            lui 0x0
+            swd
+            lda
+            sws
+            
+            swd
+            lds 0
+            swd
+            isp 1
+            ret

@@ -8,10 +8,13 @@
 class TextCommand: public Command {
     public:
         TextCommand(std::string text);
-        bool execute();
-        bool assemble();
+        std::vector<std::string> getLabels();
+        int execute();
+        int executeLabel(std::string label);
+        int assemble();
     private:
         Command* cmd;
+        void trace(int depth);
 };
 
 #endif
