@@ -3,14 +3,16 @@
 
 #include <vector>
 #include <string>
+#include <unordered_map>
 
 #include "Command.h"
 
 class ListCommand: public Command {
     public:
+        ListCommand* clone();
         std::vector<std::string> getLabels();
-        int execute();
-        int executeLabel(std::string label);
+        int execute(CPUState* state);
+        int executeLabel(CPUState* state, std::string label);
         int assemble();
     protected:
         std::vector<Command*> cmds;

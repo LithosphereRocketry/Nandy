@@ -1,10 +1,10 @@
 # Fibonacci calculator using stack pointer abuse
 
-@macro swds
-            swd
-            sws
-            swd
-@end
+#@macro swds
+#            swd
+#            sws
+#            swd
+#@end
 
 fibonacci:
             isp -1

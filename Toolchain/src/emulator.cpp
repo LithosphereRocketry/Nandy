@@ -7,6 +7,12 @@ int main(int argc, char** argv) {
         std::cout << "No path specified\n";
         return 0;
     }
-    FileCommand program = FileCommand(std::string(argv[1]));
-    program.execute();
+    CPUState state;
+    state.pc = 0;
+    try {
+        FileCommand program = FileCommand(std::string(argv[1]));
+        program.executeLabel(&state, "main");
+    } catch(InvalidInstructionException e) {
+        std::cout << "Invalid instruction \"" << e.what() << "\"" << std::endl;
+    }
 }

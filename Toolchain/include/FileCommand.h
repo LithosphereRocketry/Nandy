@@ -10,6 +10,7 @@
 class FileCommand: public ListCommand {
     public:
         FileCommand(std::string path);
+        FileCommand* clone();
 };
 
 #endif
