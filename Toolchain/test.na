@@ -1,18 +1,22 @@
 # Fibonacci calculator using stack pointer abuse
 
+@macro swds
+            swd
+            sws
+            swd
+@end
+
 fibonacci:
             isp -1
             swd
             strs 0
-            swd
-            sws
-            swd
+            swds
             lui 0x0
             swd
             stra 0      # prepare for SP abuse
             lui 0b0000
             addi 1
-            
+
 fibloop:    add
             swd
             isp -1
