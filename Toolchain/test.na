@@ -1,11 +1,5 @@
 # Fibonacci calculator using stack pointer abuse
 
-            andi 0
-            wrs
-            ioa
-            jsr fibonacci
-            ioa
-
 fibonacci:
             isp -1
             swd
@@ -18,7 +12,7 @@ fibonacci:
             stra 0      # prepare for SP abuse
             lui 0b0000
             addi 1
-
+            
 fibloop:    add
             swd
             isp -1
@@ -35,3 +29,10 @@ fibloop:    add
             swd
             isp 1
             ret
+
+main:
+            andi 0
+            wrs
+            ioa
+            jsr fibonacci
+            ioa
