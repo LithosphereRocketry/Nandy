@@ -3,6 +3,8 @@
 ## About This Guide
 
 ## Assembly Syntax Rules
+The 
+
 
 ## Common Constructs
 
@@ -63,21 +65,35 @@ Sets the carry bit to the carry result of `add`, but does not actually modify `a
 Sets the carry bit to the carry result of `addc`, but does not actually modify `acc`.  
 #### Subtraction instructions
 ##### `sub`
+Subtractes the value of `data` from the value of `acc` and stores the result in `acc`; updates `carry` with the carry-out result of the subtraction.
 ##### `subc`  
-##### `subi`  
+Identical to `sub`, but replaces the carry-in of the subtraction with the contents of the carry bit.
+##### `subi <number>`  
+Identical to `sub`, but subtracts `<number>` from `acc` in place of `data`.
 ##### `_sub`, `_subc`  
+Identical to `sub` and `subc` respectively, but do not update the carry bit.
 ##### `scry`  
+Sets the carry bit to the carry result of `sub`, but does not actually modify `acc`. Note that this may be used as an unsigned comparison operator.
 ##### `scryc`
+Sets the carry bit to the carry result of `subc`, but does not actually modify `acc`.
 #### Halfword manipulation instructions
 ##### `lu`  
-##### `lui`  
+Moves the top 4 bits of `acc` into the bottom 4 bits of `acc`, and replaces the top 4 bits of `acc` with the bottom 4 bits of `data`. Also sets `carry` to the result of `acc != data`. 
+##### `lui <number>`  
+Moves the top 4 bits of `acc` into the bottom 4 bits of `acc`, and replaces the top 4 bits of `acc` with the bottom 4 bits of `<number>`. Also sets `carry` to the result of `acc != <number>`. Note that two `lui` instructions may be used to load an exact 8-bit value in `acc`.
 ##### `_lu`  
+Identical to `lu`, but does not update the carry bit.
 ##### `ne`
+Sets `carry` to the result of `acc != data`. 
 #### XOR instructions
 ##### `xor`  
-##### `xori`  
+Sets `acc` to a bitwise XOR of `acc` and `data`. Also sets `carry` to the result of `acc == data`.
+##### `xori <number>`  
+Identical to `xor`, but XORs `acc` with `<number>` in place of `data`.
 ##### `_xor`  
+Identical to `xor`, but does not update the carry bit.
 ##### `eq`  
+Sets `carry` to the result of `acc == data`.
 #### AND instructions
 ##### `and`  
 ##### `andi`  
