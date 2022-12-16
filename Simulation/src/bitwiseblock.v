@@ -23,7 +23,7 @@ module bitwiseblock(
         output cout
     );
 
-    wire qnand, le, ge, ne, qand, andsel, xorsel, asel, ncin, comp;
+    wire qnand, le, ge, ne, qand, andsel, xorsel, bsel, ncin, comp;
     nand00 gnand(
         .a(a),
         .b(b),
@@ -66,8 +66,8 @@ module bitwiseblock(
     );
     nand00 gasel(
         .a(op1),
-        .b(a),
-        .q(asel)
+        .b(b),
+        .q(bsel)
     );
     nand00 gncin(
         .a(cin),
@@ -75,7 +75,7 @@ module bitwiseblock(
         .q(ncin)
     );
     nand00 gcomp(
-        .a(asel),
+        .a(bsel),
         .b(ne),
         .q(comp)
     );

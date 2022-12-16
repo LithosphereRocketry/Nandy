@@ -76,6 +76,15 @@ Identical to `sub` and `subc` respectively, but do not update the carry bit.
 Sets the carry bit to the carry result of `sub`, but does not actually modify `acc`. Note that this may be used as an unsigned comparison operator.
 ##### `scryc`
 Sets the carry bit to the carry result of `subc`, but does not actually modify `acc`.
+#### Comparison instructions
+##### `ne`
+Sets `carry` to the result of `acc != data`. 
+##### `eq`  
+Sets `carry` to the result of `acc == data`.
+##### `lt`
+Sets `carry` to the result of `acc < data` via two's complement.
+##### `lt`
+Sets `carry` to the result of `acc >= data` via two's complement.
 #### Halfword manipulation instructions
 ##### `lu`  
 Moves the top 4 bits of `acc` into the bottom 4 bits of `acc`, and replaces the top 4 bits of `acc` with the bottom 4 bits of `data`. Also sets `carry` to the result of `acc != data`. 
@@ -83,8 +92,6 @@ Moves the top 4 bits of `acc` into the bottom 4 bits of `acc`, and replaces the 
 Moves the top 4 bits of `acc` into the bottom 4 bits of `acc`, and replaces the top 4 bits of `acc` with the bottom 4 bits of `<number>`. Also sets `carry` to the result of `acc != <number>`. Note that two `lui` instructions may be used to load an exact 8-bit value in `acc`.
 ##### `_lu`  
 Identical to `lu`, but does not update the carry bit.
-##### `ne`
-Sets `carry` to the result of `acc != data`. 
 #### XOR instructions
 ##### `xor`  
 Sets `acc` to a bitwise XOR of `acc` and `data`. Also sets `carry` to the result of `acc == data`.
@@ -92,8 +99,6 @@ Sets `acc` to a bitwise XOR of `acc` and `data`. Also sets `carry` to the result
 Identical to `xor`, but XORs `acc` with `<number>` in place of `data`.
 ##### `_xor`  
 Identical to `xor`, but does not update the carry bit.
-##### `eq`  
-Sets `carry` to the result of `acc == data`.
 #### AND instructions
 ##### `and`  
 ##### `andi`  
