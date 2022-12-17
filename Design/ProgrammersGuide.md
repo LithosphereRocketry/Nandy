@@ -10,6 +10,19 @@ Throughout this guide, `code markdown` is used for code snippets, instruction sp
 ## Common Constructs
 
 ## "Hacks" and Advanced Techniques
+### Stack-Pointer Abuse
+While the NANDy only offers two arithmetic registers, with convention being to use the stack for any additional parameters, many functions are much easier to implement if a third register is available. Take, for example, this pseudocode function to compute the Nth Fibonacci number:
+```
+fibonacci(n) {
+    a = 0
+    b = 1
+    while(n > 0) {
+        a += b
+        swap a, b
+    }
+    return a
+}
+```
 
 ## Assembly Syntax Rules
 ### Assembly Files
