@@ -6,8 +6,8 @@ Multi-function bitwise logic block
 op1     op0     q       cout
 0       0       0       a!=b
 0       1       xor     a!=b*
-1       0       and     a>b
-1       1       or      a>b*
+1       0       and     a<b
+1       1       or      a<b*
 
 * inverted at a later stage
 

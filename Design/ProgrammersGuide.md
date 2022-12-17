@@ -83,8 +83,12 @@ Sets `carry` to the result of `acc != data`.
 Sets `carry` to the result of `acc == data`.
 ##### `lt`
 Sets `carry` to the result of `acc < data` via two's complement.
-##### `lt`
+##### `ge`
 Sets `carry` to the result of `acc >= data` via two's complement.
+##### `top`
+Sets `carry` to the top bit of `acc`. Note that this may be used to test if `acc` is negative.
+##### `bot`
+Sets `carry` to the bottom bit of `acc`. Note that this may be used to test if `acc` is even.
 #### Halfword manipulation instructions
 ##### `lu`  
 Moves the top 4 bits of `acc` into the bottom 4 bits of `acc`, and replaces the top 4 bits of `acc` with the bottom 4 bits of `data`. Also sets `carry` to the result of `acc != data`. 
@@ -101,25 +105,37 @@ Identical to `xor`, but XORs `acc` with `<number>` in place of `data`.
 Identical to `xor`, but does not update the carry bit.
 #### AND instructions
 ##### `and`  
-##### `andi`  
+Sets `acc` to a bitwise AND of `acc` and `data`. Also sets `carry` to the result of `acc < data`.
+##### `andi <number>`  
+Identical to `and`, but ANDs `acc` with `<number>` in place of `data`.
 ##### `_and`  
-##### `gt`
+Identical to `and`, but does not update the carry bit.
 #### OR instructions
 ##### `or`  
+Sets `acc` to a bitwise OR of `acc` and `data`. Also sets `carry` to the result of `acc >= data`.
 ##### `ori`  
+Identical to `or`, but ORs `acc` with `<number>` in place of `data`.
 ##### `_or`  
-##### `le`  
+Identical to `or`, but does not update the carry bit.
 #### Left-shift instructions
 ##### `sl`  
+Shifts the contents of `acc` left by one bit, putting the top bit in `carry`. Fills lowermost bit with 0. This shift most closely matches the behavior of `<<` in most languages.
 ##### `slc`  
+Identical to `sl`, but fills the lowermost bit with the previous value of `carry`.
 ##### `slr`  
+Identical to `sl`, but rotates the uppermost bit into the lowermost bit.
 ##### `sla`  
+Identical to `sl`, but fills the lowermost bit by extending the bottom bit of `acc`. Note that despite the mnemonic, this operation is not particularly useful for arithmetic and is included mostly for completeness. 
 ##### `_sl`, `_slc`, `_slr`, `_sla`  
-##### `top`
+Identical to `sl`, `slc`, `slr`, and `sla`, respectively, but do not set the carry bit.
 #### Right-shift instructions
 ##### `sr`  
+Shifts the contents of `acc` to the left by one bit, putting the bottom bit in `carry`. Fills uppermost bit with 0.
 ##### `src`  
+Identical to `sr`, but fills the uppermost bit with the previous value of `carry`.
 ##### `srr`  
-##### `sra`  
+Identical to `sr`, but rotates the lowermost bit into the uppermost bit.
+##### `sra`
+Identical to `sr`, but fills the uppermost bit by extending the top bit of `acc`. This shift most closely matches the behavior of `>>` in most languages.
 ##### `_sr`, `_src`, `_srr`, `_sra`  
-##### `bot`
+Identical to `sr`, `src`, `srr`, and `sra`, respectively, but do not set the carry bit.
