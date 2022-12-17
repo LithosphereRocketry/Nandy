@@ -1,14 +1,27 @@
 # NANDy Programmer's Manual
 
+NOTE: implementation of these features not yet complete
+
 ## About This Guide
+This guide is intended to detail all of the explicit rules, as well as some best practices and implementation hints, for writing programs in NANDy assembly. Because the NANDy is a very simple processor with limited resources, it may often be necessary to deviate from these guidelines for best performance, so in no way should every word of this document be taken as gospel; however, following these conventions will make code significantly easier to understand.  
 
-## Assembly Syntax Rules
-The 
-
+Throughout this guide, `code markdown` is used for code snippets, instruction specifications, and other pieces of useful text. In general, code markdown with `<angle brackets>` is used to denote a required parameter, while `[square brackets]` are used to denote optional syntax.  
 
 ## Common Constructs
 
 ## "Hacks" and Advanced Techniques
+
+## Assembly Syntax Rules
+### Assembly Files
+By default, NANDy assembly programs are stored as plain 7-bit ASCII text files with the file extension `.na`.
+
+### Instruction Formatting
+Normal assembly instructions follow the following format:  
+`[<label>:] <mnemonic> [<arguments>]`  
+Labels may be any sequence of characters not including a colon or '@', and any amount of whitespace, but not a newline, may separate each argument. Labels should always be interpreted as case-sensitive; instruction mnemonics should always be valid in all lowercase, though implementations may choose to recognize case-insensitive mnemonics.
+
+### Preprocessor
+Preprocessor directives are defined by lines beginning with `@`.
 
 ## Instruction Set
 ### Program flow instructions
