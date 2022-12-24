@@ -9,7 +9,24 @@ Throughout this guide, `code markdown` is used for code snippets, instruction sp
 
 ## Common Constructs
 
-## "Hacks" and Advanced Techniques
+## Optimization and "Hacks"
+### Efficient Loops
+A major part of optimizing NANDy programs, like in many architectures, is minimizing the number of jump instructions. In NANDy this is especially important, as static jumps take two cycles, regardless of whether the jump is conditional or whether a conditional jump actually executes. Take the following loop structures:
+```
+loop1:
+	# code goes here
+	jif end
+	j loop1
+
+loop2:
+	# code goes here
+	jnif loop2
+	j end
+	
+end:
+```
+Both have identical functionality, but because the first loop executes `jif end` every cycle, it will have an additional two cycles of overhead for every loop cycle. Therefore, when designing loops, it is important to check for the most common condition first.
+
 ### Stack-Pointer Abuse
 While the NANDy only offers two arithmetic registers, with convention being to use the stack for any additional parameters, many functions are much easier to implement if a third register is available. Take, for example, this pseudocode function to compute the Nth Fibonacci number:
 ```
@@ -19,10 +36,82 @@ fibonacci(n) {
     while(n > 0) {
         a += b
         swap a, b
+        n --
     }
     return a
 }
 ```
+By typical NANDy calling conventions, this program could be implemented as:
+```
+fibonacci:
+    dsp 3
+    swd
+    strs 2
+    lui 1
+    lui 0
+    swd             # b = 1
+    lt              # if count < 1, jump to return 0
+    jif fibonacci_rz
+    subi 1          # easier to measure < 0 than <= 0
+    strs 0
+    andi 0          # a = 0
+fibonacci_loop:
+    add             # a += b
+    swd             # swap a, b
+    strs 1
+    lds 0
+    subi 1          # n --
+    strs 0
+    lds 1           # carry flag from 'subi 1' persists through memory exchange
+    jnif fibonacci_loop
+    j fibonacci_end
+fibonacci_rz:
+    andi 0          # if we got here through the n<1 case, force 0
+fibonacci_end:
+    swd
+    lds 2
+    swd
+    isp 3
+    ret
+```
+However, this program leaves something to be desired in terms of efficiency. In particular, it swaps variables to and from the stack very frequently. A way to avoid this would be to use the stack-pointer register as the loop counter instead of swapping the value to and from memory:
+```
+# Memory address 0 statically allocated for SP abuse
+fibonacci:
+	dsp 1
+	swd
+    lui 1
+    lui 0
+    swd  			# b = 1
+    lt              # if count < 1, jump to return 0
+    jif fibonacci_rz
+    subi 1          # easier to measure < 0 than <= 0
+	sws				# this is where the magic starts
+	stran 1			# store at address 1-1=0
+	andi 0			# a = 0
+fibonacci_loop:
+    add             # a += b
+    swd             # swap a, b
+	dsp 1			# n --
+    jnif fibonacci_loop
+    j fibonacci_end
+fibonacci_rz:
+    andi 0          # if we got here through the n<1 case, force 0
+fibonacci_end:
+	sws
+	andi 0
+	swd
+	lda	0			# retrieve old SP from address 0
+	sws
+	swd
+	lds	0			# retrieve return address from stack and everything is right in the world again
+	swd
+	ret
+```
+Here we have sacrificed a byte of memory, along with some additional setup and teardown time, in order to significantly trim our loop time from 9 cycles to only 5. This strategy is denoted **SP abuse** or **stack abuse**, and may be used wihtin NANDy "good practice." However, it is subject to several caveats:
+- The programmer is responsible for ensuring that the location used to store the stack pointer is not in use by any other routine.
+- While in SP abuse, the stack is obviously not available. This means that all memory used must be statically allocated; both `strs` and `stra` will effectively be absolute writes, with different base addresses.
+- Because the state of the stack is unknown, SP-abuse routines may not call other functions or call themselves recursively.
 
 ## Assembly Syntax Rules
 ### Assembly Files
@@ -38,6 +127,12 @@ Preprocessor directives are defined by lines beginning with `@`.
 
 ## Instruction Set
 ### Program flow instructions
+#### Debugging instructions
+##### `nop`
+Does nothing.
+##### `brk`
+Halts program execution until a hardware resume or hardware reset input is received.
+
 #### Jump instructions
 ##### `j <label>`  
 Jumps to the instruction labeled by <label>. This instruction takes two clock cycles to complete and occupies two bytes in memory.  
@@ -45,8 +140,12 @@ Jumps to the instruction labeled by <label>. This instruction takes two clock cy
 Identical to `j`, except the current value of the program counter will be stored to the `data` register. This operation is most commonly used for calling procedures.  
 ##### `jif`  
 Identical to `j`, except the jump will only be taken if the carry bit contains a 1. This will take two cycles to execute regardless of whether the branch is taken.  
+##### `jnif`  
+Identical to `j`, except the jump will only be taken if the carry bit contains a 0. This will take two cycles to execute regardless of whether the branch is taken.  
 ##### `ret`  
-Jumps to the address stored in `data`, plus one. Replaces the value in `data` with the current value of the program counter as with `jsr`. Unlike the other jump instructions, this instruction only takes a single cycle and single byte of ROM.  
+Jumps to the address stored in `data`, plus one. Unlike the other jump instructions, this instruction only takes a single cycle and single byte of ROM.  
+##### `retsr`  
+Identical to `ret`, but replaces the value in `data` with the current value of the program counter as with `jsr`.
 
 #### Stack pointer manipulation instructions
 ##### `isp <number>`  
