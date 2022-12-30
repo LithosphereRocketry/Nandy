@@ -1,7 +1,7 @@
 # Semi-automated C/C++ makefile
 
 # This should be all you need to change
-TARGETS = emulator assembler
+TARGETS = emulator assembler bin_emulator
 
 # Header files go here
 INCDIR = include/
@@ -45,7 +45,7 @@ $(OBJDIR)%.o: $(SRCDIR)%.cpp $(INC) | $(OBJDIR)
 
 # If the above rule fails, see if it has a .c file we can use instead of .cpp
 $(OBJDIR)%.o: $(SRCDIR)%.c $(INC) | $(OBJDIR)
-	$(CC) -I$(INCDIR) -c $< -o $@
+	$(CC) $(COPTS) -I$(INCDIR) -c $< -o $@
 
 # If the object directory doesn't exist, make it
 $(OBJDIR):
