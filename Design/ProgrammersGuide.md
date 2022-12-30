@@ -249,10 +249,8 @@ Shifts the contents of `acc` left by one bit, putting the top bit in `carry`. Fi
 Identical to `sl`, but fills the lowermost bit with the previous value of `carry`.
 ##### `slr`  
 Identical to `sl`, but rotates the uppermost bit into the lowermost bit.
-##### `sla`  
-Identical to `sl`, but fills the lowermost bit by extending the bottom bit of `acc`. Note that despite the mnemonic, this operation is not particularly useful for arithmetic and is included mostly for completeness. 
-##### `_sl`, `_slc`, `_slr`, `_sla`  
-Identical to `sl`, `slc`, `slr`, and `sla`, respectively, but do not set the carry bit.
+##### `_sl`, `_slc`, `_slr`  
+Identical to `sl`, `slc`, and `slr`, respectively, but do not set the carry bit.
 #### Right-shift instructions
 ##### `sr`  
 Shifts the contents of `acc` to the left by one bit, putting the bottom bit in `carry`. Fills uppermost bit with 0.
