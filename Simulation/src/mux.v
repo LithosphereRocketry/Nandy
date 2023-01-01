@@ -11,11 +11,11 @@ Truth table:
     1   b
 */
 
-module mux(
-        input a,
-        input b,
+module mux #(parameter WIDTH=1) (
+        input [WIDTH-1:0] a,
+        input [WIDTH-1:0] b,
         input s,
-        output q
+        output [WIDTH-1:0] q
     );
     
     wire ns;
@@ -25,13 +25,11 @@ module mux(
         .q(ns)
     );
 
-    selmux m(
+    selmux m [WIDTH-1:0] (
         .a(a),
         .b(b),
         .q(q),
         .sa(ns),
         .sb(s)
     );
-
-
 endmodule
