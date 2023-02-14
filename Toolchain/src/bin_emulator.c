@@ -18,6 +18,7 @@ typedef uint8_t inst_t;
 #define BRK_MASK 1<<3
 #define WR_MASK 1<<3
 #define RD_MASK 1<<2
+#define COND_INV_MASK 1<<0
 
 #define ALU_INST_MASK 0xF
 #define ALU_WRITESBOTH_MASK 0b1100 // any instruction with either of these bits can
@@ -218,11 +219,13 @@ bool step(bool interrupt) {
 				aluop(i & ALU_INST_MASK, i & CARRY_SEL_MASK, acc, imm, &acc);
 			} else { // jumps
 				if(!(i & JUMP_COND_MASK)) { // unconditional jumps
-					int offs = (((int) signExt(i, 4)) << 8) + ((int) imm) - 1;
+					int offs = ((((int) signExt(i, 4)) << 8) | ((int) imm)) - 1;
 					printf("%i %i %i\n", signExt(i, 4), imm, offs);
 					pc += offs;
 				} else {
-					// conditional jumps
+					if((carry && !(i & COND_INV_MASK)) || (!carry && (i & COND_INV_MASK))) {
+						pc += imm;
+					}
 				}
 			}
 		}
