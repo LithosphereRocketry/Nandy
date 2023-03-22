@@ -1,13 +1,14 @@
 #include "parseNum.h"
 #include <stdio.h>
 
+
 int main(int argc, char** argv) {
-    if(argc > 1) {
-        int result;
-        if(parseInt(argv[1], &result)) {
-            printf("Result: %i\n", result);
+    int x;
+    for(int i = 1; i < argc; i++) {
+        if(parseInt(&x, argv[i])) {
+            printf("%s = %i\n", argv[i], x);
         } else {
-            printf("Invalid int literal %s\n", argv[1]);
+            printf("Failed to parse %s: %s\n", argv[i], pnum_parse_err);
         }
-    } 
+    }
 }
