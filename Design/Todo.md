@@ -7,6 +7,7 @@
 ## Simulation
 * Start putting together datapath
 * Carry handling in ALU incl. comparison ops
+* Make comparison module not suck
 
 ## Toolchain
 ### Compiler
@@ -14,7 +15,7 @@
 
 ### Assembler
 * Make better plan for parse->macro expand->assemble pipeline
-* Figure out how to get from 
+* Figure out how to get from something AST ish to line numbers for jumps
 
 ### Emulator
 * Fix issues in multiplication test

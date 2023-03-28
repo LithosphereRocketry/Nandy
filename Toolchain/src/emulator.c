@@ -11,9 +11,11 @@ typedef uint8_t inst_t;
 #define ALU_SEL_MASK 1<<6
 #define ISP_MASK 1<<5
 #define XY_MASK 1<<5
+#define MEM_WRITE_MASK 1<<5
 #define JUMP_MASK 1<<5
 #define CARRY_SEL_MASK 1<<4
 #define PROGFLOW_MASK 1<<4
+#define MEM_STACK_MASK 1<<4
 #define JUMP_COND_MASK 1<<4
 #define BRK_MASK 1<<3
 #define WR_MASK 1<<3
@@ -25,14 +27,18 @@ typedef uint8_t inst_t;
 								   // write ACC and CARRY simultaneously
 #define REGID_MASK 0b0011
 
-/*
-*/
+#define WRITABLE_REGION 1<<15
+
 
 enum ALUMode {
 	ALU_B = 0x0,
 	ALU_XOR = 0x1,
 	ALU_AND = 0x2,
 	ALU_OR = 0x3,
+	ALU_NE = 0x0,
+	ALU_EQ = 0x1,
+	ALU_LT = 0x2,
+	ALU_GE = 0x3,
 	ALU_ADD = 0x4,
 	ALU_ADDC = 0x5,
 	ALU_SUB = 0x6,
@@ -60,22 +66,17 @@ enum RegID {
 	REGID_DY = 0x3
 };
 
+/*
+		add y
+end:	sw x
+		nei 0
+		jif mult_loop
+*/
 unsigned long cycles = -1;
 word_t acc, x, y, sp;
 bool carry;
 addr_t pc = -1;
-inst_t mem[65536] = {
-	0x1B, // brk
-	0xC0, // rdi
-	10,
-	0x0A, // wr x
-	0xC0, // rdi
-	20,
-	0x44, // _add x
-	0xEF, // j
-	-2
-};
-word_t* ram = mem + 32768;
+inst_t mem[65536];
 word_t ioin, ioout;
 
 word_t signExt(word_t value, int bits) {
@@ -94,17 +95,17 @@ bool pause() {
 	while(1) {
 		switch(radix) {
 			case RADIX_DECIMAL:
-				printf("    PC %hhi\t   ACC %hhi\t  IOIN %hhi\tCycles %hhi\n  Inst %hhi\t    SP %hhi\t    DX %hhi\t    DY %hhi\tIOOUT %hhi\n> ",
-					pc, acc, ioin, cycles, mem[pc], sp, x, ioout);
+				printf("    PC %hhi\t   ACC %hhi\t  IOIN %hhi\tCycles %i\t Carry %hhi\n  Inst %hhi\t    SP %hhi\t    DX %hhi\t    DY %hhi\tIOOUT %hhi\n> ",
+					pc, acc, ioin, cycles, carry, mem[pc], sp, x, y, ioout);
 				break;
 			case RADIX_UNSIGNED:
-				printf("    PC %hhu\t   ACC %hhu\t  IOIN %hhu\tCycles %hhu\n  Inst %hhu\t    SP %hhu\t    DX %hhu\t    DY %hhu\tIOOUT %hhu\n> ",
-					pc, acc, ioin, cycles, mem[pc], sp, x, ioout);
+				printf("    PC %hhu\t   ACC %hhu\t  IOIN %hhu\tCycles %u\t Carry %hhi\n  Inst %hhu\t    SP %hhu\t    DX %hhu\t    DY %hhu\tIOOUT %hhu\n> ",
+					pc, acc, ioin, cycles, carry, mem[pc], sp, x, y, ioout);
 				break;
 			case RADIX_HEX:
 			default:
-				printf("    PC 0x%hhx\t   ACC 0x%hhx\t  IOIN 0x%hhx\tCycles 0x%hhx\n  Inst 0x%hhx\t    SP 0x%hhx\t    DX 0x%hhx\t    DY 0x%hhx\tIOOUT 0x%hhx\n> ",
-					pc, acc, ioin, cycles, mem[pc], sp, x, ioout);
+				printf("    PC 0x%hhx\t   ACC 0x%hhx\t  IOIN 0x%hhx\tCycles 0x%x\t Carry %hhi\n  Inst 0x%hhx\t    SP 0x%hhx\t    DX 0x%hhx\t    DY 0x%hhx\tIOOUT 0x%hhx\n> ",
+					pc, acc, ioin, cycles, carry, mem[pc], sp, x, y, ioout);
 		}
 		char input[256];
 		fgets(input, 255, stdin);
@@ -148,9 +149,37 @@ void aluop(enum ALUMode mode, bool isCarry, word_t a, word_t b, word_t* result) 
 			newresult = b;
 			newcarry = (a != b);
 			break;
+		case ALU_XOR:
+			newresult = a ^ b;
+			newcarry = (a == b);
+			break;
+		case ALU_AND:
+			newresult = a & b;
+			newcarry = (a < b);
+			break;
+		case ALU_OR:
+			newresult = a | b;
+			newcarry = (a >= b);
+			break;
 		case ALU_ADD:
 			newresult = a + b;
 			newcarry = (newresult >> 8) & 1;
+			break;
+		case ALU_ADDC:
+			newresult = a + b + (int) carry;
+			newcarry = (newresult >> 8) & 1;
+			break;
+		case ALU_SUB:
+			newresult = a - b;
+			newcarry = (newresult >> 8) & 1;
+			break;
+		case ALU_SUBC:
+			newresult = a - b + (int) !carry;
+			newcarry = (newresult >> 8) & 1;
+			break;
+		case ALU_SL:
+			newresult = a << 1;
+			newcarry = (a >> 7) & 1;
 			break;
 		default:
 			printf("ALU operation 0x%x not implemented\n", mode);
@@ -214,12 +243,26 @@ bool step(bool interrupt) {
 	} else { // multicycle operations
 		word_t imm = fetch();
 		if(!(i & ALU_SEL_MASK)) { // memory 
+			addr_t memaddr;
+			if(!(i & MEM_STACK_MASK)) {
+				memaddr = (((int) y) << 8 | x) + signExt(i, 4);
+			} else {
+				memaddr = ((unsigned) sp) + signExt(i, 4);
+			}
+			if(!(i & MEM_WRITE_MASK)) { // reads
+				acc = mem[memaddr];
+			} else { // writes
+				if(memaddr & WRITABLE_REGION) {
+					mem[memaddr] = acc;
+				}
+			}
 		} else { // immediates
 			if(!(i & JUMP_MASK)) { // immediate ops
 				aluop(i & ALU_INST_MASK, i & CARRY_SEL_MASK, acc, imm, &acc);
 			} else { // jumps
 				if(!(i & JUMP_COND_MASK)) { // unconditional jumps
-					int offs = ((((int) signExt(i, 4)) << 8) | ((int) imm)) - 1;
+					int offs = ((((int) signExt(i, 4)) << 8)
+							  | (((int) imm) & 0xFF)) - 1;
 					printf("%i %i %i\n", signExt(i, 4), imm, offs);
 					pc += offs;
 				} else {
@@ -233,7 +276,42 @@ bool step(bool interrupt) {
 	return true;
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv) {	
+	mem[0] = PROGFLOW_MASK | BRK_MASK | 0xB;
+	mem[1] = MULTICYCLE_MASK | ALU_SEL_MASK | ALU_B;
+	mem[2] = 7;
+	mem[3] = WR_MASK | REGID_DX;
+	mem[4] = MULTICYCLE_MASK | ALU_SEL_MASK | ALU_B;
+	mem[5] = 12;
+	mem[6] = WR_MASK | REGID_DY;
+	mem[7] = MULTICYCLE_MASK | ALU_SEL_MASK | ALU_B;
+	mem[8] = 0;
+	mem[9] = RD_MASK | WR_MASK | REGID_DX;
+	mem[10] = ALU_SEL_MASK | CARRY_SEL_MASK | ALU_SL;
+	mem[11] = RD_MASK | WR_MASK | REGID_DX;
+	mem[12] = ALU_SEL_MASK | ALU_SL;
+	mem[13] = MULTICYCLE_MASK | ALU_SEL_MASK | JUMP_MASK | JUMP_COND_MASK | COND_INV_MASK;
+	mem[14] = 2;
+	mem[15] = ALU_SEL_MASK | ALU_ADD;
+	mem[16] = RD_MASK | WR_MASK | REGID_DX;
+	mem[17] = MULTICYCLE_MASK | ALU_SEL_MASK | CARRY_SEL_MASK | ALU_NE;
+	mem[18] = 0;
+	mem[19] = MULTICYCLE_MASK | ALU_SEL_MASK | JUMP_MASK | JUMP_COND_MASK;
+	mem[20] = -9;
+	mem[21] = PROGFLOW_MASK | BRK_MASK | 0xB;
+
+	char prod = 0;
+	char a = 7;
+	char b = 12;
+	while(a) {
+		prod <<= 1;
+		if(a & 0x80) {
+			prod += b;
+		}
+		a <<= 1;
+	}
+	printf("product: %i\n", prod);
+
 	while(step(true));
     // char* path = NULL;
     // bool debug = false;

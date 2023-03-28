@@ -1,7 +1,7 @@
 # Semi-automated C/C++ makefile
 
 # This should be all you need to change
-TARGETS = emulator assembler bin_emulator parse-test
+TARGETS = emulator assembler parse-test
 
 # Header files go here
 INCDIR = include/

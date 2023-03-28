@@ -2,25 +2,34 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
+#include <limits.h>
 
-typedef int8_t word_t;
-typedef uint8_t inst_t;
+#define COMMENT_TOK "#"
 
-typedef enum {
-    IMM_NONE,
-    IMM_3,
-    IMM_4
-} ImmType;
+int main(int argc, char** argv) {
+    if(argc != 3) {
+        printf("%s: Expected 2 arguments, got %i", argv[0], argc-1);
+        return 0;
+    }
+    char* srcpath = argv[1];
+    char* dstpath = argv[2];
 
-typedef struct {
-    char* mnemonic;
-    ImmType imm;
-    inst_t base;
-} Instruction;
+    FILE* srcfile = fopen(srcpath, "r");
+    FILE* dstfile = fopen(dstpath, "w");
 
-unsigned int index = 0;
-inst_t binary[256];
-
-void assemble(char* line) {
-    
+    while(!feof(srcfile)) {
+        char buf[512];
+        fgets(buf, 511, srcfile);
+        char* comment = strstr(buf, COMMENT_TOK);
+        if(comment) { *comment = '\0'; }
+        if(strlen(buf) > 0) {
+            char cmd[512], arg[512];
+            bool isarg = sscanf(buf, "%s%s", cmd, arg)-1;
+            if(isarg) {
+                printf("Call %s with argument %s\n", cmd, arg);
+            } else {
+                printf("Call %s\n", cmd);
+            }
+        }
+    }
 }
