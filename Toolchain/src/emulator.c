@@ -66,17 +66,28 @@ enum RegID {
 	REGID_DY = 0x3
 };
 
-/*
-		add y
-end:	sw x
-		nei 0
-		jif mult_loop
-*/
 unsigned long cycles = -1;
 word_t acc, x, y, sp;
 bool carry;
 addr_t pc = -1;
-inst_t mem[65536];
+inst_t mem[65536] = {
+	0b11000000, // rdi 10
+	25,
+	0b00001000, // wr sp
+	0b11000000, // rdi 'A'
+	'A',
+	0b00011100, // break
+	
+	0b00000000, // lbl: nop
+	0b00001001, // wr io
+	0b00111111, // isp -1
+	0b11000100, // _addi 1
+	1,
+	0b11110001, // jnif lbl
+	-6,
+
+	0b00011100 // break
+};
 word_t ioin, ioout;
 
 word_t signExt(word_t value, int bits) {
@@ -222,6 +233,9 @@ bool step(bool interrupt) {
 					}
 					if(i & WR_MASK) {
 						*to = acc;
+						if(to == &ioout) {
+							putc(acc, stdout);
+						}
 					}
 					if(i & RD_MASK) {
 						acc = from;
@@ -277,28 +291,28 @@ bool step(bool interrupt) {
 }
 
 int main(int argc, char** argv) {	
-	mem[0] = PROGFLOW_MASK | BRK_MASK | 0xB;
-	mem[1] = MULTICYCLE_MASK | ALU_SEL_MASK | ALU_B;
-	mem[2] = 7;
-	mem[3] = WR_MASK | REGID_DX;
-	mem[4] = MULTICYCLE_MASK | ALU_SEL_MASK | ALU_B;
-	mem[5] = 12;
-	mem[6] = WR_MASK | REGID_DY;
-	mem[7] = MULTICYCLE_MASK | ALU_SEL_MASK | ALU_B;
-	mem[8] = 0;
-	mem[9] = RD_MASK | WR_MASK | REGID_DX;
-	mem[10] = ALU_SEL_MASK | CARRY_SEL_MASK | ALU_SL;
-	mem[11] = RD_MASK | WR_MASK | REGID_DX;
-	mem[12] = ALU_SEL_MASK | ALU_SL;
-	mem[13] = MULTICYCLE_MASK | ALU_SEL_MASK | JUMP_MASK | JUMP_COND_MASK | COND_INV_MASK;
-	mem[14] = 2;
-	mem[15] = ALU_SEL_MASK | ALU_ADD;
-	mem[16] = RD_MASK | WR_MASK | REGID_DX;
-	mem[17] = MULTICYCLE_MASK | ALU_SEL_MASK | CARRY_SEL_MASK | ALU_NE;
-	mem[18] = 0;
-	mem[19] = MULTICYCLE_MASK | ALU_SEL_MASK | JUMP_MASK | JUMP_COND_MASK;
-	mem[20] = -9;
-	mem[21] = PROGFLOW_MASK | BRK_MASK | 0xB;
+	// mem[0] = PROGFLOW_MASK | BRK_MASK | 0xB;
+	// mem[1] = MULTICYCLE_MASK | ALU_SEL_MASK | ALU_B;
+	// mem[2] = 7;
+	// mem[3] = WR_MASK | REGID_DX;
+	// mem[4] = MULTICYCLE_MASK | ALU_SEL_MASK | ALU_B;
+	// mem[5] = 12;
+	// mem[6] = WR_MASK | REGID_DY;
+	// mem[7] = MULTICYCLE_MASK | ALU_SEL_MASK | ALU_B;
+	// mem[8] = 0;
+	// mem[9] = RD_MASK | WR_MASK | REGID_DX;
+	// mem[10] = ALU_SEL_MASK | CARRY_SEL_MASK | ALU_SL;
+	// mem[11] = RD_MASK | WR_MASK | REGID_DX;
+	// mem[12] = ALU_SEL_MASK | ALU_SL;
+	// mem[13] = MULTICYCLE_MASK | ALU_SEL_MASK | JUMP_MASK | JUMP_COND_MASK | COND_INV_MASK;
+	// mem[14] = 2;
+	// mem[15] = ALU_SEL_MASK | ALU_ADD;
+	// mem[16] = RD_MASK | WR_MASK | REGID_DX;
+	// mem[17] = MULTICYCLE_MASK | ALU_SEL_MASK | CARRY_SEL_MASK | ALU_NE;
+	// mem[18] = 0;
+	// mem[19] = MULTICYCLE_MASK | ALU_SEL_MASK | JUMP_MASK | JUMP_COND_MASK;
+	// mem[20] = -9;
+	// mem[21] = PROGFLOW_MASK | BRK_MASK | 0xB;
 
 	char prod = 0;
 	char a = 7;

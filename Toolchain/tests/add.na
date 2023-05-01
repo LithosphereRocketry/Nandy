@@ -1,9 +1,21 @@
+@include basic.na
+@define waitnz
+        isp     1
+        sts     0
+loop:   rd      io
+        eqi     0
+        jif     loop
+@end
+
+@literal 3
 brk     0xB
 # Take two inputs from IO
-rd      io
-wr      x
-rd      io
+loop:   rd      io
+        wr      x
+        rd      io
 
-add     x   # Add the values
-wr      io
-brk
+        add     x   # Add the values
+        jif     loop                    
+
+        wr      io
+        brk

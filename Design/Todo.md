@@ -22,4 +22,4 @@
 * Finish remainder of math instructions
 
 ## Hardware
-* Aaaaaaaaaaaaaa
+* Test new register design

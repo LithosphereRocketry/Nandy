@@ -1,10 +1,13 @@
 #include <stdio.h>
-#include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
-#include <limits.h>
 
-#define COMMENT_TOK "#"
+#include "instructions.h"
+
+typedef struct {
+    char* name;
+    instruction_t* location;
+} label_t;
 
 int main(int argc, char** argv) {
     if(argc != 3) {
@@ -19,17 +22,13 @@ int main(int argc, char** argv) {
 
     while(!feof(srcfile)) {
         char buf[512];
+        memset(buf, 0, 512);
         fgets(buf, 511, srcfile);
-        char* comment = strstr(buf, COMMENT_TOK);
-        if(comment) { *comment = '\0'; }
-        if(strlen(buf) > 0) {
-            char cmd[512], arg[512];
-            bool isarg = sscanf(buf, "%s%s", cmd, arg)-1;
-            if(isarg) {
-                printf("Call %s with argument %s\n", cmd, arg);
-            } else {
-                printf("Call %s\n", cmd);
-            }
+        
+        instruction_t* instr = buildInstruction(buf);
+        if(instr) {
+            printInstruction(instr);
+            deleteInstruction(instr);
         }
     }
 }

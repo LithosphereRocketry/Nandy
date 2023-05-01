@@ -1,0 +1,13 @@
+
+	rdi 25
+	wr sp
+	rdi 'A'
+	brk
+	
+lbl: nop
+	wr io
+	isp -1
+	_addi 1
+	jnif lbl
+	
+	brk
