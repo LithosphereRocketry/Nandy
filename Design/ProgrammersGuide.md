@@ -1,1 +1,39 @@
+# NANDy Programmer's Manual
 
+NOTE: implementation of these features not yet complete
+
+## About This Guide
+This guide is intended to detail all of the explicit rules, as well as some best practices and implementation hints, for writing programs in NANDy assembly. Because the NANDy is a very simple processor with limited resources, it may often be necessary to deviate from these guidelines for best performance, so this document can and should be ignored whenever it is necessary; however, following these conventions will make code significantly easier to understand.  
+
+Throughout this guide, `code markdown` is used for code snippets, instruction specifications, and other pieces of useful text. In general, code markdown with `<angle brackets>` is used to denote a required parameter, while `[square brackets]` are used to denote optional syntax.
+
+## The NANDy Architecture
+
+### Overview
+NANDy is an accumulator-based architecture with four core registers and 16-bit memory addressing. It supports basic arithmetic operations on 8 bits of data, including addition, subtraction, and bitwise operators, as well as carry-in and carry-out for operating on larger datatypes.
+
+### Registers
+NANDy has four core registers, specified as follows:
+* ACC: Accumulator; used for all mathematical operations; additionally is the data register for all memory operations.
+* DX: Data X register; can be used as second operand in arithmetic operands; used as lower 8 bits for memory addresses
+* DY: Data Y register; can be used as second operand in arithmetic operands; used as upper 8 bits for memory addresses
+* SP: Stack pointer; used as lower 8 bits of address in stack-addressing mode; incrementable/decrementable independently of ACC
+The I/O bus is also treated as a register from the programmer's perspective and may be accessed by all register-move operations; however, it represents separate input and output ports, so no data written to it can be read back.
+
+Registers are primarily manipulated via the `rd`, `wr`, and `sw` instructions, which read a register's value into the accumulator, write the accumulator's value into a register, and swap the accumulator with a register, respectively. There are no direct operations for manipulating non-accumulator registers relative to each other, but the same effect can be achieved by multiple swaps; for example, the nonexistent `sw dx, dy` is equivalent to:
+```sw dx
+sw dy
+sw dx
+```
+Constant values may be read into the accumulator via the `rdi` instruction. Similar to register swaps, there is no way to directly read into registers other than the accumulator, but the same can be accomplished by a series of swaps:
+```sw dx
+rdi 100
+sw dx
+```
+
+### Memory
+NANDy uses a single memory address space for both program and data memory. Implementations may choose to use any memory layout they choose, however memory address 0 must be the start of program execution and memory address 0xFFFF must be writable; the standard layout places program ROM between 0x0000 and 0x7FFF and general-purpose RAM between 0x8000 and 0xFFFF. Implementations which do not support a full 64KB of memory may choose to ignore upper bits of the address in order to satisfy these constraints, but these implementations may require modifications to the assembler in order to function correctly.
+
+Memory may be addressed in one of two modes: absolute mode and stack mode. In absolute mode, as in the `lda` and `stra` instructions, DX and DY are combined to form a 16-bit base address and this address is further offset by the immediate value given. In stack mode, as in `lds` and `strs`, SP is combined with the upper byte 0xFF to form a base address and this address is similarly offset by the immediate. Immediates for these instructions are signed 4-bit values, allowing an offset of up to +7 or -8 bytes.
+
+## Instruction Reference
