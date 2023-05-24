@@ -5,6 +5,8 @@
 #include <string.h>
 #include <ctype.h>
 
+const instruction_t INSTRUCTION_INITIALIZER = {0, NULL, NULL, NULL};
+
 instruction_t* buildInstruction(char* line) {
     char *label = 0, *inst = 0, *param = 0;
     char* comment = strstr(line, COMMENT_TOK);
@@ -49,6 +51,15 @@ instruction_t* buildInstruction(char* line) {
     return result;
 }
 
+void insertInstruction(instruction_t* after, instruction_t* instr) {
+    instr->next = after->next;
+    instr->prev = after;
+    if(after->next) {
+        after->next->prev = instr;
+    }
+    after->next = instr;
+}
+
 void deleteInstruction(instruction_t* instr) {
     free(instr->params);
     if(instr->next) { instr->next->prev = instr->prev; }
@@ -61,8 +72,10 @@ void printInstruction(instruction_t* instr) {
 }
 
 void flattenInstruction(instruction_t* instr) {
-    if(instr->token == encodeToken("@literal")) {
-        
+    if(instr->token == encodeToken("rdi")) {
+        if(instr->params) {
+            
+        }
     } else { // things that are already flat
         return;
     }

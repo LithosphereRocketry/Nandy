@@ -13,7 +13,10 @@ typedef struct instruction {
     struct instruction* prev;
 } instruction_t;
 
+const extern instruction_t INSTRUCTION_INITIALIZER;
+
 instruction_t* buildInstruction(char* line);
+void insertInstruction(instruction_t* after, instruction_t* instr);
 void deleteInstruction(instruction_t* instr);
 void printInstruction(instruction_t* instr);
 void flattenInstruction(instruction_t* instr);
