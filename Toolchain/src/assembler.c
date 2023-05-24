@@ -3,8 +3,9 @@
 #include <string.h>
 
 #include "instructions.h"
+#include "programs.h"
 
-typedef struct {
+typedef struct label {
     char* name;
     instruction_t* location;
 } label_t;
@@ -18,8 +19,9 @@ int main(int argc, char** argv) {
     char* dstpath = argv[2];
 
     FILE* srcfile = fopen(srcpath, "r");
-    FILE* dstfile = fopen(dstpath, "w");
-
+    // FILE* dstfile = fopen(dstpath, "w");
+    
+    program_t program = PROGRAM_INITIALIZER;
     while(!feof(srcfile)) {
         char buf[512];
         memset(buf, 0, 512);
@@ -27,8 +29,20 @@ int main(int argc, char** argv) {
         
         instruction_t* instr = buildInstruction(buf);
         if(instr) {
-            printInstruction(instr);
-            deleteInstruction(instr);
+            append(&program, instr);
         }
     }
+    print(&program);
+    delete(&program);
+    
+        
+    //     instruction_t* instr = buildInstruction(buf);
+    //     printInstruction(instr);
+    //     printf("hi");
+    //     if(instr) {
+    //         append(&program, instr);
+    //     }
+    // }
+    // print(&program);
+    // delete(&program);
 }
