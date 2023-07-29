@@ -3,6 +3,7 @@
 assembler
 emulator
 parse-test
+*.bak
 
 # User settings
 .vscode
