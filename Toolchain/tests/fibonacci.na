@@ -1,0 +1,36 @@
+    rdi 0
+    wr sp
+    rd io
+#    call fib
+    wr io
+
+fib:#isp -3
+#    sts 0 # argument
+    rd dl
+#    sts 1
+    rd dh
+#    sts 2
+
+#    rdi 0
+    wr x
+#    rdi 1
+    wr y
+fib_loop:
+#    lds 0
+#    subi 1
+#    jif fib_done
+#    sts 0
+    rd x
+#    add y
+    sw y
+#    wr x
+fib_done:
+    rd y
+#    sts 0
+#    lds 1
+    wr dl
+#    lds 2
+#    wr dh
+#    lds 0
+#    isp 3
+#    return
