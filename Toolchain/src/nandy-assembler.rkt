@@ -17,11 +17,22 @@
 (struct sw-exp (reg) #:transparent)
 (struct ja-exp () #:transparent)
 (struct jar-exp () #:transparent)
+(struct sig-exp (num) #:transparent)
+(struct isp-exp (num) #:transparent)
+(struct add-exp (reg) #:transparent)
+(struct lda-exp (target) #:transparent)
+(struct lds-exp (target) #:transparent)
+(struct stra-exp (target) #:transparent)
+(struct strs-exp (target) #:transparent)
 (struct rdi-exp (num) #:transparent)
+(struct subi-exp (num) #:transparent)
+(struct j-exp (label) #:transparent)
+(struct jif-exp (sig label) #:transparent)
 
 ; Pseudoinstructions
 (struct move-exp (from to) #:transparent)
 (struct swap-exp (a b) #:transparent)
+(struct call-exp (label) #:transparent)
 
 (define parse-reg
   (lambda (name)
@@ -37,6 +48,22 @@
   (lambda (rep)
     (string->number rep))) ; todo: more things here
 
+(define parse-label
+  (lambda (lbl)
+    lbl))
+
+(define parse-sigout
+  (lambda (name)
+    (case name
+      [("brk" "0") 0]
+      [else (raise (string-append "Unrecognized output signal: " name))])))
+
+(define parse-sigin
+  (lambda (name)
+    (case name
+      [("carry" "0") 0]
+      [else (raise (string-append "Unrecognized input signal: " name))])))
+
 ; == Text -> instruction translation here
 (struct idesc (generator arg-parsers))
 (define instructions
@@ -46,7 +73,19 @@
          (cons "sw" (idesc sw-exp (list parse-reg)))
          (cons "ja" (idesc ja-exp '()))
          (cons "jar" (idesc jar-exp '()))
-         (cons "rdi" (idesc rdi-exp (list parse-number))))))
+         (cons "sig" (idesc sig-exp (list parse-sigout)))
+         (cons "isp" (idesc isp-exp (list parse-number)))
+         (cons "add" (idesc add-exp (list parse-reg)))
+         (cons "lda" (idesc lda-exp (list parse-number)))
+         (cons "lds" (idesc lds-exp (list parse-number)))
+         (cons "stra" (idesc stra-exp (list parse-number)))
+         (cons "strs" (idesc strs-exp (list parse-number)))
+         (cons "rdi" (idesc rdi-exp (list parse-number)))
+         (cons "subi" (idesc subi-exp (list parse-number)))
+         (cons "j" (idesc j-exp (list parse-label)))
+         (cons "jif" (idesc jif-exp (list parse-sigin parse-label)))
+         
+         (cons "call" (idesc call-exp (list parse-label))))))
 
 (define parse-str
   (lambda (str)
