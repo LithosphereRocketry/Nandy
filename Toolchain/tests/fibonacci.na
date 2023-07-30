@@ -1,6 +1,6 @@
     rdi 0
-    wr sp
-    rd io
+    move acc sp
+    move io acc
     call fib
     wr io
     sig brk

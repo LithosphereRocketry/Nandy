@@ -9,6 +9,9 @@
 (struct list-exp (contents) #:transparent)
 (struct label-exp (label target) #:transparent)
 
+; Macros
+(struct @include-exp (path) #:transparent)
+
 ; Real instructions
 (struct none-exp () #:transparent)
 (struct nop-exp () #:transparent)
@@ -33,6 +36,11 @@
 (struct move-exp (from to) #:transparent)
 (struct swap-exp (a b) #:transparent)
 (struct call-exp (label) #:transparent)
+
+(define noop (lambda (a) a))
+
+(define parse-fpath
+  (lambda (a) a)) ; TODO: make this resolve paths in a sensible way
 
 (define parse-reg
   (lambda (name)
@@ -68,7 +76,8 @@
 (struct idesc (generator arg-parsers))
 (define instructions
   (make-immutable-hash
-   (list (cons "rd" (idesc rd-exp (list parse-reg)))
+   (list (cons "@include" (idesc @include-exp (list parse-fpath)))
+         (cons "rd" (idesc rd-exp (list parse-reg)))
          (cons "wr" (idesc wr-exp (list parse-reg)))
          (cons "sw" (idesc sw-exp (list parse-reg)))
          (cons "ja" (idesc ja-exp '()))
@@ -85,7 +94,8 @@
          (cons "j" (idesc j-exp (list parse-label)))
          (cons "jif" (idesc jif-exp (list parse-sigin parse-label)))
          
-         (cons "call" (idesc call-exp (list parse-label))))))
+         (cons "call" (idesc call-exp (list parse-label)))
+         (cons "move" (idesc move-exp (list parse-reg parse-reg))))))
 
 (define parse-str
   (lambda (str)
@@ -97,7 +107,6 @@
                 (none-exp)
                 (parse-inst (car tok) (cdr tok))))))))
 
-; This is where instruction definitions go
 (define parse-inst
   (lambda (istr args)
     (if (hash-has-key? instructions istr)
@@ -123,7 +132,18 @@
           [(label-exp? exp) (label-exp (label-exp-label exp) (parse (label-exp-target exp)))]
           [else exp])))
 
-(define load-str
+(define macro-expand
+  (lambda (exp)
+    (cond [(move-exp? exp) (cond [(eq? (move-exp-to exp) 'acc) (rd-exp (move-exp-from exp))]
+                                 [(eq? (move-exp-from exp) 'acc) (wr-exp (move-exp-to exp))]
+                                 [else (list-exp (list (sw-exp (move-exp-to exp))
+                                                       (rd-exp (move-exp-from exp))
+                                                       (sw-exp (move-exp-to exp))))])]
+          [(list-exp? exp) (list-exp (map macro-expand (list-exp-contents exp)))]
+          [(label-exp? exp) (label-exp (label-exp-label exp) (macro-expand (label-exp-target exp)))]
+          [else exp])))
+
+(define load-file
   (lambda (fname)
     (string->immutable-string (port->string
                                (open-input-file fname #:mode 'text)))))
@@ -140,4 +160,4 @@
 
 (define assemble
   (lambda (fname)
-    (parse (organize-str (load-str fname)))))
+    (macro-expand (parse (organize-str (load-file fname))))))
