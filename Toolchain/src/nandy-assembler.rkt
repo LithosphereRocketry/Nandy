@@ -143,11 +143,28 @@
           [(label-exp? exp) (label-exp (label-exp-label exp) (macro-expand (label-exp-target exp)))]
           [else exp])))
 
+; Turns any AST into a flat list of expressions in order, maybe with labels applied
+(define flatten
+  (lambda (exp)
+    (cond [(list-exp? exp) (let recurse ([rem-list (list-exp-contents exp)]
+                                          [built-list '()])
+                              (if (null? rem-list)
+                                  (list-exp built-list)
+                                  (recurse (cdr rem-list)
+                                           (append built-list
+                                                   (list-exp-contents (flatten (car rem-list)))))))]
+          [(label-exp? exp) (let ([result (list-exp-contents (flatten (label-exp-target exp)))])
+                              (if (null? (cdr result))
+                                  (list-exp (list (label-exp (label-exp-label exp) (car result))))
+                                  ; if a label is applied to a macro expansion, apply it to the first element
+                                  (list-exp (cons (label-exp (label-exp-label exp) (car result)) (cdr result)))))]
+          [else (list-exp (list exp))])))
+
+; File handling
 (define load-file
   (lambda (fname)
     (string->immutable-string (port->string
                                (open-input-file fname #:mode 'text)))))
-
 (define organize-str
   (lambda (codestr)
     (let* ([lines (string-split codestr linebrk-token)] ; break into lines
@@ -160,4 +177,4 @@
 
 (define assemble
   (lambda (fname)
-    (macro-expand (parse (organize-str (load-file fname))))))
+    (flatten (macro-expand (parse (organize-str (load-file fname)))))))
