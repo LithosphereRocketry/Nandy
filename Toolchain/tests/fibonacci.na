@@ -1,5 +1,6 @@
     rdi 0
     move acc sp
+    brk
     move io acc
     call fib
     wr io
@@ -23,11 +24,11 @@ fib_loop:
     strs 0
     rd x
     add y
-    sw y
-    wr x
+    move y x
+    move acc y # this is inefficient, done for demonstration
     j fib_loop
-fib_done:
-    rd y
+fib_done: move y x # this is inefficient, done for demonstration
+    rd x
     strs 0
     lds 1
     wr dl
