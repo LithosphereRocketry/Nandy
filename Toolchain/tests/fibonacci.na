@@ -1,36 +1,38 @@
     rdi 0
     wr sp
     rd io
-#    call fib
+    call fib
     wr io
+    sig brk
 
-fib:#isp -3
-#    sts 0 # argument
+fib:isp -3
+    strs 0 # argument
     rd dl
-#    sts 1
+    strs 1
     rd dh
-#    sts 2
+    strs 2
 
-#    rdi 0
+    rdi 0
     wr x
-#    rdi 1
+    rdi 1
     wr y
 fib_loop:
-#    lds 0
-#    subi 1
-#    jif fib_done
-#    sts 0
+    lds 0
+    subi 1
+    jif carry fib_done
+    strs 0
     rd x
-#    add y
+    add y
     sw y
-#    wr x
+    wr x
+    j fib_loop
 fib_done:
     rd y
-#    sts 0
-#    lds 1
+    strs 0
+    lds 1
     wr dl
-#    lds 2
-#    wr dh
-#    lds 0
-#    isp 3
-#    return
+    lds 2
+    wr dh
+    lds 0
+    isp 3
+    ja
