@@ -143,6 +143,7 @@
           [(label-exp? exp) (label-exp (label-exp-label exp) (parse (label-exp-target exp)))]
           [else exp])))
 
+; Macro definitions go here
 (define macro-expand
   (lambda (exp)
     (cond [(@include-exp? exp) (resolve-file (@include-exp-path exp))]
@@ -151,7 +152,8 @@
                                            (rdi-exp (bytenum (call-exp-label exp) 1))
                                            (wr-exp 'dy)
                                            (jar-exp)))]
-          [(move-exp? exp) (cond [(eq? (move-exp-to exp) 'acc) (rd-exp (move-exp-from exp))]
+          [(move-exp? exp) (cond [(eq? (move-exp-to exp) (move-exp-from exp)) (none-exp)]
+                                 [(eq? (move-exp-to exp) 'acc) (rd-exp (move-exp-from exp))]
                                  [(eq? (move-exp-from exp) 'acc) (wr-exp (move-exp-to exp))]
                                  [else (list-exp (list (sw-exp (move-exp-to exp))
                                                        (rd-exp (move-exp-from exp))
@@ -177,6 +179,7 @@
                                   (list-exp (cons (label-exp (label-exp-label exp) (car result)) (cdr result)))))]
           [else (list-exp (list exp))])))
 
+; Number of bytes in a given expression; only accepts primitives
 (define exp-length
   (lambda (exp)
     (cond [(rd-exp? exp) 1]
@@ -197,8 +200,8 @@
           [(j-exp? exp) 2]
           [(jif-exp? exp) 2]
           [else (raise (string-append "Expression " (format "~a" exp) " has no defined length"))])))
-          
 
+; Converts a list-exp into a list of primitive expressions and a hash of label locations
 (struct labeled-program (ltab ilist) #:transparent)
 (define resolve-labels
   (lambda (lexp)
