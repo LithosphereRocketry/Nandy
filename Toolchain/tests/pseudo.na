@@ -1,1 +1,6 @@
-add 57
+addi 1
+addi 2
+addi 3
+addi 4
+addi 5
+move x y

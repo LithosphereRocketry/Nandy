@@ -1,6 +1,7 @@
+@include ../tests/pseudo.na
     rdi 0
     move acc sp
-    brk
+    sig brk
     move io acc
     call fib
     wr io
@@ -15,7 +16,7 @@ fib:isp -3
 
     rdi 0
     wr x
-    rdi 1
+    rdi 257$0 # = 1
     wr y
 fib_loop:
     lds 0
@@ -24,8 +25,8 @@ fib_loop:
     strs 0
     rd x
     add y
-    move y x
-    move acc y # this is inefficient, done for demonstration
+    sw y
+    wr x
     j fib_loop
 fib_done: move y x # this is inefficient, done for demonstration
     rd x
