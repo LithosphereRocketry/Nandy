@@ -2,6 +2,7 @@
 (define linebrk-token "\n")
 (define comment-token "#")
 (define label-token ":")
+(define bytesel-token "$")
 
 ; == AST expressions here ==
 ; Abstract constructs
@@ -28,6 +29,7 @@
 (struct stra-exp (target) #:transparent)
 (struct strs-exp (target) #:transparent)
 (struct rdi-exp (num) #:transparent)
+(struct addi-exp (num) #:transparent)
 (struct subi-exp (num) #:transparent)
 (struct j-exp (label) #:transparent)
 (struct jif-exp (sig label) #:transparent)
@@ -52,9 +54,17 @@
       [("io") 'io]
       [else (raise (string-append "Unrecognized register: " name))])))
 
+(struct bytenum (symbol index) #:transparent)
 (define parse-number
   (lambda (rep)
-    (string->number rep))) ; todo: more things here
+    (or (string->number rep)
+        (and (string-contains? rep bytesel-token)
+             (let* ([rspl (string-split rep bytesel-token)]
+                    [bnum (string->number (cadr rspl))])
+               (if bnum
+                   (bytenum (parse-number (car rspl)) bnum)
+                   (raise "Byte index must be a number"))))
+        rep)))  ; if it's not a numeric literal it's a symbol, deal with it later
 
 (define parse-label
   (lambda (lbl)
@@ -90,6 +100,7 @@
          (cons "stra" (idesc stra-exp (list parse-number)))
          (cons "strs" (idesc strs-exp (list parse-number)))
          (cons "rdi" (idesc rdi-exp (list parse-number)))
+         (cons "addi" (idesc addi-exp (list parse-number)))
          (cons "subi" (idesc subi-exp (list parse-number)))
          (cons "j" (idesc j-exp (list parse-label)))
          (cons "jif" (idesc jif-exp (list parse-sigin parse-label)))
@@ -134,7 +145,13 @@
 
 (define macro-expand
   (lambda (exp)
-    (cond [(move-exp? exp) (cond [(eq? (move-exp-to exp) 'acc) (rd-exp (move-exp-from exp))]
+    (cond [(@include-exp? exp) (resolve-file (@include-exp-path exp))]
+          [(call-exp? exp) (list-exp (list (rdi-exp (bytenum (call-exp-label exp) 0))
+                                           (wr-exp 'dx)
+                                           (rdi-exp (bytenum (call-exp-label exp) 1))
+                                           (wr-exp 'dy)
+                                           (jar-exp)))]
+          [(move-exp? exp) (cond [(eq? (move-exp-to exp) 'acc) (rd-exp (move-exp-from exp))]
                                  [(eq? (move-exp-from exp) 'acc) (wr-exp (move-exp-to exp))]
                                  [else (list-exp (list (sw-exp (move-exp-to exp))
                                                        (rd-exp (move-exp-from exp))
@@ -160,6 +177,47 @@
                                   (list-exp (cons (label-exp (label-exp-label exp) (car result)) (cdr result)))))]
           [else (list-exp (list exp))])))
 
+(define exp-length
+  (lambda (exp)
+    (cond [(rd-exp? exp) 1]
+          [(wr-exp? exp) 1]
+          [(sw-exp? exp) 1]
+          [(ja-exp? exp) 1]
+          [(jar-exp? exp) 1]
+          [(sig-exp? exp) 1]
+          [(isp-exp? exp) 1]
+          [(add-exp? exp) 1]
+          [(lda-exp? exp) 1]
+          [(lds-exp? exp) 1]
+          [(stra-exp? exp) 1]
+          [(strs-exp? exp) 1]
+          [(rdi-exp? exp) 2]
+          [(addi-exp? exp) 2]
+          [(subi-exp? exp) 2]
+          [(j-exp? exp) 2]
+          [(jif-exp? exp) 2]
+          [else (raise (string-append "Expression " (format "~a" exp) " has no defined length"))])))
+          
+
+(struct labeled-program (ltab ilist) #:transparent)
+(define resolve-labels
+  (lambda (lexp)
+    (if (list-exp? lexp)
+        (let recurse ([exps (list-exp-contents lexp)]
+                      [ltab (make-immutable-hash)]
+                      [clean-exps '()]
+                      [index 0])
+          (if (null? exps)
+              (labeled-program ltab (reverse clean-exps))
+              (cond [(none-exp? (car exps)) (recurse (cdr exps) ltab clean-exps index)]
+                    [(list-exp? (car exps)) (raise "Can only resolve labels on a flattened program")]
+                    [(label-exp? (car exps)) (recurse (cons (label-exp-target (car exps)) (cdr exps))
+                                                      (hash-set ltab (label-exp-label (car exps)) index)
+                                                      clean-exps index)]
+                    [else (recurse (cdr exps) ltab (cons (car exps) clean-exps) (+ index (exp-length (car exps))))])))
+        (raise "Can only resolve labels on list expressions"))))
+  
+
 ; File handling
 (define load-file
   (lambda (fname)
@@ -169,12 +227,15 @@
   (lambda (codestr)
     (let* ([lines (string-split codestr linebrk-token)] ; break into lines
            [lines-csplit (map (lambda (l) (string-split l comment-token #:trim? #f)) lines)]
-           [lines-nc (map car (filter
-                               (lambda (item) (not (null? item)))
-                               lines-csplit))] ; remove comments
+           [lines-nc (map car (filter (lambda (item) (not (null? item)))
+                                      lines-csplit))] ; remove comments
            [lines-norm (filter non-empty-string? (map string-normalize-spaces lines-nc))]) ; remove whitespace
       (list-exp (map text-exp lines-norm)))))
 
+(define resolve-file
+  (lambda (fname)
+    (macro-expand (parse (organize-str (load-file fname))))))
+
 (define assemble
   (lambda (fname)
-    (flatten (macro-expand (parse (organize-str (load-file fname)))))))
+    (resolve-labels (flatten (resolve-file fname)))))
