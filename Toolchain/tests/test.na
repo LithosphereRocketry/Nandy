@@ -1,0 +1,19 @@
+nop
+rd x
+wr y
+sw sp
+ja
+jar
+sig brk
+test: nop
+isp 6
+add y
+lda 4
+lds 4
+stra 4
+strs 4
+rdi 112
+addi -9
+subi 12
+j test
+jif 0 test
