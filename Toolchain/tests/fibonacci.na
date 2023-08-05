@@ -1,6 +1,6 @@
     rdi 0
-    move acc sp
-    move io acc
+    wr sp
+    rd io
     call fib
     wr io
     sig brk
@@ -26,8 +26,8 @@ fib_loop:
     sw y
     wr x
     j fib_loop
-fib_done: move y x # this is inefficient, done for demonstration
-    rd x
+fib_done:
+    rd y
     strs 0
     lds 1
     wr dl
