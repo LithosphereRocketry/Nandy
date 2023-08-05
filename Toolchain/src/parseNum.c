@@ -18,7 +18,7 @@ int _div(int x, int y) { return x/y; }
 
 const char binsyms[] = {'+', '-', '*', '/'};
 int (*binfuncs[])(int, int) = {_add, _sub, _mul, _div};
-_STATIC_ASSERT(sizeof(binsyms) == sizeof(binfuncs)/sizeof(int (*)(int, int)));
+// _STATIC_ASSERT(sizeof(binsyms) == sizeof(binfuncs)/sizeof(int (*)(int, int)));
 
 int toDigit(char digit) {
     if(digit >= '0' && digit <= '9') {

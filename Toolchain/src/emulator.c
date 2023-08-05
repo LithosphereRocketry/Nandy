@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stddef.h>
 #include <string.h>
 
 typedef int8_t word_t;
@@ -27,7 +28,7 @@ typedef uint8_t inst_t;
 								   // write ACC and CARRY simultaneously
 #define REGID_MASK 0b0011
 
-#define WRITABLE_REGION 1<<15
+#define WRITABLE_REGION (1<<15)
 
 
 enum ALUMode {
@@ -70,24 +71,7 @@ unsigned long cycles = -1;
 word_t acc, x, y, sp;
 bool carry;
 addr_t pc = -1;
-inst_t mem[65536] = {
-	0b11000000, // rdi 10
-	25,
-	0b00001000, // wr sp
-	0b11000000, // rdi 'A'
-	'A',
-	0b00011100, // break
-	
-	0b00000000, // lbl: nop
-	0b00001001, // wr io
-	0b00111111, // isp -1
-	0b11000100, // _addi 1
-	1,
-	0b11110001, // jnif lbl
-	-6,
-
-	0b00011100 // break
-};
+inst_t mem[65536];
 word_t ioin, ioout;
 
 word_t signExt(word_t value, int bits) {
@@ -106,16 +90,16 @@ bool pause() {
 	while(1) {
 		switch(radix) {
 			case RADIX_DECIMAL:
-				printf("    PC %hhi\t   ACC %hhi\t  IOIN %hhi\tCycles %i\t Carry %hhi\n  Inst %hhi\t    SP %hhi\t    DX %hhi\t    DY %hhi\tIOOUT %hhi\n> ",
+				printf("    PC %hhi\t   ACC %hhi\t  IOIN %hhi\tCycles %lu\t Carry %hhi\n  Inst %hhi\t    SP %hhi\t    DX %hhi\t    DY %hhi\tIOOUT %hhi\n> ",
 					pc, acc, ioin, cycles, carry, mem[pc], sp, x, y, ioout);
 				break;
 			case RADIX_UNSIGNED:
-				printf("    PC %hhu\t   ACC %hhu\t  IOIN %hhu\tCycles %u\t Carry %hhi\n  Inst %hhu\t    SP %hhu\t    DX %hhu\t    DY %hhu\tIOOUT %hhu\n> ",
+				printf("    PC %hhu\t   ACC %hhu\t  IOIN %hhu\tCycles %lu\t Carry %hhi\n  Inst %hhu\t    SP %hhu\t    DX %hhu\t    DY %hhu\tIOOUT %hhu\n> ",
 					pc, acc, ioin, cycles, carry, mem[pc], sp, x, y, ioout);
 				break;
 			case RADIX_HEX:
 			default:
-				printf("    PC 0x%hhx\t   ACC 0x%hhx\t  IOIN 0x%hhx\tCycles 0x%x\t Carry %hhi\n  Inst 0x%hhx\t    SP 0x%hhx\t    DX 0x%hhx\t    DY 0x%hhx\tIOOUT 0x%hhx\n> ",
+				printf("    PC 0x%hhx\t   ACC 0x%hhx\t  IOIN 0x%hhx\tCycles 0x%lx\t Carry %hhi\n  Inst 0x%hhx\t    SP 0x%hhx\t    DX 0x%hhx\t    DY 0x%hhx\tIOOUT 0x%hhx\n> ",
 					pc, acc, ioin, cycles, carry, mem[pc], sp, x, y, ioout);
 		}
 		char input[256];
@@ -140,6 +124,18 @@ bool pause() {
 				radix = RADIX_HEX;
 			} else {
 				printf("Unrecognized radix mode \"%s\"\n", radtxt);
+			}
+		} else if(!strcmp(cmd, "io") || !strcmp(cmd, "i")) {
+			long newio = 0;
+			if(sscanf(input, "%*s %li", &newio) < 1) {
+				printf("No I/O value given\n");
+			} else if((radix == RADIX_DECIMAL || radix == RADIX_HEX) && newio >= -128 && newio <= 127) {
+				ioin = newio;
+			} else if((radix == RADIX_UNSIGNED || radix == RADIX_HEX) && newio >= 0 && newio <= 255) {
+				ioin = newio;
+			} else {
+				printf("Warning: IO value %li will be truncated\n", newio);
+				ioin = newio;
 			}
 		} else {
 			printf("Unrecognized command \"%s\"\n", cmd);
@@ -277,7 +273,7 @@ bool step(bool interrupt) {
 				if(!(i & JUMP_COND_MASK)) { // unconditional jumps
 					int offs = ((((int) signExt(i, 4)) << 8)
 							  | (((int) imm) & 0xFF)) - 1;
-					printf("%i %i %i\n", signExt(i, 4), imm, offs);
+					// printf("%i %i %i\n", signExt(i, 4), imm, offs);
 					pc += offs;
 				} else {
 					if((carry && !(i & COND_INV_MASK)) || (!carry && (i & COND_INV_MASK))) {
@@ -290,44 +286,22 @@ bool step(bool interrupt) {
 	return true;
 }
 
-int main(int argc, char** argv) {	
-	// mem[0] = PROGFLOW_MASK | BRK_MASK | 0xB;
-	// mem[1] = MULTICYCLE_MASK | ALU_SEL_MASK | ALU_B;
-	// mem[2] = 7;
-	// mem[3] = WR_MASK | REGID_DX;
-	// mem[4] = MULTICYCLE_MASK | ALU_SEL_MASK | ALU_B;
-	// mem[5] = 12;
-	// mem[6] = WR_MASK | REGID_DY;
-	// mem[7] = MULTICYCLE_MASK | ALU_SEL_MASK | ALU_B;
-	// mem[8] = 0;
-	// mem[9] = RD_MASK | WR_MASK | REGID_DX;
-	// mem[10] = ALU_SEL_MASK | CARRY_SEL_MASK | ALU_SL;
-	// mem[11] = RD_MASK | WR_MASK | REGID_DX;
-	// mem[12] = ALU_SEL_MASK | ALU_SL;
-	// mem[13] = MULTICYCLE_MASK | ALU_SEL_MASK | JUMP_MASK | JUMP_COND_MASK | COND_INV_MASK;
-	// mem[14] = 2;
-	// mem[15] = ALU_SEL_MASK | ALU_ADD;
-	// mem[16] = RD_MASK | WR_MASK | REGID_DX;
-	// mem[17] = MULTICYCLE_MASK | ALU_SEL_MASK | CARRY_SEL_MASK | ALU_NE;
-	// mem[18] = 0;
-	// mem[19] = MULTICYCLE_MASK | ALU_SEL_MASK | JUMP_MASK | JUMP_COND_MASK;
-	// mem[20] = -9;
-	// mem[21] = PROGFLOW_MASK | BRK_MASK | 0xB;
-
-	char prod = 0;
-	char a = 7;
-	char b = 12;
-	while(a) {
-		prod <<= 1;
-		if(a & 0x80) {
-			prod += b;
-		}
-		a <<= 1;
+int main(int argc, char** argv) {
+	if(argc != 2) {
+		printf("Usage: %s <filename>\n", argv[0]);
+		return 1;
 	}
-	printf("product: %i\n", prod);
-
-	while(step(true));
-    // char* path = NULL;
+    char* path = argv[1];
+	printf("Loading file %s...\n", path);
+	FILE* binfile = fopen(path, "rb");
+	size_t loaded = fread(mem, sizeof(inst_t), 32768, binfile);
+	printf("%lu bytes loaded\n", loaded);
+	// A bit of a hack to start in the debug menu but then continue running with
+	// no debug afterward
+	if(pause()) {
+		while(step(true));
+	}
+	// char* path = NULL;
     // bool debug = false;
     // for(int i = 1; i < argc; i++) {
 	// 	if(argv[i][0] == '-') {

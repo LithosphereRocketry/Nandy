@@ -1,4 +1,5 @@
 #include "programs.h"
+#include "stddef.h"
 
 const program_t PROGRAM_INITIALIZER = {NULL, NULL};
 

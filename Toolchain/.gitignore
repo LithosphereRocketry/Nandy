@@ -1,4 +1,10 @@
+# Racket
 *.bak
+# NANDy specific
+*.nb
+assembler
+emulator
+parse-test
 
 # User settings
 .vscode
