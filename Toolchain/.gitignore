@@ -5,6 +5,10 @@ emulator
 parse-test
 *.bak
 
+# Racket
+*.bak
+*.rkt~
+
 # User settings
 .vscode
 

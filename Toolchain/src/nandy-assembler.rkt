@@ -174,10 +174,11 @@
 (define macro-expand
   (lambda (exp)
     (cond [(@include-exp? exp) (expand-file (@include-exp-path exp))]
-          [(call-exp? exp) (list-exp (list (rdi-exp (bytenum (call-exp-label exp) 0))
+          [(call-exp? exp) (list-exp (list (wr-exp 'dy)
+                                           (rdi-exp (bytenum (call-exp-label exp) 0))
                                            (wr-exp 'dx)
                                            (rdi-exp (bytenum (call-exp-label exp) 1))
-                                           (wr-exp 'dy)
+                                           (sw-exp 'dy)
                                            (jar-exp)))]
           [(move-exp? exp) (cond [(eq? (move-exp-to exp) (move-exp-from exp)) (none-exp)]
                                  [(eq? (move-exp-to exp) 'acc) (rd-exp (move-exp-from exp))]
@@ -321,7 +322,7 @@
 
 (define num->4bi
   (lambda (num)
-    (if (and (exact-integer? num) (>= num -8) (< num 8)) num
+    (if (and (exact-integer? num) (>= num -8) (< num 8)) (bitwise-and #xF num)
         (raise (format "~a is not a valid 4-bit immediate" num)))))
 
 (define num->u3bi
@@ -387,4 +388,5 @@
            [labeled-program (resolve-labels flat)]
            [pure-ilist (resolve-values labeled-program)]
            [binary (build-binary pure-ilist)])
+      (display labeled-program)
       (save-binfile! oname binary))))
