@@ -1,7 +1,5 @@
-@include ../tests/pseudo.na
     rdi 0
     move acc sp
-    sig brk
     move io acc
     call fib
     wr io
