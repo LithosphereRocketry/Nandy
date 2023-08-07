@@ -5,9 +5,11 @@ SRCDIR = src/
 TESTDIR = tests/
 LOGDIR = logs/
 OBJDIR = obj/
+INCDIR = include/
 
 # Each test gets compiled with all of the files in SRC
 SRC = $(wildcard $(SRCDIR)*.v)
+INC = $(wildcard $(INCDIR)*.vh)
 # Each test file gets exactly one verilog source
 TEST_SRC = $(wildcard $(TESTDIR)*.v)
 # Each will be compiled to a wave result
@@ -19,10 +21,10 @@ $(info [${SRC}])
 all: $(TEST_OUT)
 
 $(TEST_OUT): $(LOGDIR)%.txt: $(OBJDIR)%.vvp | $(WAVEDIR)
-	$(VVP) $< -l > $@
+	$(VVP) $< > $@
 
-$(OBJDIR)%.vvp: $(TESTDIR)%.v $(SRC) | $(OBJDIR)
-	$(VLG) -s $* -o $@ $^
+$(OBJDIR)%.vvp: $(TESTDIR)%.v $(SRC) $(INC) | $(OBJDIR)
+	$(VLG) -I$(INCDIR) -s $* -o $@ $< $(SRC)
 
 # If the directories don't exist, make them
 $(WAVEDIR):

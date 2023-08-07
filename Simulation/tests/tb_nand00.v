@@ -1,6 +1,8 @@
 `timescale 1ns/1ps
 
 module tb_nand00();
+    `include "debug.vh"
+
     reg a, b;
     wire q;
 
@@ -14,6 +16,8 @@ module tb_nand00();
         a = 1'b0;
         b = 1'b0;
         
+        assert #(message = "Heehee hoohoo") (1'b0);
+
         #50;
         a = 1'b1;
         #50;
