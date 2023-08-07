@@ -20,7 +20,7 @@ module shift(
     );
     nand00 g_nenc(
         .a(nenc),
-        .b(1),
+        .b(1'b1),
         .q(encarry)
     );
     mux m_ra(

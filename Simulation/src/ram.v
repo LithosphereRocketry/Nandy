@@ -39,7 +39,7 @@ module ram(
             $display("Written at %t", $time);
         end
     end
-    assign data = (!write) ? 'z : readData;
+    assign data = (!write) ? 8'bz : readData;
 
 
 endmodule

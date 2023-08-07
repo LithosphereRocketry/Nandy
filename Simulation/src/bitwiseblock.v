@@ -46,7 +46,7 @@ module bitwiseblock(
     );
     nand00 gand(
         .a(qnand),
-        .b(1),
+        .b(1'b1),
         .q(qand)
     );
     nand00 gandsel(
@@ -71,7 +71,7 @@ module bitwiseblock(
     );
     nand00 gncin(
         .a(cin),
-        .b(1),
+        .b(1'b1),
         .q(ncin)
     );
     nand00 gcomp(

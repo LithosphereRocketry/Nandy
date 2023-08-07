@@ -15,17 +15,17 @@ module pulsegentest(
     wire nclk, clkdel, nclkdel, npulse, pulse;
     nand00 gateinp1(
         .a(clk),
-        .b(1),
+        .b(1'b1),
         .q(nclk)
     );
     nand00 gateinp2(
         .a(nclk),
-        .b(1),
+        .b(1'b1),
         .q(clkdel)
     );
     nand00 gateinp3(
         .a(clkdel),
-        .b(1),
+        .b(1'b1),
         .q(nclkdel)
     );
 
@@ -37,7 +37,7 @@ module pulsegentest(
     );
     nand00 gatepinv(
         .a(npulse),
-        .b(1),
+        .b(1'b1),
         .q(pulse)
     );
 

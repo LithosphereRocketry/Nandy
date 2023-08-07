@@ -38,7 +38,7 @@ module edgegate(
 
     nand00 clkinv(
         .a(clk),
-        .b(1),
+        .b(1'b1),
         .q(nclk)
     );
     nand00 latchen(
@@ -63,7 +63,7 @@ module edgegate(
     );
     nand00 clkoutinv(
         .a(nclkout),
-        .b(1),
+        .b(1'b1),
         .q(clkout)
     );
 

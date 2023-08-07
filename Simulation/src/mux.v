@@ -21,7 +21,7 @@ module mux #(parameter WIDTH=1) (
     wire ns;
     nand00 inv(
         .a(s),
-        .b(1),
+        .b(1'b1),
         .q(ns)
     );
 

@@ -8,12 +8,12 @@ module orgate(
     wire na, nb;
     nand00 inva(
         .a(a),
-        .b(1),
+        .b(1'b1),
         .q(na)
     );
     nand00 invb(
         .a(b),
-        .b(1),
+        .b(1'b1),
         .q(nb)
     );
     nand00 org(
