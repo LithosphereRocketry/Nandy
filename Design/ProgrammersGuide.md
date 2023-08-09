@@ -22,12 +22,14 @@ NANDy has four core registers, specified as follows:
 The I/O bus is also treated as a register from the programmer's perspective and may be accessed by all register-move operations; however, it represents separate input and output ports, so no data written to it can be read back.
 
 Registers are primarily manipulated via the `rd`, `wr`, and `sw` instructions, which read a register's value into the accumulator, write the accumulator's value into a register, and swap the accumulator with a register, respectively. There are no direct operations for manipulating non-accumulator registers relative to each other, but the same effect can be achieved by multiple swaps; for example, the nonexistent `sw dx, dy` is equivalent to:
-```sw dx
+```
+sw dx
 sw dy
 sw dx
 ```
 Constant values may be read into the accumulator via the `rdi` instruction. Similar to register moves, there is no way to directly read into registers other than the accumulator, but the same can be accomplished by a series of swaps:
-```sw dx
+```
+sw dx
 rdi 100
 sw dx
 ```
@@ -52,7 +54,8 @@ By default, all operations except bitwise logical ones (`xor`, `and`, `or`) modi
 * `ge`: Sets the carry bit to 1 if ACC is greater than or equal to the second operand, 0 otherwise.
 
 Several instructions allow a suffix of `c` to indicate that the carry bit should be used as a mathematical carry; specifically, `add`, `sub`, `sl`, and `sr` can be modified to `addc`, `subc`, `slc`, and `src`. In addition and subtraction, this overrides the carry-in line of the adder; in shift operations, it specifies the value that should be shifted into the new place. This allows operations to be chained for larger bit widths, as in this example of a 16-bit left shift of the combined value of [DX, ACC]:
-```sl
+```
+sl
 sw dx
 slc
 sw dx
