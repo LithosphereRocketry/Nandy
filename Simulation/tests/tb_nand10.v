@@ -11,14 +11,19 @@ module tb_nand10();
         .q(q)
     );
 
+    assert #("Incorrect value!") val (.value(q == ~(inp[0] & inp[1] & inp[2])));
+
     initial begin
         inp = 0;
         #50;
         repeat (8) begin
+            $display("Testing value %b", inp);
             inp = inp + 1;
             #50;
+            val.test();
         end
-        $display("done");
+        $display("All tests passed");
+        $finish(0);
     end
 
 endmodule
