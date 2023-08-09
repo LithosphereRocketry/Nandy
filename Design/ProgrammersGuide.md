@@ -35,7 +35,7 @@ For convenience, the included assembler provides a `move` macro that moves a val
 better performance may sometimes be achieved by hand-writing the swap sequences.
 
 ### Arithmetic
-NANDy provides a number of 8-bit arithmetic operations as primitive instructions. Most are two-operand; one input can be selected between DX and DY, and the other is always the accumulator, with the result placed back in the acccumulator. A few operations have only one operand, such as `sl` - these always act directly on the accumulator. The basic arithmetic operands are as follows:
+NANDy provides a number of 8-bit arithmetic operations as primitive instructions. Most are two-operand; one input can be selected between DX and DY, and the other is always the accumulator, with the result placed back in the acccumulator. A few operations have only one operand, such as `sl` - these always act directly on the accumulator. The basic arithmetic operations are as follows:
 * `add`: Adds the two operands
 * `sub`: Subtracts the second operand from the accumulator
 * `xor`: Bitwise-xors the two operands
