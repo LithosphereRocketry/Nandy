@@ -20,7 +20,7 @@ $(info [${SRC}])
 
 all: $(TEST_OUT)
 
-$(TEST_OUT): $(LOGDIR)%.txt: $(OBJDIR)%.vvp | $(WAVEDIR)
+$(TEST_OUT): $(LOGDIR)%.txt: $(OBJDIR)%.vvp | $(LOGDIR)
 	$(VVP) $< > $@
 
 $(OBJDIR)%.vvp: $(TESTDIR)%.v $(SRC) $(INC) | $(OBJDIR)
@@ -29,7 +29,7 @@ $(OBJDIR)%.vvp: $(TESTDIR)%.v $(SRC) $(INC) | $(OBJDIR)
 # If the directories don't exist, make them
 $(WAVEDIR):
 	mkdir $@
-$(OBJDIR):
+$(LOGDIR):
 	mkdir $@
 
 # If everything else fails, warn the user
