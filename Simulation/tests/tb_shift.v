@@ -3,7 +3,7 @@
 module tb_shift();
     reg [7:0] a;
     reg cin;
-    reg [3:0] mode;
+    reg [2:0] mode;
     wire [7:0] q;
     wire cout;
 

@@ -6,7 +6,7 @@ module tb_ram();
     reg [7:0] addr;
     reg write;
 
-    assign data = !write ? dataReg : 'z;
+    assign data = !write ? dataReg : 8'bz;
     
     ram test(
         .data(data),
@@ -15,25 +15,25 @@ module tb_ram();
     );
 
     initial begin
-        dataReg = 'x;
-        addr = 0;
-        write = 1;
+        dataReg = 8'bx;
+        addr = 8'h0;
+        write = 1'b1;
         #80;
-        dataReg = 'hAA;
+        dataReg = 8'hAA;
         #20;
-        write = 0;
+        write = 1'b0;
         #100;
-        write = 1;
+        write = 1'b1;
         #80;
-        addr = 4;
+        addr = 8'h4;
         #20;
         dataReg = 'hFE;
-        write = 0;
+        write = 1'b0;
         #100;
-        write = 1;
-        addr = 0;
+        write = 1'b1;
+        addr = 8'h0;
         #100;
-        addr = 4;
+        addr = 8'h4;
         #100;
     end
 
