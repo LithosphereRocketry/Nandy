@@ -91,4 +91,15 @@ Memory may be addressed in one of two modes: absolute mode and stack mode. In ab
 
 As an 8-bit architecture, NANDy has no hardware-defined endianness or byte alignment. In general, it is encouraged to use little-endian representations and single-byte alignment, as this provides the best combination of memory efficiency and compatibility with other architectures.
 
+#### The Stack
+NANDy has a 256-byte stack, located betweeen addresses 0xFF00 and 0xFFFF. By convention the stack grows downwards; the stack pointer should be initialized to 0x00 and then decremented to allocate space. In order to improve performance, an instruction `isp` (and corresponding no-carry version `_isp`) is provided which moves the stack pointer by the provided 4-bit immediate in a single cycle.
+
+Generally speaking, memory addresses below the stack pointer are considered to be undefined in the context of stack access, and using them should be avoided. Using `lds` and `strs` with a negative memory offset can access memory outside the stack page 0xFFnn, which may cause collisions with other memory regions; use with care *(eventually this will be standardized to a yes or no).
+
+In some cases, it may be necessary or advantageous to neglect the stack memory region and instead use the stack pointer as an extra general-purpose register. 
+
+### Program Flow
+
+### Function Calling
+
 ## Instruction Reference
