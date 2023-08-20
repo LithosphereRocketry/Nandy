@@ -21,9 +21,12 @@ By convention, commands starting with `@` represent preprocessing macros that ex
 ### Literals and Symbols
 Several instructions take a literal value as an argument; this can be a decimal number *(more radices coming soon) or a combination of operations on another literal. Currently only the byte selection operator is supported, denoted `$`. The expression `N$M` is equal to the Mth byte of N, with 0 representing the least-significant byte; in this operation M must be a decimal number and cannot contain other symbols.
 
-Symbols may be defined in one of two ways:
+Symbols may be defined in one of three ways:
 * Placing a label `name:` in the program sets the value of the symbol "name" to the address of the first instruction following the label.
 * The macro `@define name <value>` sets the value of the symbol "name" to the given value. This assignment is not recursive; it may depend on any label or any `@define` before it in the program, but not itself or any `@define` after it.
+* The macro `@static <amount> name` reserves `amount` bytes at the bottom of RAM for static variables, and creates a symbol `name` containing the address of the first byte of the reserved region.
+
+Additionally, a predefined symbol `FREE_MEM` is provided pointing to the first byte of RAM not reserved by `@static`.
 
 Symbols may be used in most arithmetic and program-flow operations as if they were numbers. Symbols should only be defined using ASCII letters and underscores; defining a symbol using characters outside this set may function on some assembler versions but is undefined behavior.
 
