@@ -21,6 +21,7 @@ typedef uint8_t inst_t;
 #define BRK_MASK 1<<3
 #define WR_MASK 1<<3
 #define RD_MASK 1<<2
+#define RET_MASK 1<<2
 #define COND_INV_MASK 1<<0
 
 #define ALU_INST_MASK 0xF
@@ -238,7 +239,12 @@ bool step(bool interrupt) {
 					}
 				} else { // prorgam flow
 					if(!(i & BRK_MASK)) { // ret/call
-
+						addr_t oldpc = pc + 1;
+						pc = (((addr_t) y) << 8) + x - 1;
+						if(i & RET_MASK) { // call only
+							x = oldpc & 0xFF;
+							y = oldpc >> 8;
+						}
 					} else { // break
 						if(interrupt) return pause();
 					}
@@ -251,7 +257,6 @@ bool step(bool interrupt) {
 			aluop(i & ALU_INST_MASK, i & CARRY_SEL_MASK, acc, alub, &acc);
 		}
 	} else { // multicycle operations
-		word_t imm = fetch();
 		if(!(i & ALU_SEL_MASK)) { // memory 
 			addr_t memaddr;
 			if(!(i & MEM_STACK_MASK)) {
@@ -267,6 +272,7 @@ bool step(bool interrupt) {
 				}
 			}
 		} else { // immediates
+			word_t imm = fetch();
 			if(!(i & JUMP_MASK)) { // immediate ops
 				aluop(i & ALU_INST_MASK, i & CARRY_SEL_MASK, acc, imm, &acc);
 			} else { // jumps
@@ -277,7 +283,7 @@ bool step(bool interrupt) {
 					pc += offs;
 				} else {
 					if((carry && !(i & COND_INV_MASK)) || (!carry && (i & COND_INV_MASK))) {
-						pc += imm;
+						pc += imm - 1;
 					}
 				}
 			}
