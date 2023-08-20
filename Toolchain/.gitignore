@@ -3,7 +3,7 @@
 assembler
 emulator
 parse-test
-*.bak
+nandy-asm
 
 # Racket
 *.bak

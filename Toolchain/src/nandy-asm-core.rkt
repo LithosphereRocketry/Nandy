@@ -1,4 +1,6 @@
 #lang racket
+(provide assemble)
+
 (define linebrk-token "\n")
 (define comment-token "#")
 (define label-token ":")
@@ -31,9 +33,11 @@
 (struct strs-exp (target) #:transparent)
 (struct rdi-exp (num) #:transparent)
 (struct addi-exp (num) #:transparent)
+(struct _addi-exp (num) #:transparent)
 (struct subi-exp (num) #:transparent)
 (struct j-exp (label) #:transparent)
 (struct jif-exp (sig label) #:transparent)
+(struct jnif-exp (sig label) #:transparent)
 
 ; Pseudoinstructions
 (struct move-exp (from to) #:transparent)
@@ -104,9 +108,11 @@
          (cons "strs" (idesc strs-exp (list parse-number)))
          (cons "rdi" (idesc rdi-exp (list parse-number)))
          (cons "addi" (idesc addi-exp (list parse-number)))
+         (cons "_addi" (idesc _addi-exp (list parse-number)))
          (cons "subi" (idesc subi-exp (list parse-number)))
          (cons "j" (idesc j-exp (list parse-label)))
          (cons "jif" (idesc jif-exp (list parse-sigin parse-label)))
+         (cons "jnif" (idesc jnif-exp (list parse-sigin parse-label)))
          
          (cons "call" (idesc call-exp (list parse-label)))
          (cons "move" (idesc move-exp (list parse-reg parse-reg))))))
@@ -229,9 +235,11 @@
           [(strs-exp? exp) 1]
           [(rdi-exp? exp) 2]
           [(addi-exp? exp) 2]
+          [(_addi-exp? exp) 2]
           [(subi-exp? exp) 2]
           [(j-exp? exp) 2]
           [(jif-exp? exp) 2]
+          [(jnif-exp? exp) 2]
           [else (raise (string-append "Expression " (format "~a" exp) " has no defined length"))])))
 
 (define byte->sbyte
@@ -301,6 +309,7 @@
                    [(subi-exp? inst) (subi-exp (get-value (subi-exp-num inst) ltab))]
                    [(j-exp? inst) (j-exp (get-value (j-exp-label inst) ltab))]
                    [(jif-exp? inst) (jif-exp (jif-exp-sig inst) (get-value (jif-exp-label inst) ltab))]
+                   [(jnif-exp? inst) (jnif-exp (jnif-exp-sig inst) (get-value (jnif-exp-label inst) ltab))]
                    [else inst])) ilist))))
 
 (define reg->bits
@@ -353,12 +362,16 @@
                      [(strs-exp? inst) (list (bitwise-ior #b10110000 (num->4bi (strs-exp-target inst))))]
                      [(rdi-exp? inst) (list #b11000000 (num->8bi (rdi-exp-num inst)))]
                      [(addi-exp? inst) (list #b11010100 (num->8bi (addi-exp-num inst)))]
+                     [(_addi-exp? inst) (list #b11000100 (num->8bi (_addi-exp-num inst)))]
                      [(subi-exp? inst) (list #b11010110 (num->8bi (subi-exp-num inst)))]
                      [(j-exp? inst) (let ([offset (- (j-exp-label inst) (+ loc 1))])
                                       (list (bitwise-ior #b11100000 (num->4bi (get-bnum offset 1)))
                                             (num->8bi (get-bnum offset 0))))]
                      [(jif-exp? inst) (let ([offset (- (jif-exp-label inst) (+ loc 1))])
                                         (list (bitwise-ior #b11110000 (num->u3bi (jif-exp-sig inst)))
+                                              (num->8bi offset)))]
+                     [(jnif-exp? inst) (let ([offset (- (jnif-exp-label inst) (+ loc 1))])
+                                        (list (bitwise-ior #b11111000 (num->u3bi (jnif-exp-sig inst)))
                                               (num->8bi offset)))]
                      [else (raise "Could not convert to binary")])])
       (if (= (length rep) (exp-length inst))
