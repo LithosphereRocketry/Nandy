@@ -14,7 +14,7 @@ fib:isp -3
 
     rdi 0
     wr x
-    rdi 257$0 # = 1
+    rdi 1
     wr y
 fib_loop:
     lds 0

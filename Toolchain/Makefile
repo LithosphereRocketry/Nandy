@@ -2,8 +2,8 @@
 
 # This should be all you need to change
 TARGETS = emulator assembler parse-test
+RKT_TARGETS = nandy-asm
 
-# Header files go here
 INCDIR = include/
 # C/C++ files go here
 SRCDIR = src/
@@ -16,7 +16,7 @@ OBJDIR = obj/
 .PHONY: all clean
 
 # make all = make (all of the final targets given)
-all: $(TARGETS)
+all: $(TARGETS) $(RKT_TARGETS)
 
 # includes = everything in INCDIR with a .h file extension
 INC = $(wildcard $(INCDIR)*.h)
@@ -30,6 +30,10 @@ OBJ = $(patsubst $(SRCDIR)%.c,$(OBJDIR)%.o,$(CSRC)) $(patsubst $(SRCDIR)%.cpp,$(
 TGTOBJ = $(patsubst %,$(OBJDIR)%.o,$(TARGETS))
 # Dependency objects = things that should be given to targets = whatever objects aren't targets
 DEPOBJ = $(filter-out $(TGTOBJ),$(OBJ))
+
+# Special case for Racket programs
+$(RKT_TARGETS): %: $(SRCDIR)%.rkt $(SRCDIR)*.rkt
+	raco exe -o $@ $<
 
 # To build a target:
 # - Require its corresponding object and all of the dependency objects to be up to date
