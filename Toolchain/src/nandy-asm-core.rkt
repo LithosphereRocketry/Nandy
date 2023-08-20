@@ -15,6 +15,7 @@
 ; Macros
 (struct @include-exp (path) #:transparent)
 (struct @define-exp (sym val) #:transparent)
+(struct @static-exp (len sym) #:transparent)
 
 ; Real instructions
 (struct none-exp () #:transparent)
@@ -93,6 +94,7 @@
   (make-immutable-hash
    (list (cons "@define" (idesc @define-exp (list parse-label parse-number)))
          (cons "@include" (idesc @include-exp (list parse-fpath)))
+         (cons "@static" (idesc @static-exp (list parse-number parse-label)))
          (cons "nop" (idesc nop-exp '()))
          (cons "rd" (idesc rd-exp (list parse-reg)))
          (cons "wr" (idesc wr-exp (list parse-reg)))
@@ -276,19 +278,26 @@
         (let recurse ([exps (list-exp-contents lexp)]
                       [ltab (make-immutable-hash)]
                       [clean-exps '()]
-                      [index 0])
+                      [index 0]
+                      [static-index #x8000])
           (if (null? exps)
-              (labeled-program ltab (reverse clean-exps))
-              (cond [(none-exp? (car exps)) (recurse (cdr exps) ltab clean-exps index)]
+              (labeled-program (hash-set ltab "FREE_MEM" static-index)
+                               (reverse clean-exps))
+              (cond [(none-exp? (car exps)) (recurse (cdr exps) ltab clean-exps index static-index)]
                     [(list-exp? (car exps)) (raise "Can only resolve labels on a flattened program")]
                     [(@define-exp? (car exps)) (recurse (cdr exps)
                                                         (hash-set ltab
                                                                   (@define-exp-sym exp)
-                                                                  (get-value (@define-exp-val exp) ltab index)))]
+                                                                  (get-value (@define-exp-val exp)))
+                                                        clean-exps index static-index)]
+                    [(@static-exp? (car exps)) (recurse (cdr exps)
+                                                        (hash-set ltab
+                                                                  (@static-exp-sym (car exps)) static-index)
+                                                        clean-exps index (+ static-index (@static-exp-len (car exps))))]
                     [(label-exp? (car exps)) (recurse (cons (label-exp-target (car exps)) (cdr exps))
                                                       (hash-set ltab (label-exp-label (car exps)) index)
-                                                      clean-exps index)]
-                    [else (recurse (cdr exps) ltab (cons (car exps) clean-exps) (+ index (exp-length (car exps))))])))
+                                                      clean-exps index static-index)]
+                    [else (recurse (cdr exps) ltab (cons (car exps) clean-exps) (+ index (exp-length (car exps))) static-index)])))
         (raise "Can only resolve labels on list expressions"))))
 
 ; Makes symbolic values into real numbers
