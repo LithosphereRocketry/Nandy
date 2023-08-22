@@ -1,0 +1,71 @@
+# Basic multiplication function
+# Multiplies two 8-bit unsigned integers and generates an 8-bit result
+    rdi -1
+    wr sp
+    sig brk
+top:
+    rd io
+    strs 0
+    sig brk
+    rd io
+    call mul8
+    wr io
+    sig brk
+    j top
+
+mul8:
+# This can probably be made a lot faster with SP abuse
+# Reg : [A RAL RAH SP]
+# Stack : [| B]
+    isp -3
+    sw dx
+    strs 0
+    rd dy
+    strs 1
+    rdi 0
+    strs 2
+# Reg : [x A x SP]
+# Stack : [RAL RAH sum | B]
+    rdi 7
+    wr dy
+# Reg : [x A LC SP]
+# Stack : [RAL RAH sum | B]
+
+mul8_loop:
+    lds 2
+    sl
+    strs 2
+    rd dx
+    sl
+    wr dx
+    jnif carry mul8_skip
+
+    lds 2
+    sw dx
+    strs 2
+# Reg : [x sum LC SP]
+# Stack : [RAL RAH A | B]
+
+    lds 3
+    add dx
+    wr dx
+# Reg : [x sum LC SP]
+# Stack : [RAL RAH A | B]
+    lds 2
+    sw dx
+    strs 2
+# Reg : [x A LC SP]
+# Stack : [RAL RAH sum | B]
+mul8_skip:
+    rd dy
+    subi 1
+    wr dy
+    jnif carry mul8_loop
+
+    lds 0
+    wr dx
+    lds 1
+    wr dy
+    lds 2
+    isp 3
+    ja
