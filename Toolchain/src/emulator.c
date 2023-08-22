@@ -20,9 +20,9 @@ typedef uint8_t inst_t;
 #define JUMP_COND_MASK 1<<4
 #define BRK_MASK 1<<3
 #define WR_MASK 1<<3
+#define COND_INV_MASK 1<<3
 #define RD_MASK 1<<2
 #define RET_MASK 1<<2
-#define COND_INV_MASK 1<<0
 
 #define ALU_INST_MASK 0xF
 #define ALU_WRITESBOTH_MASK 0b1100 // any instruction with either of these bits can
@@ -188,6 +188,18 @@ void aluop(enum ALUMode mode, bool isCarry, word_t a, word_t b, word_t* result) 
 		case ALU_SL:
 			newresult = a << 1;
 			newcarry = (a >> 7) & 1;
+			break;
+		case ALU_SLC:
+			newresult = a << 1 | (carry ? 1 : 0);
+			newcarry = (a >> 7) & 1;
+			break;
+		case ALU_SR:
+			newresult = a >> 1;
+			newcarry = a & 1;
+			break;
+		case ALU_SRC:
+			newresult = a >> 1 | (carry ? 0x80 : 0);
+			newcarry = a & 1;
 			break;
 		default:
 			printf("ALU operation 0x%x not implemented\n", mode);
