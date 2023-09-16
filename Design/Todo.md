@@ -14,12 +14,11 @@
 * Look into modifying GCC/similar to compile to NANDy ASM (maybe?)
 
 ### Assembler
-* Make better plan for parse->macro expand->assemble pipeline
-* Figure out how to get from something AST ish to line numbers for jumps
+* Macros
+* "Standard library" functions
 
 ### Emulator
-* Fix issues in multiplication test
-* Finish remainder of math instructions
+* Better debugger (with disassembly?)
 
 ## Hardware
-* Test new register design
+* New register design using pulse former
