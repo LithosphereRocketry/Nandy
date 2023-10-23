@@ -49,6 +49,7 @@
 (struct move-exp (from to) #:transparent)
 (struct swap-exp (a b) #:transparent)
 (struct call-exp (label) #:transparent)
+(struct goto-exp (label) #:transparent)
 
 (define noop (lambda (a) a))
 
@@ -127,6 +128,7 @@
          (cons "jnif" (idesc jnif-exp (list parse-sigin parse-label)))
          
          (cons "call" (idesc call-exp (list parse-label)))
+         (cons "goto" (idesc goto-exp (list parse-label)))
          (cons "move" (idesc move-exp (list parse-reg parse-reg))))))
 
 
@@ -198,6 +200,12 @@
                                            (rdi-exp (bytenum (call-exp-label exp) 1))
                                            (sw-exp 'dy)
                                            (jar-exp)))]
+          [(goto-exp? exp) (list-exp (list (wr-exp 'dy)
+                                           (rdi-exp (bytenum (call-exp-label exp) 0))
+                                           (wr-exp 'dx)
+                                           (rdi-exp (bytenum (call-exp-label exp) 1))
+                                           (sw-exp 'dy)
+                                           (ja-exp)))]
           [(move-exp? exp) (cond [(eq? (move-exp-to exp) (move-exp-from exp)) (none-exp)]
                                  [(eq? (move-exp-to exp) 'acc) (rd-exp (move-exp-from exp))]
                                  [(eq? (move-exp-from exp) 'acc) (wr-exp (move-exp-to exp))]
