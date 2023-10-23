@@ -102,7 +102,32 @@ Generally speaking, memory addresses below the stack pointer are considered to b
 In some cases, it may be necessary or advantageous to neglect the stack memory region and instead use the stack pointer as an extra general-purpose register. 
 
 ### Program Flow
+NANDy program flow is provided by a small handful of jump instructions. Simple unconditional jumps are handled by `j <label>`; the label may also be replaced by a direct memory address, but this practice is not recommended. Note that `j` is always a relative jump, with a range limit of [-2048, +2047] bytes; attempting to jump outside this range will cause an error in assembly.
 
-### Function Calling
+Conditionals and loops are handled by the `jif` and `jnif` instructions. Both take the form `j[n]if <signal> <label>`, where `<signal>` represents an input signal (see the [Input/Output](#input-output) section). In most cases, signal 0 (alias `carry`) will be used. `jif` will jump to the specified label if the specified signal is high, while `jnif` will jump if the specified signal is low. Both instructions have reduced jump range, only allowing jumps of [-128, +127] bytes.
+
+Of note for optimization is that all relative jump instructions will take two cycles - this includes `jif` and `jnif` even when the jump is not taken. Therefore it is usually faster to let a loop fall through when it is finished:
+```
+loop:
+    # this is fast
+    ...
+    jnif carry loop
+    # done
+```
+Than to jump out of the loop:
+```
+loop:
+    # this is slow
+    ...
+    jif carry done
+    j loop
+done: # done
+```
+
+For jumps outside relative range, the absolute jump instructions `ja` and `jar` must be used. Both jump to the address formed by the combined Y and X registers; `ja` leaves the registers unchanged, while `jar` replaces the register values with the address of the instruction following the origin of the jump. `ja` and `jar` take no arguments; the assembler provides the macros `goto <label>` and `call <label>`, which automate the placement of address values in registers for each respectively.
+
+#### Function Calling
+
+### Input/Output
 
 ## Instruction Reference
