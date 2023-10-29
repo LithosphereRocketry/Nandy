@@ -99,7 +99,7 @@ NANDy has a 256-byte stack, located betweeen addresses 0xFF00 and 0xFFFF. By con
 
 Generally speaking, memory addresses below the stack pointer are considered to be undefined in the context of stack access, and using them should be avoided. Using `lds` and `strs` with a negative memory offset can access memory outside the stack page 0xFFnn, which may cause collisions with other memory regions; use with care *(eventually this will be standardized to a yes or no).
 
-In some cases, it may be necessary or advantageous to neglect the stack memory region and instead use the stack pointer as an extra general-purpose register. 
+In some cases, it may be necessary or advantageous to neglect the stack memory region and instead use the stack pointer as an extra general-purpose register. This is referred to as "stack-pointer abuse." Anytime the stack pointer does not represent the lowest allocated memory address on the stack, whether due to abuse or non-initialization, the stack is said to be "invalid"; when that condition is true, it is said to be "valid." 
 
 ### Program Flow
 NANDy program flow is provided by a small handful of jump instructions. Simple unconditional jumps are handled by `j <label>`; the label may also be replaced by a direct memory address, but this practice is not recommended. Note that `j` is always a relative jump, with a range limit of [-2048, +2047] bytes; attempting to jump outside this range will cause an error in assembly.
@@ -123,10 +123,17 @@ loop:
     j loop
 done: # done
 ```
-
-For jumps outside relative range, the absolute jump instructions `ja` and `jar` must be used. Both jump to the address formed by the combined Y and X registers; `ja` leaves the registers unchanged, while `jar` replaces the register values with the address of the instruction following the origin of the jump. `ja` and `jar` take no arguments; the assembler provides the macros `goto <label>` and `call <label>`, which automate the placement of address values in registers for each respectively.
+For jumps outside relative range, the absolute jump instructions `ja` and `jar` must be used. Both jump to the address formed by the combined Y and X registers; `ja` leaves the registers unchanged, while `jar` replaces the register values with the address of the instruction following the origin of the jump. `ja` and `jar` take no arguments; the assembler provides the macros `goto <label>` and `call <label>`, which automate the placement of address values in registers for each respectively. Both macros leave the accumulator unchanged; neither retains the previous values of X and Y anywhere in memory.
 
 #### Function Calling
+Function calling is typically accomplished with the `call` macro, along with use of the stack. The following conventions apply:
+* The stack must be valid at the time of call
+* Return address is passed in the X and Y registers
+* Functions must return the stack pointer to its original state
+* Arguments are passed in the accumulator and on the stack
+* Return values are passed in the accumulator and on the stack
+* At return, the stack pointer should be returned to its original state
+Upon call, a function "claims" a certain amount of stack space, which should be carefully documented as it may not be obvious. This is distinct from allocating stack space and is used for parameter passing. For example, a function that multiplies two 8-bit values might claim one byte of stack, pass its arguments in the accumulator and claimed byte, and return a 16-bit value split across the accumulator and claimed byte. Any claimed value that does not have an assigned meaning (typically, because padding is required to maintain the same stack pointer location) should be treated as "don't care"; if it has no meaning as an argument, it should accept any value, and if it has no meaning as a return, it may return containing any value.
 
 ### Input/Output
 
