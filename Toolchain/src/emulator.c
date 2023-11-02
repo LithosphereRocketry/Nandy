@@ -17,10 +17,9 @@ typedef uint8_t inst_t;
 #define CARRY_SEL_MASK 1<<4
 #define PROGFLOW_MASK 1<<4
 #define MEM_STACK_MASK 1<<4
-#define JUMP_COND_MASK 1<<4
+#define COND_INV_MASK 1<<4
 #define BRK_MASK 1<<3
 #define WR_MASK 1<<3
-#define COND_INV_MASK 1<<3
 #define RD_MASK 1<<2
 #define RET_MASK 1<<2
 
@@ -288,15 +287,10 @@ bool step(bool interrupt) {
 			if(!(i & JUMP_MASK)) { // immediate ops
 				aluop(i & ALU_INST_MASK, i & CARRY_SEL_MASK, acc, imm, &acc);
 			} else { // jumps
-				if(!(i & JUMP_COND_MASK)) { // unconditional jumps
-					int offs = ((((int) signExt(i, 4)) << 8)
-							  | (((int) imm) & 0xFF)) - 1;
-					// printf("%i %i %i\n", signExt(i, 4), imm, offs);
+				int offs = ((((int) signExt(i, 4)) << 8)
+							| (((int) imm) & 0xFF)) - 1;
+				if((carry && !(i & COND_INV_MASK)) || (!carry && (i & COND_INV_MASK))) {
 					pc += offs;
-				} else {
-					if((carry && !(i & COND_INV_MASK)) || (!carry && (i & COND_INV_MASK))) {
-						pc += imm - 1;
-					}
 				}
 			}
 		}
