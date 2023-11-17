@@ -11,41 +11,98 @@
 (struct text-exp (str) #:transparent)
 (struct list-exp (contents) #:transparent)
 (struct label-exp (label target) #:transparent)
+(struct none-exp () #:transparent)
 
 ; Macros
 (struct @include-exp (path) #:transparent)
 (struct @define-exp (sym val) #:transparent)
 (struct @static-exp (len sym) #:transparent)
+(struct @loc-exp (addr) #:transparent)
+(struct @memloc-exp (addr) #:transparent)
 
 ; Real instructions
-(struct none-exp () #:transparent)
+;; Control flow
 (struct nop-exp () #:transparent)
 (struct rd-exp (reg) #:transparent)
 (struct wr-exp (reg) #:transparent)
 (struct sw-exp (reg) #:transparent)
 (struct ja-exp () #:transparent)
 (struct jar-exp () #:transparent)
-(struct sig-exp (num) #:transparent)
+(struct brk-exp () #:transparent)
+(struct bell-exp () #:transparent)
+(struct dint-exp () #:transparent)
+(struct eint-exp () #:transparent)
+(struct iclr-exp () #:transparent)
+(struct _isp-exp (num) #:transparent)
 (struct isp-exp (num) #:transparent)
+;; Register ALU, no carry
+(struct xor-exp (reg) #:transparent)
+(struct and-exp (reg) #:transparent)
+(struct or-exp (reg) #:transparent)
+(struct inv-exp (reg) #:transparent) ; low priority
+(struct xnor-exp (reg) #:transparent)
+(struct nand-exp (reg) #:transparent)
+(struct nor-exp (reg) #:transparent)
+(struct _add-exp (reg) #:transparent)
+(struct _addc-exp (reg) #:transparent)
+(struct _sub-exp (reg) #:transparent)
+(struct _subc-exp (reg) #:transparent)
+(struct _sl-exp () #:transparent)
+(struct _slc-exp () #:transparent)
+(struct _sla-exp () #:transparent)
+(struct _slr-exp () #:transparent)
+(struct _sr-exp () #:transparent)
+(struct _src-exp () #:transparent)
+(struct _srr-exp () #:transparent)
+(struct _sra-exp () #:transparent)
+;; Register ALU, carry
+(struct ne-exp (reg) #:transparent)
+(struct eq-exp (reg) #:transparent)
+(struct par-exp (reg) #:transparent)
+(struct npar-exp (reg) #:transparent)
+(struct lt-exp (reg) #:transparent)
+(struct ge-exp (reg) #:transparent)
+(struct gt-exp (reg) #:transparent)
+(struct le-exp (reg) #:transparent)
 (struct add-exp (reg) #:transparent)
+(struct addc-exp (reg) #:transparent)
+(struct sub-exp (reg) #:transparent)
+(struct subc-exp (reg) #:transparent)
 (struct sl-exp () #:transparent)
 (struct slc-exp () #:transparent)
+(struct sla-exp () #:transparent)
+(struct slr-exp () #:transparent)
 (struct sr-exp () #:transparent)
 (struct src-exp () #:transparent)
+(struct srr-exp () #:transparent)
+(struct sra-exp () #:transparent)
+;; Memory
 (struct lda-exp (target) #:transparent)
 (struct lds-exp (target) #:transparent)
 (struct stra-exp (target) #:transparent)
 (struct strs-exp (target) #:transparent)
+;; Immediates
 (struct rdi-exp (num) #:transparent)
+(struct xori-exp (num) #:transparent)
+(struct andi-exp (num) #:transparent)
+(struct ori-exp (num) #:transparent)
+(struct xnori-exp (num) #:transparent)
+(struct nandi-exp (num) #:transparent)
+(struct nori-exp (num) #:transparent)
+(struct _addi-exp (num) #:transparent)
+(struct _addci-exp (num) #:transparent)
+(struct _subi-exp (num) #:transparent)
+(struct _subci-exp (num) #:transparent)
 (struct addi-exp (num) #:transparent)
 (struct addci-exp (num) #:transparent)
-(struct _addi-exp (num) #:transparent)
 (struct subi-exp (num) #:transparent)
-(struct j-exp (label) #:transparent)
-(struct jif-exp (sig label) #:transparent)
-(struct jnif-exp (sig label) #:transparent)
+(struct subci-exp (num) #:transparent)
+;; Conditionals
+(struct jif-exp (label) #:transparent)
+(struct jnif-exp (label) #:transparent)
 
 ; Pseudoinstructions
+(struct j-exp (label) #:transparent)
 (struct move-exp (from to) #:transparent)
 (struct swap-exp (a b) #:transparent)
 (struct call-exp (label) #:transparent)
@@ -82,18 +139,6 @@
   (lambda (lbl)
     lbl))
 
-(define parse-sigout
-  (lambda (name)
-    (case name
-      [("brk" "0") 0]
-      [else (raise (string-append "Unrecognized output signal: " name))])))
-
-(define parse-sigin
-  (lambda (name)
-    (case name
-      [("carry" "0") 0]
-      [else (raise (string-append "Unrecognized input signal: " name))])))
-
 ; == Text -> instruction translation here
 (struct idesc (generator arg-parsers))
 (define instructions
@@ -107,8 +152,33 @@
          (cons "sw" (idesc sw-exp (list parse-reg)))
          (cons "ja" (idesc ja-exp '()))
          (cons "jar" (idesc jar-exp '()))
-         (cons "sig" (idesc sig-exp (list parse-sigout)))
+         (cons "brk" (idesc brk-exp '()))
+         (cons "bell" (idesc brk-exp '()))
+         (cons "dint" (idesc brk-exp '()))
+         (cons "eint" (idesc brk-exp '()))
+         (cons "iclr" (idesc brk-exp '()))
+         (cons "_isp" (idesc _isp-exp (list parse-number)))
          (cons "isp" (idesc isp-exp (list parse-number)))
+         (cons "xor" (idesc xor-exp (list parse-reg)))
+         (cons "and" (idesc xor-exp (list parse-reg)))
+         (cons "or" (idesc xor-exp (list parse-reg)))
+         (cons "inv" (idesc xor-exp (list parse-reg)))
+         (cons "xnor" (idesc xnor-exp (list parse-reg)))
+         (cons "nand" (idesc nand-exp (list parse-reg)))
+         (cons "nor" (idesc nor-exp (list parse-reg)))
+         (cons "_add" (idesc _add-exp (list parse-reg)))
+         (cons "_addc" (idesc _addc-exp (list parse-reg)))
+         (cons "_sub" (idesc _sub-exp (list parse-reg)))
+         (cons "_subc" (idesc _subc-exp (list parse-reg)))
+         (cons "_sl" (idesc _sl-exp '()))
+         (cons "_slc" (idesc _slc-exp '()))
+         (cons "_sla" (idesc _sla-exp '()))
+         (cons "_slr" (idesc _slr-exp '()))
+         (cons "_sr" (idesc _sr-exp '()))
+         (cons "_src" (idesc _src-exp '()))
+         (cons "_srr" (idesc _srr-exp '()))
+         (cons "_sra" (idesc _sra-exp '()))
+         
          (cons "add" (idesc add-exp (list parse-reg)))
          (cons "sl" (idesc sl-exp '()))
          (cons "slc" (idesc slc-exp '()))
@@ -123,10 +193,10 @@
          (cons "addci" (idesc addci-exp (list parse-number)))
          (cons "_addi" (idesc _addi-exp (list parse-number)))
          (cons "subi" (idesc subi-exp (list parse-number)))
-         (cons "j" (idesc j-exp (list parse-label)))
-         (cons "jif" (idesc jif-exp (list parse-sigin parse-label)))
-         (cons "jnif" (idesc jnif-exp (list parse-sigin parse-label)))
+         (cons "jif" (idesc jif-exp (list parse-label)))
+         (cons "jnif" (idesc jnif-exp (list parse-label)))
          
+         (cons "j" (idesc j-exp (list parse-label)))
          (cons "call" (idesc call-exp (list parse-label)))
          (cons "goto" (idesc goto-exp (list parse-label)))
          (cons "move" (idesc move-exp (list parse-reg parse-reg))))))
@@ -193,7 +263,9 @@
 ; Macro definitions go here
 (define macro-expand
   (lambda (exp)
-    (cond [(@include-exp? exp) (expand-file (@include-exp-path exp))]
+    (cond [(j-exp? exp) (list-exp (list (jif-exp (j-exp-label exp))
+                                        (jnif-exp (j-exp-label exp))))]
+          [(@include-exp? exp) (expand-file (@include-exp-path exp))]
           [(call-exp? exp) (list-exp (list (wr-exp 'dy)
                                            (rdi-exp (bytenum (call-exp-label exp) 0))
                                            (wr-exp 'dx)
@@ -262,7 +334,6 @@
           [(addci-exp? exp) 2]
           [(_addi-exp? exp) 2]
           [(subi-exp? exp) 2]
-          [(j-exp? exp) 2]
           [(jif-exp? exp) 2]
           [(jnif-exp? exp) 2]
           [else (raise (string-append "Expression " (format "~a" exp) " has no defined length"))])))
@@ -299,7 +370,7 @@
   (lambda (lexp)
     (if (list-exp? lexp)
         (let recurse ([exps (list-exp-contents lexp)]
-                      [ltab (make-immutable-hash)]
+                      [ltab (hash-set (make-immutable-hash) "ISR" #x7F00)]
                       [clean-exps '()]
                       [index 0]
                       [static-index #x8000])
@@ -340,9 +411,8 @@
                    [(addi-exp? inst) (addi-exp (get-value (addi-exp-num inst) ltab))]
                    [(addci-exp? inst) (addci-exp (get-value (addci-exp-num inst) ltab))]
                    [(subi-exp? inst) (subi-exp (get-value (subi-exp-num inst) ltab))]
-                   [(j-exp? inst) (j-exp (get-value (j-exp-label inst) ltab))]
-                   [(jif-exp? inst) (jif-exp (jif-exp-sig inst) (get-value (jif-exp-label inst) ltab))]
-                   [(jnif-exp? inst) (jnif-exp (jnif-exp-sig inst) (get-value (jnif-exp-label inst) ltab))]
+                   [(jif-exp? inst) (jif-exp (get-value (jif-exp-label inst) ltab))]
+                   [(jnif-exp? inst) (jnif-exp (get-value (jnif-exp-label inst) ltab))]
                    [else inst])) ilist))))
 
 (define reg->bits
@@ -402,15 +472,12 @@
                      [(addci-exp? inst) (list #b11010101 (num->8bi (addci-exp-num inst)))]
                      [(_addi-exp? inst) (list #b11000100 (num->8bi (_addi-exp-num inst)))]
                      [(subi-exp? inst) (list #b11010110 (num->8bi (subi-exp-num inst)))]
-                     [(j-exp? inst) (let ([offset (- (j-exp-label inst) (+ loc 1))])
+                     [(jif-exp? inst) (let ([offset (- (jif-exp-label inst) (+ loc 1))])
                                       (list (bitwise-ior #b11100000 (num->4bi (get-bnum offset 1)))
                                             (num->8bi (get-bnum offset 0))))]
-                     [(jif-exp? inst) (let ([offset (- (jif-exp-label inst) (+ loc 1))])
-                                        (list (bitwise-ior #b11110000 (num->u3bi (jif-exp-sig inst)))
-                                              (num->8bi offset)))]
                      [(jnif-exp? inst) (let ([offset (- (jnif-exp-label inst) (+ loc 1))])
-                                        (list (bitwise-ior #b11111000 (num->u3bi (jnif-exp-sig inst)))
-                                              (num->8bi offset)))]
+                                      (list (bitwise-ior #b11110000 (num->4bi (get-bnum offset 1)))
+                                            (num->8bi (get-bnum offset 0))))]
                      [else (raise (format "Could not convert ~a to binary" inst))])])
       (if (= (length rep) (exp-length inst))
           rep
