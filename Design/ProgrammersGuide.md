@@ -3,37 +3,71 @@
 NOTE: implementation of these features not yet complete
 
 ## About This Guide
-This guide is intended to detail all of the explicit rules, as well as some best practices and implementation hints, for writing programs in NANDy assembly. Because the NANDy is a very simple processor with limited resources, it may often be necessary to deviate from these guidelines for best performance, so this document can and should be ignored whenever it is necessary; however, following these conventions will make code significantly easier to understand.  
+This guide is intended to detail all of the explicit rules, as well as some best
+practices and implementation hints, for writing programs in NANDy assembly.
+Because the NANDy is a very simple processor with limited resources, it may
+often be necessary to deviate from these guidelines for best performance, so
+this document can and should be ignored whenever it is necessary; however,
+following these conventions will make code significantly easier to understand.  
 
-Throughout this guide, `code markdown` is used for code snippets, instruction specifications, and other pieces of useful text. In general, code markdown with `<angle brackets>` is used to denote a required parameter, while `[square brackets]` are used to denote optional syntax.
+Throughout this guide, `code markdown` is used for code snippets, instruction
+specifications, and other pieces of useful text. In general, code markdown with
+`<angle brackets>` is used to denote a required parameter, while
+`[square brackets]` are used to denote optional syntax.
 
 ## The NANDy Assembler
 
 ### Basic Syntax
-NANDy provides a referencce assembler design which supports all *(not yet) core instructions as well as a number of helpful shortcuts and macros, which are detailed in their relevant sections throughout this guide. The basic structure of a line of assembly is:
+NANDy provides a referencce assembler design which supports all  core
+instructions as well as a number of helpful shortcuts and macros, which are
+detailed in their relevant sections throughout this guide. The basic structure
+of a line of assembly is:
 ```
 [<label>:] <command> [<operands>] [#<comment>]
 ```
-It is also allowable to have a line with only a label, only a comment, or no content at all. Arguments are whitespace-delineated, and it is not necessary to have any whitespace after a label or before a comment; all whitespace other than newlines is considered equivalent.
+It is also allowable to have a line with only a label, only a comment, or no
+content at all. Arguments are whitespace-delineated, and it is not necessary to
+have any whitespace after a label or before a comment; all whitespace other than
+newlines is considered equivalent.
 
-By convention, commands starting with `@` represent preprocessing macros that expand to either nothing or complex external constructs; other assemblers are very strongly discouraged (but not prohibited) from using the `@` character in any other context.
+By convention, commands starting with `@` represent preprocessing macros that
+expand to either nothing or complex external constructs; other assemblers are
+very strongly discouraged (but not prohibited) from using the `@` character in
+any other context.
 
 ### Literals and Symbols
-Several instructions take a literal value as an argument; this can be a decimal number *(more radices coming soon) or a combination of operations on another literal. Currently only the byte selection operator is supported, denoted `$`. The expression `N$M` is equal to the Mth byte of N, with 0 representing the least-significant byte; in this operation M must be a decimal number and cannot contain other symbols.
+Several instructions take a literal value as an argument; this can be a decimal
+number *(more radices coming soon) or a combination of operations on another
+literal. Currently only the byte selection operator is supported, denoted `$`.
+The expression `N$M` is equal to the Mth byte of N, with 0 representing the
+least-significant byte; in this operation M must be a decimal number and cannot
+contain other symbols.
 
 Symbols may be defined in one of three ways:
-* Placing a label `name:` in the program sets the value of the symbol "name" to the address of the first instruction following the label.
-* The macro `@define name <value>` sets the value of the symbol "name" to the given value. This assignment is not recursive; it may depend on any label or any `@define` before it in the program, but not itself or any `@define` after it.
-* The macro `@static <amount> name` reserves `amount` bytes at the bottom of RAM for static variables, and creates a symbol `name` containing the address of the first byte of the reserved region.
+* Placing a label `name:` in the program sets the value of the symbol "name" to
+the address of the first instruction following the label.
+* The macro `@define name <value>` sets the value of the symbol "name" to the
+given value. This assignment is not recursive; it may depend on any label or any
+`@define` before it in the program, but not itself or any `@define` after it.
+* The macro `@static <amount> name` reserves `amount` bytes at the bottom of RAM
+for static variables, and creates a symbol `name` containing the address of the
+first byte of the reserved region.
 
-Additionally, a predefined symbol `FREE_MEM` is provided pointing to the first byte of RAM not reserved by `@static`.
+Additionally, a predefined symbol `FREE_MEM` is provided pointing to the first
+byte of RAM not reserved by `@static`.
 
-Symbols may be used in most arithmetic and program-flow operations as if they were numbers. Symbols should only be defined using ASCII letters and underscores; defining a symbol using characters outside this set may function on some assembler versions but is undefined behavior.
+Symbols may be used in most arithmetic and program-flow operations as if they
+were numbers. Symbols should only be defined using ASCII letters and
+underscores; defining a symbol using characters outside this set may function on
+some assembler versions but is undefined behavior.
 
 ## Using The NANDy Architecture
 
 ### Overview
-NANDy is an accumulator-based architecture with four core registers and 16-bit memory addressing. It supports basic arithmetic operations on 8 bits of data, including addition, subtraction, and bitwise operators, as well as carry-in and carry-out for operating on larger datatypes.
+NANDy is an accumulator-based architecture with four core registers and 16-bit
+memory addressing. It supports basic arithmetic operations on 8 bits of data,
+including addition, subtraction, and bitwise operators, as well as carry-in and
+carry-out for operating on larger datatypes.
 
 ### Registers
 NANDy has four core registers, specified as follows:
