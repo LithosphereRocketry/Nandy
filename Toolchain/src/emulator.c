@@ -165,7 +165,7 @@ void aluop(enum ALUMode mode, bool isCarry, bool isXY, word_t a, word_t b, word_
 			break;
 		case ALU_AND:
 			newresult = a & b;
-			newcarry = (a == 0);
+			newcarry = (a != 0);
 			break;
 		case ALU_OR:
 			newresult = a | b;
@@ -181,7 +181,7 @@ void aluop(enum ALUMode mode, bool isCarry, bool isXY, word_t a, word_t b, word_
 			break;
 		case ALU_NAND:
 			newresult = ~(a & b);
-			newcarry = (a != 0);
+			newcarry = (a == 0);
 			break;
 		case ALU_NOR:
 			newresult = ~(a | b);
