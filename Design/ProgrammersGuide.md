@@ -54,7 +54,9 @@ for static variables, and creates a symbol `name` containing the address of the
 first byte of the reserved region.
 
 Additionally, a predefined symbol `FREE_MEM` is provided pointing to the first
-byte of RAM not reserved by `@static`.
+byte of RAM not reserved by `@static`, and a predefined symbol `ISR` is provided
+with the value 0x7F00, corresponding to the address of the interrupt service
+routine.
 
 Symbols may be used in most arithmetic and program-flow operations as if they
 were numbers. Symbols should only be defined using ASCII letters and
@@ -112,9 +114,9 @@ achieved by hand-writing the swap sequences.
 
 ### Arithmetic
 NANDy provides a number of 8-bit arithmetic operations as primitive
-instructions. Most are two-operand; one input can be selected between DX and DY,
-and the other is always the accumulator, with the result placed back in the
-acccumulator. A few operations have only one operand, such as `sl` - these
+instructions. Most are two-operand; one input is always the accumulator,
+and the other can be selected between DX and DY, with the result placed back in
+the acccumulator. A few operations have only one operand, such as `sl` - these
 always act directly on the accumulator. The basic arithmetic operations are as
 follows:
 * `add`: Adds the two operands
@@ -122,10 +124,19 @@ follows:
 * `xor`: Bitwise-xors the two operands
 * `and`: Bitwise-ands the two operands
 * `or`: Bitwise-ors the two operands
+* `xnor`: Bitwise-xnors the two operands
+* `nand`: Bitwise-nands the two operands
+* `nor`: Bitwise-nors the two operands
+* `inv`: Sets accumulator equal to the bitwise inverse of the second operand (*)
 * `sl`/`sr`: Shifts the accumulator left/right by 1 place, filling with zeroes
 * `slr`/`srr`: Rotates the accumulator left/right by 1 place
 * `sla`/`sra`: Shifts the accumulator left/right by 1 place, leaving the vacated
 position unchanged
+
+(*) If this instruction seems like a bit of an anomaly, it is - it is more a
+consequence of spare logic in the ALU and not really needed for any particular
+purpose. However, since it technically fulfils a unique purpose, it is
+included here rather than left undocumented.
 
 By default, all operations except bitwise logical ones (`xor`, `and`, `or`)
 modify the value of the carry bit. For addition and subtraction, the carry bit
@@ -133,16 +144,16 @@ is set to the value that the 9th bit of the result would take were it extended
 by an extra bit; for shifts, it is set to the value that was shifted off the end
 of the register. Operations may be prevented from setting the carry bit by
 prepending an underscore (`_`) to their mnemonic. There also exists a set of
-comparison operations which only modify the carry bit, and do not affect the
-accumulator at all:
-* `ne`: Sets the carry bit to 1 if ACC is not equal to the second operand, 0
-otherwise.
-* `eq`: Sets the carry bit to 1 if ACC is equal to the second operand, 0
-otherwise.
-* `lt`: Sets the carry bit to 1 if ACC is less than the second operand, 0
-otherwise.
-* `ge`: Sets the carry bit to 1 if ACC is greater than or equal to the second
-operand, 0 otherwise.
+operations which only modify the carry bit, and do not affect the accumulator at
+all:
+* `zero`: Set the carry bit high if the accumulator is zero, and low otherwise.
+* `nzero`: Inverse of `zero`.
+* `par`: Set the carry bit high if the accumulator contains an odd number of
+high bits, and low otherwise.
+* `npar`: Inverse of `par`. 
+* `cset`: Set the carry bit high unconditionally.
+* `cclr`: Set the carry bit low unconditionally.
+* `ctog`: Invert the value of the carry bit.
 
 Several instructions allow a suffix of `c` to indicate that the carry bit should
 be used as a mathematical carry; specifically, `add`, `sub`, `sl`, and `sr` can
@@ -184,8 +195,14 @@ absolute mode, as in the `lda` and `stra` instructions, DX and DY are combined
 to form a 16-bit base address and this address is further offset by the
 immediate value given. In stack mode, as in `lds` and `strs`, SP is combined
 with the upper byte 0xFF to form a base address and this address is similarly
-offset by the immediate. Immediates for these instructions are signed 4-bit
-values, allowing an offset of up to +7 or -8 bytes.
+offset by the immediate. Immediates for these instructions are unsigned 4-bit
+values, allowing a positive offset of 0 to 15 bytes.
+
+Implementations will typically designate some portion of memory as "read-only"
+for the purposes of boot or program ROM. In the reference implementation,
+read-only memory extends from 0x0000 to 0x7FFF. Writing to read-only memory is
+undefined behavior, and may result in corruption of memory distant from the
+address written.
 
 As an 8-bit architecture, NANDy has no hardware-defined endianness or byte
 alignment. In general, it is encouraged to use little-endian representations and
@@ -200,10 +217,10 @@ instruction `isp` (and corresponding no-carry version `_isp`) is provided which
 moves the stack pointer by the provided 4-bit immediate in a single cycle.
 
 Generally speaking, memory addresses below the stack pointer are considered to
-be undefined in the context of stack access, and using them should be avoided.
-Using `lds` and `strs` with a negative memory offset can access memory outside
-the stack page 0xFFnn, which may cause collisions with other memory regions; use
-with care *(eventually this will be standardized to a yes or no).
+be undefined in the context of stack access, and it should be expected that
+their contents may change at any time. Reading off the top of the stack (offset
+above 0xFFFF) is also undefined behavior, and will usually result in reading the
+first bytes of program memory.
 
 In some cases, it may be necessary or advantageous to neglect the stack memory
 region and instead use the stack pointer as an extra general-purpose register.
@@ -213,36 +230,32 @@ or non-initialization, the stack is said to be "invalid"; when that condition is
 true, it is said to be "valid." 
 
 ### Program Flow
-NANDy program flow is provided by a small handful of jump instructions. Simple
-unconditional jumps are handled by `j <label>`; the label may also be replaced
-by a direct memory address, but this practice is not recommended. Note that `j`
-is always a relative jump, with a range limit of [-2048, +2047] bytes;
-attempting to jump outside this range will cause an error in assembly.
+NANDy program flow is provided by a small handful of jump instructions. Local
+conditional jumps are handled by the `jif` and `jnif` instructions. Both
+take the form `j[n]if <label>`, where the label may also be replaced by a direct memory address, but this practice is not recommended. These jumps have a range
+limit of [-2048, +2047] bytes; attempting to jump outside this range will cause
+an error in assembly. `jif` will jump to the specified label if the specified
+signal is high, while `jnif` will jump if the specified signal is low. There is
+no unconditional local jump; however, the `j` macro is provided that fulfils the
+same function, equivalent to `jif` followed by `jnif`.
 
-Conditionals and loops are handled by the `jif` and `jnif` instructions. Both
-take the form `j[n]if <signal> <label>`, where `<signal>` represents an input
-signal (see the [Input/Output](#input-output) section). In most cases, signal 0
-(alias `carry`) will be used. `jif` will jump to the specified label if the
-specified signal is high, while `jnif` will jump if the specified signal is low.
-Both instructions have reduced jump range, only allowing jumps of [-128, +127]
-bytes.
-
-Of note for optimization is that all relative jump instructions will take two
+Of note for optimization is that relative jump instructions will take two
 cycles - this includes `jif` and `jnif` even when the jump is not taken.
-Therefore it is usually faster to let a loop fall through when it is finished:
+Therefore it is usually faster to let a loop fall through when it is finished.
+The `j` macro is especially disadvantageous for performance-sensitive code; it
+may take either 2 or 4 cycles depending on the state of the carry bit.
 ```
 loop:
     # this is fast
     ...
-    jnif carry loop
+    jnif loop
     # done
 ```
-Than to jump out of the loop:
 ```
 loop:
     # this is slow
     ...
-    jif carry done
+    jif done
     j loop
 done: # done
 ```
