@@ -240,10 +240,10 @@ no unconditional local jump; however, the `j` macro is provided that fulfils the
 same function, equivalent to `jif` followed by `jnif`.
 
 Of note for optimization is that relative jump instructions will take two
-cycles - this includes `jif` and `jnif` even when the jump is not taken.
-Therefore it is usually faster to let a loop fall through when it is finished.
-The `j` macro is especially disadvantageous for performance-sensitive code; it
-may take either 2 or 4 cycles depending on the state of the carry bit.
+cycles - this includes when the jump is not taken. Therefore it is usually
+faster to let a loop fall through when it is finished. The `j` macro is
+especially disadvantageous for performance-sensitive code; it may take either 2
+or 4 cycles depending on the state of the carry bit.
 ```
 loop:
     # this is fast
