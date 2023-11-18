@@ -3,7 +3,7 @@
     rd io
     call fib
     wr io
-    sig brk
+    brk
 
 fib:isp -3
     strs 0 # argument
