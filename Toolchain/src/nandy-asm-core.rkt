@@ -57,11 +57,11 @@
 (struct _sra-exp () #:transparent)
 ;; Register ALU, carry
 (struct cclr-exp () #:transparent)
-(struct zero-exp () #:transparent)
+(struct nzero-exp () #:transparent)
 (struct par-exp () #:transparent)
 (struct cset-exp () #:transparent)
 (struct ctog-exp () #:transparent)
-(struct nzero-exp () #:transparent)
+(struct zero-exp () #:transparent)
 (struct npar-exp () #:transparent)
 (struct add-exp (reg) #:transparent)
 (struct addc-exp (reg) #:transparent)
@@ -178,11 +178,11 @@
          (cons "_srr" (idesc _srr-exp '()))
          (cons "_sra" (idesc _sra-exp '()))
          (cons "cclr" (idesc cclr-exp '()))
-         (cons "zero" (idesc zero-exp '()))
+         (cons "nzero" (idesc nzero-exp '()))
          (cons "par" (idesc par-exp '()))
          (cons "cset" (idesc cset-exp '()))
          (cons "ctog" (idesc ctog-exp '()))
-         (cons "nzero" (idesc nzero-exp '()))
+         (cons "zero" (idesc zero-exp '()))
          (cons "npar" (idesc npar-exp '()))
          (cons "add" (idesc add-exp (list parse-reg)))
          (cons "addc" (idesc add-exp (list parse-reg)))
@@ -374,11 +374,11 @@
           [(_sra-exp? exp) 1]
 
           [(cclr-exp? exp) 1]
-          [(zero-exp? exp) 1]
+          [(nzero-exp? exp) 1]
           [(par-exp? exp) 1]
           [(cset-exp? exp) 1]
           [(ctog-exp? exp) 1]
-          [(nzero-exp? exp) 1]
+          [(zero-exp? exp) 1]
           [(npar-exp? exp) 1]
           [(add-exp? exp) 1]
           [(addc-exp? exp) 1]
@@ -576,11 +576,11 @@
                      [(_srr-exp? inst) (list #b01101110)]
                      [(_sra-exp? inst) (list #b01101111)]
                      [(cclr-exp? inst) (list #b01010000)]
-                     [(zero-exp? inst) (list #b01010010)]
+                     [(nzero-exp? inst) (list #b01010010)]
                      [(par-exp? inst) (list #b01010011)]
                      [(cset-exp? inst) (list #b01010100)]
                      [(ctog-exp? inst) (list #b01010101)]
-                     [(nzero-exp? inst) (list #b01010110)]
+                     [(zero-exp? inst) (list #b01010110)]
                      [(npar-exp? inst) (list #b01010111)]
                      [(add-exp? inst) (list (bitwise-ior #b01011000 (regmath->bits (add-exp-reg inst))))]
                      [(addc-exp? inst) (list (bitwise-ior #b01011001 (regmath->bits (addc-exp-reg inst))))]
