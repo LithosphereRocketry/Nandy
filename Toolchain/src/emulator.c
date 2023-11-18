@@ -86,7 +86,7 @@ word_t signExt(word_t value, int bits) {
 	}
 }
 
-bool step(bool interrupt);
+bool step(bool debugint);
 bool pause() {
 	// PC increments early in this implementation so we subtract 1
 	printf("Breakpoint\n");
@@ -234,7 +234,7 @@ void aluop(enum ALUMode mode, bool isCarry, bool isXY, word_t a, word_t b, word_
 	}
 }
 
-bool step(bool interrupt) {
+bool step(bool debugint) {
 	inst_t i = fetch();
 	if(!(i & MULTICYCLE_MASK)) { // single cycle operations
 		if(!(i & ALU_SEL_MASK)) { // basic instructions
@@ -278,7 +278,7 @@ bool step(bool interrupt) {
 							y = oldpc >> 8;
 						}
 					} else { // break
-						if(interrupt) return pause();
+						if(debugint) return pause();
 					}
 				}
 			} else { // isp instructions
