@@ -2,12 +2,11 @@
 	rdi 25
 	wr sp
 	rdi 65 # 'A'
-	sig brk
+	brk
 	
 lbl: nop
 	wr io
 	isp -1
 	_addi 1
-	jnif carry lbl
-	
-	sig brk
+	jnif lbl
+	brk
