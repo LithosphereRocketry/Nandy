@@ -71,30 +71,52 @@ carry-out for operating on larger datatypes.
 
 ### Registers
 NANDy has four core registers, specified as follows:
-* ACC: Accumulator; used for all mathematical operations; additionally is the data register for all memory operations.
-* DX: Data X register; can be used as second operand in arithmetic operands; used as lower 8 bits for memory addresses (alias X, DL)
-* DY: Data Y register; can be used as second operand in arithmetic operands; used as upper 8 bits for memory addresses (alias Y, DH)
-* SP: Stack pointer; used as lower 8 bits of address in stack-addressing mode; incrementable/decrementable independently of ACC
+* ACC: Accumulator; used for all mathematical operations; additionally is the
+data register for all memory operations
+* DX: Data X register; can be used as second operand in arithmetic operands;
+used as lower 8 bits for memory addresses (alias X, DL)
+* DY: Data Y register; can be used as second operand in arithmetic operands;
+used as upper 8 bits for memory addresses (alias Y, DH)
+* SP: Stack pointer; used as lower 8 bits of address in stack-addressing mode;
+incrementable/decrementable independently of ACC
 
-The I/O bus is also treated as a register from the programmer's perspective and may be accessed by all register-move operations; however, it represents separate input and output ports, so no data written to it can be read back.
+The I/O bus is also treated as a register from the programmer's perspective and
+may be accessed by all register-move operations; however, it represents separate
+input and output ports, so no data written to it can be read back.
 
-Registers are primarily manipulated via the `rd`, `wr`, and `sw` instructions, which read a register's value into the accumulator, write the accumulator's value into a register, and swap the accumulator with a register, respectively. There are no direct operations for manipulating non-accumulator registers relative to each other, but the same effect can be achieved by multiple swaps; for example, the nonexistent `sw dx, dy` is equivalent to:
+Registers are primarily manipulated via the `rd`, `wr`, and `sw` instructions,
+which read a register's value into the accumulator, write the accumulator's
+value into a register, and swap the accumulator with a register, respectively.
+There are no direct operations for manipulating non-accumulator registers
+relative to each other, but the same effect can be achieved by multiple swaps;
+for example, the nonexistent `sw dx, dy` is equivalent to:
 ```
 sw dx
 sw dy
 sw dx
 ```
-Constant values may be read into the accumulator via the `rdi` instruction. Similar to register moves, there is no way to directly read into registers other than the accumulator, but the same can be accomplished by a series of swaps:
+Constant values may be read into the accumulator via the `rdi` instruction.
+Similar to register moves, there is no way to directly read into registers other
+than the accumulator, but the same can be accomplished by a series of swaps:
 ```
 sw dx
 rdi 100
 sw dx
 ```
-For convenience, the included assembler provides a `move` macro that moves a value from any register to any other register while minimally disturbing other registers. This macro will expand to one or more `sw`, `rd`, and `wr` instructions when assembled; it is generally fairly efficient, but if some registers contain "don't care" values
-better performance may sometimes be achieved by hand-writing the swap sequences.
+For convenience, the included assembler provides a `move` macro that moves a
+value from any register to any other register while minimally disturbing other
+registers. This macro will expand to one or more `sw`, `rd`, and `wr`
+instructions when assembled; it is generally fairly efficient, but if some
+registers contain "don't care" values better performance may sometimes be
+achieved by hand-writing the swap sequences.
 
 ### Arithmetic
-NANDy provides a number of 8-bit arithmetic operations as primitive instructions. Most are two-operand; one input can be selected between DX and DY, and the other is always the accumulator, with the result placed back in the acccumulator. A few operations have only one operand, such as `sl` - these always act directly on the accumulator. The basic arithmetic operations are as follows:
+NANDy provides a number of 8-bit arithmetic operations as primitive
+instructions. Most are two-operand; one input can be selected between DX and DY,
+and the other is always the accumulator, with the result placed back in the
+acccumulator. A few operations have only one operand, such as `sl` - these
+always act directly on the accumulator. The basic arithmetic operations are as
+follows:
 * `add`: Adds the two operands
 * `sub`: Subtracts the second operand from the accumulator
 * `xor`: Bitwise-xors the two operands
@@ -102,45 +124,112 @@ NANDy provides a number of 8-bit arithmetic operations as primitive instructions
 * `or`: Bitwise-ors the two operands
 * `sl`/`sr`: Shifts the accumulator left/right by 1 place, filling with zeroes
 * `slr`/`srr`: Rotates the accumulator left/right by 1 place
-* `sla`/`sra`: Shifts the accumulator left/right by 1 place, leaving the vacated position unchanged
+* `sla`/`sra`: Shifts the accumulator left/right by 1 place, leaving the vacated
+position unchanged
 
-By default, all operations except bitwise logical ones (`xor`, `and`, `or`) modify the value of the carry bit. For addition and subtraction, the carry bit is set to the value that the 9th bit of the result would take were it extended by an extra bit; for shifts, it is set to the value that was shifted off the end of the register. Operations may be prevented from setting the carry bit by prepending an underscore (`_`) to their mnemonic. There also exists a set of comparison operations which only modify the carry bit, and do not affect the accumulator at all:
-* `ne`: Sets the carry bit to 1 if ACC is not equal to the second operand, 0 otherwise.
-* `eq`: Sets the carry bit to 1 if ACC is equal to the second operand, 0 otherwise.
-* `lt`: Sets the carry bit to 1 if ACC is less than the second operand, 0 otherwise.
-* `ge`: Sets the carry bit to 1 if ACC is greater than or equal to the second operand, 0 otherwise.
+By default, all operations except bitwise logical ones (`xor`, `and`, `or`)
+modify the value of the carry bit. For addition and subtraction, the carry bit
+is set to the value that the 9th bit of the result would take were it extended
+by an extra bit; for shifts, it is set to the value that was shifted off the end
+of the register. Operations may be prevented from setting the carry bit by
+prepending an underscore (`_`) to their mnemonic. There also exists a set of
+comparison operations which only modify the carry bit, and do not affect the
+accumulator at all:
+* `ne`: Sets the carry bit to 1 if ACC is not equal to the second operand, 0
+otherwise.
+* `eq`: Sets the carry bit to 1 if ACC is equal to the second operand, 0
+otherwise.
+* `lt`: Sets the carry bit to 1 if ACC is less than the second operand, 0
+otherwise.
+* `ge`: Sets the carry bit to 1 if ACC is greater than or equal to the second
+operand, 0 otherwise.
 
-Several instructions allow a suffix of `c` to indicate that the carry bit should be used as a mathematical carry; specifically, `add`, `sub`, `sl`, and `sr` can be modified to `addc`, `subc`, `slc`, and `src`. In addition and subtraction, this overrides the carry-in line of the adder; in shift operations, it specifies the value that should be shifted into the new place. This allows operations to be chained for larger bit widths, as in this example of a 16-bit left shift of the combined value of [DX, ACC]:
+Several instructions allow a suffix of `c` to indicate that the carry bit should
+be used as a mathematical carry; specifically, `add`, `sub`, `sl`, and `sr` can
+be modified to `addc`, `subc`, `slc`, and `src`. In addition and subtraction,
+this overrides the carry-in line of the adder; in shift operations, it specifies
+the value that should be shifted into the new place. This allows operations to
+be chained for larger bit widths, as in this example of a 16-bit left shift of
+the combined value of [DX, ACC]:
 ```
 sl
 sw dx
 slc
 sw dx
 ```
-Two-operand arithmetic instructions may have `i` appended to their mnemonic, indicating that they operate on an immediate value instead of a register. These instructions take a signed 8-bit integer as their argument and otherwise behave the same as their register equivalents. Performance-minded users should be aware that these instructions use two clock cycles and two bytes of program memory, as opposed to register operations that take only one.
+Two-operand arithmetic instructions may have `i` appended to their mnemonic,
+indicating that they operate on an immediate value instead of a register. These
+instructions take a signed 8-bit integer as their argument and otherwise behave
+the same as their register equivalents. Performance-minded users should be aware
+that these instructions use two clock cycles and two bytes of program memory, as
+opposed to register operations that take only one.
 
-All modifiers can be combined, limited only by which operations each modifier is compatible with. For example, the instruction `_addci 3` adds the value 3 plus the carry bit to the accumulator without modifying the carry bit. Modifiers must be combined in the order shown - `addic` is not a valid instruction.
+All modifiers can be combined, limited only by which operations each modifier is
+compatible with. For example, the instruction `_addci 3` adds the value 3 plus
+the carry bit to the accumulator without modifying the carry bit. Modifiers must
+be combined in the order shown - `addic` is not a valid instruction.
 
 ### Memory
-NANDy uses a single memory address space for both program and data memory. Implementations may choose to use any memory layout they choose, however memory address 0 must be the start of program execution and memory address 0xFFFF must be writable; the reference implementation places program ROM between 0x0000 and 0x7FFF and general-purpose RAM between 0x8000 and 0xFFFF. Implementations which do not support a full 64KB of memory may choose to ignore upper bits of the address in order to satisfy these constraints, but these implementations may require modifications to the assembler in order to function correctly.
+NANDy uses a single memory address space for both program and data memory.
+Implementations may choose to use any memory layout they choose, however memory
+address 0 must be the start of program execution and memory address 0xFFFF must
+be writable; the reference implementation places program ROM between 0x0000 and
+0x7FFF and general-purpose RAM between 0x8000 and 0xFFFF. Implementations which
+do not support a full 64KB of memory may choose to ignore upper bits of the
+address in order to satisfy these constraints, but these implementations may
+require modifications to the assembler in order to function correctly.
 
-Memory may be addressed in one of two modes: absolute mode and stack mode. In absolute mode, as in the `lda` and `stra` instructions, DX and DY are combined to form a 16-bit base address and this address is further offset by the immediate value given. In stack mode, as in `lds` and `strs`, SP is combined with the upper byte 0xFF to form a base address and this address is similarly offset by the immediate. Immediates for these instructions are signed 4-bit values, allowing an offset of up to +7 or -8 bytes.
+Memory may be addressed in one of two modes: absolute mode and stack mode. In
+absolute mode, as in the `lda` and `stra` instructions, DX and DY are combined
+to form a 16-bit base address and this address is further offset by the
+immediate value given. In stack mode, as in `lds` and `strs`, SP is combined
+with the upper byte 0xFF to form a base address and this address is similarly
+offset by the immediate. Immediates for these instructions are signed 4-bit
+values, allowing an offset of up to +7 or -8 bytes.
 
-As an 8-bit architecture, NANDy has no hardware-defined endianness or byte alignment. In general, it is encouraged to use little-endian representations and single-byte alignment, as this provides the best combination of memory efficiency and compatibility with other architectures.
+As an 8-bit architecture, NANDy has no hardware-defined endianness or byte
+alignment. In general, it is encouraged to use little-endian representations and
+single-byte alignment, as this provides the best combination of memory
+efficiency and compatibility with other architectures.
 
 #### The Stack
-NANDy has a 256-byte stack, located betweeen addresses 0xFF00 and 0xFFFF. By convention the stack grows downwards; the stack pointer should be initialized to 0x00 and then decremented to allocate space. In order to improve performance, an instruction `isp` (and corresponding no-carry version `_isp`) is provided which moves the stack pointer by the provided 4-bit immediate in a single cycle.
+NANDy has a 256-byte stack, located betweeen addresses 0xFF00 and 0xFFFF. By
+convention the stack grows downwards; the stack pointer should be initialized to
+0x00 and then decremented to allocate space. In order to improve performance, an
+instruction `isp` (and corresponding no-carry version `_isp`) is provided which
+moves the stack pointer by the provided 4-bit immediate in a single cycle.
 
-Generally speaking, memory addresses below the stack pointer are considered to be undefined in the context of stack access, and using them should be avoided. Using `lds` and `strs` with a negative memory offset can access memory outside the stack page 0xFFnn, which may cause collisions with other memory regions; use with care *(eventually this will be standardized to a yes or no).
+Generally speaking, memory addresses below the stack pointer are considered to
+be undefined in the context of stack access, and using them should be avoided.
+Using `lds` and `strs` with a negative memory offset can access memory outside
+the stack page 0xFFnn, which may cause collisions with other memory regions; use
+with care *(eventually this will be standardized to a yes or no).
 
-In some cases, it may be necessary or advantageous to neglect the stack memory region and instead use the stack pointer as an extra general-purpose register. This is referred to as "stack-pointer abuse." Anytime the stack pointer does not represent the lowest allocated memory address on the stack, whether due to abuse or non-initialization, the stack is said to be "invalid"; when that condition is true, it is said to be "valid." 
+In some cases, it may be necessary or advantageous to neglect the stack memory
+region and instead use the stack pointer as an extra general-purpose register.
+This is referred to as "stack-pointer abuse." Anytime the stack pointer does not
+represent the lowest allocated memory address on the stack, whether due to abuse
+or non-initialization, the stack is said to be "invalid"; when that condition is
+true, it is said to be "valid." 
 
 ### Program Flow
-NANDy program flow is provided by a small handful of jump instructions. Simple unconditional jumps are handled by `j <label>`; the label may also be replaced by a direct memory address, but this practice is not recommended. Note that `j` is always a relative jump, with a range limit of [-2048, +2047] bytes; attempting to jump outside this range will cause an error in assembly.
+NANDy program flow is provided by a small handful of jump instructions. Simple
+unconditional jumps are handled by `j <label>`; the label may also be replaced
+by a direct memory address, but this practice is not recommended. Note that `j`
+is always a relative jump, with a range limit of [-2048, +2047] bytes;
+attempting to jump outside this range will cause an error in assembly.
 
-Conditionals and loops are handled by the `jif` and `jnif` instructions. Both take the form `j[n]if <signal> <label>`, where `<signal>` represents an input signal (see the [Input/Output](#input-output) section). In most cases, signal 0 (alias `carry`) will be used. `jif` will jump to the specified label if the specified signal is high, while `jnif` will jump if the specified signal is low. Both instructions have reduced jump range, only allowing jumps of [-128, +127] bytes.
+Conditionals and loops are handled by the `jif` and `jnif` instructions. Both
+take the form `j[n]if <signal> <label>`, where `<signal>` represents an input
+signal (see the [Input/Output](#input-output) section). In most cases, signal 0
+(alias `carry`) will be used. `jif` will jump to the specified label if the
+specified signal is high, while `jnif` will jump if the specified signal is low.
+Both instructions have reduced jump range, only allowing jumps of [-128, +127]
+bytes.
 
-Of note for optimization is that all relative jump instructions will take two cycles - this includes `jif` and `jnif` even when the jump is not taken. Therefore it is usually faster to let a loop fall through when it is finished:
+Of note for optimization is that all relative jump instructions will take two
+cycles - this includes `jif` and `jnif` even when the jump is not taken.
+Therefore it is usually faster to let a loop fall through when it is finished:
 ```
 loop:
     # this is fast
@@ -157,17 +246,34 @@ loop:
     j loop
 done: # done
 ```
-For jumps outside relative range, the absolute jump instructions `ja` and `jar` must be used. Both jump to the address formed by the combined Y and X registers; `ja` leaves the registers unchanged, while `jar` replaces the register values with the address of the instruction following the origin of the jump. `ja` and `jar` take no arguments; the assembler provides the macros `goto <label>` and `call <label>`, which automate the placement of address values in registers for each respectively. Both macros leave the accumulator unchanged; neither retains the previous values of X and Y anywhere in memory.
+For jumps outside relative range, the absolute jump instructions `ja` and `jar`
+must be used. Both jump to the address formed by the combined Y and X registers;
+`ja` leaves the registers unchanged, while `jar` replaces the register values
+with the address of the instruction following the origin of the jump. `ja` and
+`jar` take no arguments; the assembler provides the macros `goto <label>` and
+`call <label>`, which automate the placement of address values in registers for
+each respectively. Both macros leave the accumulator unchanged; neither retains
+the previous values of X and Y anywhere in memory.
 
 #### Function Calling
-Function calling is typically accomplished with the `call` macro, along with use of the stack. The following conventions apply:
+Function calling is typically accomplished with the `call` macro, along with use
+of the stack. The following conventions apply:
 * The stack must be valid at the time of call
 * Return address is passed in the X and Y registers
 * Functions must return the stack pointer to its original state
 * Arguments are passed in the accumulator and on the stack
 * Return values are passed in the accumulator and on the stack
 * At return, the stack pointer should be returned to its original state
-Upon call, a function "claims" a certain amount of stack space, which should be carefully documented as it may not be obvious. This is distinct from allocating stack space and is used for parameter passing. For example, a function that multiplies two 8-bit values might claim one byte of stack, pass its arguments in the accumulator and claimed byte, and return a 16-bit value split across the accumulator and claimed byte. Any claimed value that does not have an assigned meaning (typically, because padding is required to maintain the same stack pointer location) should be treated as "don't care"; if it has no meaning as an argument, it should accept any value, and if it has no meaning as a return, it may return containing any value.
+Upon call, a function "claims" a certain amount of stack space, which should be
+carefully documented as it may not be obvious. This is distinct from allocating
+stack space and is used for parameter passing. For example, a function that
+multiplies two 8-bit values might claim one byte of stack, pass its arguments in
+the accumulator and claimed byte, and return a 16-bit value split across the
+accumulator and claimed byte. Any claimed value that does not have an assigned
+meaning (typically, because padding is required to maintain the same stack
+pointer location) should be treated as "don't care"; if it has no meaning as an
+argument, it should accept any value, and if it has no meaning as a return, it
+may return containing any value.
 
 ### Input/Output
 
