@@ -8,6 +8,13 @@ typedef int8_t word_t;
 typedef uint16_t addr_t;
 typedef uint8_t inst_t;
 
+bool parity(word_t w) {
+	for(int i = 0; i < 8; i++) {
+		w ^= w >> i;
+	}
+	return w & 1;
+}
+
 #define MULTICYCLE_MASK 1<<7
 #define ALU_SEL_MASK 1<<6
 #define ISP_MASK 1<<5
@@ -18,13 +25,13 @@ typedef uint8_t inst_t;
 #define PROGFLOW_MASK 1<<4
 #define MEM_STACK_MASK 1<<4
 #define COND_INV_MASK 1<<4
-#define BRK_MASK 1<<3
+#define SIG_MASK 1<<3
 #define WR_MASK 1<<3
 #define RD_MASK 1<<2
 #define RET_MASK 1<<2
 
 #define ALU_INST_MASK 0xF
-#define ALU_WRITESBOTH_MASK 0b1100 // any instruction with either of these bits can
+#define ALU_WRITESBOTH_MASK 0b1000 // any instruction with either of these bits can
 								   // write ACC and CARRY simultaneously
 #define REGID_MASK 0b0011
 
@@ -36,22 +43,18 @@ enum ALUMode {
 	ALU_XOR = 0x1,
 	ALU_AND = 0x2,
 	ALU_OR = 0x3,
-	ALU_NE = 0x0,
-	ALU_EQ = 0x1,
-	ALU_LT = 0x2,
-	ALU_GE = 0x3,
-	ALU_ADD = 0x4,
-	ALU_ADDC = 0x5,
-	ALU_SUB = 0x6,
-	ALU_SUBC = 0x7,
-	ALU_SL = 0x8,
-	ALU_SLC = 0x9,
-	ALU_SLA = 0xA,
-	ALU_SLR = 0xB,
-	ALU_SR = 0xC,
-	ALU_SRC = 0xD,
-	ALU_SRR = 0xE,
-	ALU_SRA = 0xF
+	ALU_NB = 0x4,
+	ALU_XNOR = 0x5,
+	ALU_NAND = 0x6,
+	ALU_NOR = 0x7,
+	ALU_ADD = 0x8,
+	ALU_ADDC = 0x9,
+	ALU_SUB = 0xA,
+	ALU_SUBC = 0xB,
+	ALU_SL = 0xC,
+	ALU_SLC = 0xD,
+	ALU_SLA = 0xE,
+	ALU_SLR = 0xF
 };
 
 enum {
@@ -148,25 +151,41 @@ inst_t fetch() {
 	return mem[++pc];
 }
 
-void aluop(enum ALUMode mode, bool isCarry, word_t a, word_t b, word_t* result) {
+void aluop(enum ALUMode mode, bool isCarry, bool isXY, word_t a, word_t b, word_t* result) {
 	bool newcarry = false;
 	int newresult = 0;
 	switch(mode) {
 		case ALU_B:
 			newresult = b;
-			newcarry = (a != b);
+			newcarry = 0;
 			break;
 		case ALU_XOR:
 			newresult = a ^ b;
-			newcarry = (a == b);
+			newcarry = carry;
 			break;
 		case ALU_AND:
 			newresult = a & b;
-			newcarry = (a < b);
+			newcarry = (a == 0);
 			break;
 		case ALU_OR:
 			newresult = a | b;
-			newcarry = (a >= b);
+			newcarry = parity(a);
+			break;
+		case ALU_NB:
+			newresult = ~b;
+			newcarry = 1;
+			break;
+		case ALU_XNOR:
+			newresult = ~(a ^ b);
+			newcarry = !carry;
+			break;
+		case ALU_NAND:
+			newresult = ~(a & b);
+			newcarry = (a != 0);
+			break;
+		case ALU_NOR:
+			newresult = ~(a | b);
+			newcarry = !parity(a);
 			break;
 		case ALU_ADD:
 			newresult = a + b;
@@ -185,20 +204,22 @@ void aluop(enum ALUMode mode, bool isCarry, word_t a, word_t b, word_t* result) 
 			newcarry = (newresult >> 8) & 1;
 			break;
 		case ALU_SL:
-			newresult = a << 1;
-			newcarry = (a >> 7) & 1;
+			if(!isXY) {
+				newresult = a << 1;
+				newcarry = (a >> 7) & 1;
+			} else {
+				newresult = a >> 1;
+				newcarry = a & 1;
+			}
 			break;
 		case ALU_SLC:
-			newresult = a << 1 | (carry ? 1 : 0);
-			newcarry = (a >> 7) & 1;
-			break;
-		case ALU_SR:
-			newresult = a >> 1;
-			newcarry = a & 1;
-			break;
-		case ALU_SRC:
-			newresult = a >> 1 | (carry ? 0x80 : 0);
-			newcarry = a & 1;
+			if(!isXY) {
+				newresult = a << 1 | (carry ? 1 : 0);
+				newcarry = (a >> 7) & 1;
+			} else {
+				newresult = a >> 1 | (carry ? 0x80 : 0);
+				newcarry = a & 1;
+			}
 			break;
 		default:
 			printf("ALU operation 0x%x not implemented\n", mode);
@@ -249,7 +270,7 @@ bool step(bool interrupt) {
 						acc = from;
 					}
 				} else { // prorgam flow
-					if(!(i & BRK_MASK)) { // ret/call
+					if(!(i & SIG_MASK)) { // ret/call
 						addr_t oldpc = pc + 1;
 						pc = (((addr_t) y) << 8) + x - 1;
 						if(i & RET_MASK) { // call only
@@ -261,11 +282,11 @@ bool step(bool interrupt) {
 					}
 				}
 			} else { // isp instructions
-				aluop(ALU_ADD, i & CARRY_SEL_MASK, sp, signExt(i, 4), &sp);
+				aluop(ALU_ADD, i & CARRY_SEL_MASK, i & XY_MASK, sp, signExt(i, 4), &sp);
 			}
 		} else { // normal math
 			word_t alub = (i & XY_MASK) ? y : x;
-			aluop(i & ALU_INST_MASK, i & CARRY_SEL_MASK, acc, alub, &acc);
+			aluop(i & ALU_INST_MASK, i & CARRY_SEL_MASK, i & XY_MASK, acc, alub, &acc);
 		}
 	} else { // multicycle operations
 		if(!(i & ALU_SEL_MASK)) { // memory 
@@ -285,7 +306,7 @@ bool step(bool interrupt) {
 		} else { // immediates
 			word_t imm = fetch();
 			if(!(i & JUMP_MASK)) { // immediate ops
-				aluop(i & ALU_INST_MASK, i & CARRY_SEL_MASK, acc, imm, &acc);
+				aluop(i & ALU_INST_MASK, i & CARRY_SEL_MASK, i & XY_MASK, acc, imm, &acc);
 			} else { // jumps
 				int offs = ((((int) signExt(i, 4)) << 8)
 							| (((int) imm) & 0xFF)) - 1;
