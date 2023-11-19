@@ -31,10 +31,13 @@ $(WAVEDIR):
 	mkdir $@
 $(LOGDIR):
 	mkdir $@
+$(OBJDIR):
+	mkdir $@
 
 # If everything else fails, warn the user
 % ::
 	@echo "File $@ missing or not buildable"
+	@false
 
 clean:
 	rm -f waveforms/*.vd obj/*.vvp
