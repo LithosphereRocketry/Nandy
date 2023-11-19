@@ -27,12 +27,12 @@
 (struct wr-exp (reg) #:transparent)
 (struct sw-exp (reg) #:transparent)
 (struct ja-exp () #:transparent)
+(struct jri-exp () #:transparent)
 (struct jar-exp () #:transparent)
 (struct brk-exp () #:transparent)
 (struct bell-exp () #:transparent)
 (struct dint-exp () #:transparent)
 (struct eint-exp () #:transparent)
-(struct iclr-exp () #:transparent)
 (struct _isp-exp (num) #:transparent)
 (struct isp-exp (num) #:transparent)
 ;; Register ALU, no carry
@@ -145,17 +145,19 @@
    (list (cons "@define" (idesc @define-exp (list parse-label parse-number)))
          (cons "@include" (idesc @include-exp (list parse-fpath)))
          (cons "@static" (idesc @static-exp (list parse-number parse-label)))
+         (cons "@loc" (idesc @loc-exp (list parse-number)))
+         (cons "@memloc" (idesc @memloc-exp (list parse-number)))
          (cons "nop" (idesc nop-exp '()))
          (cons "rd" (idesc rd-exp (list parse-reg)))
          (cons "wr" (idesc wr-exp (list parse-reg)))
          (cons "sw" (idesc sw-exp (list parse-reg)))
          (cons "ja" (idesc ja-exp '()))
+         (cons "jri" (idesc jri-exp '()))
          (cons "jar" (idesc jar-exp '()))
          (cons "brk" (idesc brk-exp '()))
-         (cons "bell" (idesc brk-exp '()))
-         (cons "dint" (idesc brk-exp '()))
-         (cons "eint" (idesc brk-exp '()))
-         (cons "iclr" (idesc brk-exp '()))
+         (cons "bell" (idesc bell-exp '()))
+         (cons "dint" (idesc dint-exp '()))
+         (cons "eint" (idesc eint-exp '()))
          (cons "_isp" (idesc _isp-exp (list parse-number)))
          (cons "isp" (idesc isp-exp (list parse-number)))
          (cons "xor" (idesc xor-exp (list parse-reg)))
@@ -344,12 +346,12 @@
           [(wr-exp? exp) 1]
           [(sw-exp? exp) 1]
           [(ja-exp? exp) 1]
+          [(jri-exp? exp) 1]
           [(jar-exp? exp) 1]
           [(brk-exp? exp) 1]
           [(bell-exp? exp) 1]
           [(dint-exp? exp) 1]
           [(eint-exp? exp) 1]
-          [(iclr-exp? exp) 1]
           [(_isp-exp? exp) 1]
           [(isp-exp? exp) 1]
 
@@ -455,19 +457,30 @@
                       [index 0]
                       [static-index #x8000])
           (if (null? exps)
-              (labeled-program (hash-set ltab "FREE_MEM" static-index)
-                               (reverse clean-exps))
+              (cond [(> index #x8000) (raise "Program is too large for 32KB ROM, reduce size")]
+                    [(> static-index #xFF00) (raise "Static memory collides with stack, reduce static allocations")]
+                    [else (labeled-program (hash-set ltab "FREE_MEM" static-index)
+                                           (reverse clean-exps))])
               (cond [(none-exp? (car exps)) (recurse (cdr exps) ltab clean-exps index static-index)]
                     [(list-exp? (car exps)) (raise "Can only resolve labels on a flattened program")]
                     [(@define-exp? (car exps)) (recurse (cdr exps)
                                                         (hash-set ltab
                                                                   (@define-exp-sym exp)
-                                                                  (get-value (@define-exp-val exp)))
+                                                                  (get-value (@define-exp-val exp) ltab))
                                                         clean-exps index static-index)]
                     [(@static-exp? (car exps)) (recurse (cdr exps)
                                                         (hash-set ltab
                                                                   (@static-exp-sym (car exps)) static-index)
                                                         clean-exps index (+ static-index (@static-exp-len (car exps))))]
+                    [(@memloc-exp? (car exps)) (let ([new-addr (get-value (@memloc-exp-addr (car exps)) ltab)])
+                                                 (if (< new-addr static-index)
+                                                     (raise (format "Specified memory location ~a overlaps with previous allocation" new-addr))
+                                                     (recurse (cdr exps) ltab clean-exps index new-addr)))]
+                    [(@loc-exp? (car exps)) (let ([new-addr (get-value (@loc-exp-addr (car exps)) ltab)])
+                                              (if (< new-addr index)
+                                                  (raise (format "Specified program location ~a overlaps with previous code" new-addr))
+                                                  (recurse (cdr exps) ltab (append (build-list (- new-addr index) (lambda (a) (nop-exp)))
+                                                                                   clean-exps) new-addr static-index)))]
                     [(label-exp? (car exps)) (recurse (cons (label-exp-target (car exps)) (cdr exps))
                                                       (hash-set ltab (label-exp-label (car exps)) index)
                                                       clean-exps index static-index)]
@@ -547,13 +560,12 @@
                      [(wr-exp? inst) (list (bitwise-ior #b00001000 (reg->bits (wr-exp-reg inst))))]
                      [(sw-exp? inst) (list (bitwise-ior #b00001100 (reg->bits (sw-exp-reg inst))))]
                      [(ja-exp? inst) (list #b00010000)]
-                     [(jar-exp? inst) (list #b00010100)]
+                     [(jri-exp? inst) (list #b00010010)]
                      [(jar-exp? inst) (list #b00010100)]
                      [(brk-exp? inst) (list #b00011000)]
                      [(bell-exp? inst) (list #b00011001)]
                      [(dint-exp? inst) (list #b00011100)]
                      [(eint-exp? inst) (list #b00011101)]
-                     [(iclr-exp? inst) (list #b00011110)]
                      [(_isp-exp? inst) (list (bitwise-ior #b00100000 (num->4bi (_isp-exp-num inst))))]
                      [(isp-exp? inst) (list (bitwise-ior #b00110000 (num->4bi (isp-exp-num inst))))]
                      [(xor-exp? inst) (list (bitwise-ior #b01000001 (regmath->bits (xor-exp-reg inst))))]
@@ -638,8 +650,7 @@
            [poss (total-before lengths)]
            [bins (map inst->blist ilist poss)])
       (list->bytes (map sbyte->byte (apply append bins))))))
-           
-            
+
 (define assemble
   (lambda (iname oname)
     (let* ([ast (expand-file iname)]
@@ -647,5 +658,7 @@
            [labeled-program (resolve-labels flat)]
            [pure-ilist (resolve-values labeled-program)]
            [binary (build-binary pure-ilist)])
-      (display labeled-program)
+      (display "Assembly completed\nLabels:\n")
+      (map (lambda (a) (display (format "~a : ~a\n" (car a) (cdr a))))
+           (hash->list (labeled-program-ltab labeled-program)))
       (save-binfile! oname binary))))
