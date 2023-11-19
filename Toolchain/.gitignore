@@ -3,10 +3,12 @@
 *.rkt~
 # NANDy specific
 *.nb
+*.logi
 assembler
 emulator
 parse-test
 nandy-asm
+binconvert
 
 # User settings
 .vscode
