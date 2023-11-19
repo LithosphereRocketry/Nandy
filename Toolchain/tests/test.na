@@ -1,19 +1,11 @@
-nop
-rd x
-wr y
-sw sp
-ja
-jar
-sig brk
-test: nop
-isp 6
-add y
-lda 4
-lds 4
-stra 4
-strs 4
-rdi 112
-addi -9
-subi 12
-j test
-jif 0 test
+rdi 0
+wr sp
+cclr
+rdi 10
+start:
+_addi 48
+wr io
+_subi 48
+subi 1
+jnif start
+brk

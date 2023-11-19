@@ -11,41 +11,97 @@
 (struct text-exp (str) #:transparent)
 (struct list-exp (contents) #:transparent)
 (struct label-exp (label target) #:transparent)
+(struct none-exp () #:transparent)
 
 ; Macros
 (struct @include-exp (path) #:transparent)
 (struct @define-exp (sym val) #:transparent)
 (struct @static-exp (len sym) #:transparent)
+(struct @loc-exp (addr) #:transparent)
+(struct @memloc-exp (addr) #:transparent)
 
 ; Real instructions
-(struct none-exp () #:transparent)
+;; Control flow
 (struct nop-exp () #:transparent)
 (struct rd-exp (reg) #:transparent)
 (struct wr-exp (reg) #:transparent)
 (struct sw-exp (reg) #:transparent)
 (struct ja-exp () #:transparent)
+(struct jri-exp () #:transparent)
 (struct jar-exp () #:transparent)
-(struct sig-exp (num) #:transparent)
+(struct brk-exp () #:transparent)
+(struct bell-exp () #:transparent)
+(struct dint-exp () #:transparent)
+(struct eint-exp () #:transparent)
+(struct _isp-exp (num) #:transparent)
 (struct isp-exp (num) #:transparent)
+;; Register ALU, no carry
+(struct xor-exp (reg) #:transparent)
+(struct and-exp (reg) #:transparent)
+(struct or-exp (reg) #:transparent)
+(struct inv-exp (reg) #:transparent) ; low priority
+(struct xnor-exp (reg) #:transparent)
+(struct nand-exp (reg) #:transparent)
+(struct nor-exp (reg) #:transparent)
+(struct _add-exp (reg) #:transparent)
+(struct _addc-exp (reg) #:transparent)
+(struct _sub-exp (reg) #:transparent)
+(struct _subc-exp (reg) #:transparent)
+(struct _sl-exp () #:transparent)
+(struct _slc-exp () #:transparent)
+(struct _sla-exp () #:transparent)
+(struct _slr-exp () #:transparent)
+(struct _sr-exp () #:transparent)
+(struct _src-exp () #:transparent)
+(struct _srr-exp () #:transparent)
+(struct _sra-exp () #:transparent)
+;; Register ALU, carry
+(struct cclr-exp () #:transparent)
+(struct nzero-exp () #:transparent)
+(struct par-exp () #:transparent)
+(struct cset-exp () #:transparent)
+(struct ctog-exp () #:transparent)
+(struct zero-exp () #:transparent)
+(struct npar-exp () #:transparent)
 (struct add-exp (reg) #:transparent)
+(struct addc-exp (reg) #:transparent)
+(struct sub-exp (reg) #:transparent)
+(struct subc-exp (reg) #:transparent)
 (struct sl-exp () #:transparent)
 (struct slc-exp () #:transparent)
+(struct sla-exp () #:transparent)
+(struct slr-exp () #:transparent)
 (struct sr-exp () #:transparent)
 (struct src-exp () #:transparent)
+(struct srr-exp () #:transparent)
+(struct sra-exp () #:transparent)
+;; Memory
 (struct lda-exp (target) #:transparent)
 (struct lds-exp (target) #:transparent)
 (struct stra-exp (target) #:transparent)
 (struct strs-exp (target) #:transparent)
+;; Immediates
 (struct rdi-exp (num) #:transparent)
+(struct xori-exp (num) #:transparent)
+(struct andi-exp (num) #:transparent)
+(struct ori-exp (num) #:transparent)
+(struct xnori-exp (num) #:transparent)
+(struct nandi-exp (num) #:transparent)
+(struct nori-exp (num) #:transparent)
+(struct _addi-exp (num) #:transparent)
+(struct _addci-exp (num) #:transparent)
+(struct _subi-exp (num) #:transparent)
+(struct _subci-exp (num) #:transparent)
 (struct addi-exp (num) #:transparent)
 (struct addci-exp (num) #:transparent)
-(struct _addi-exp (num) #:transparent)
 (struct subi-exp (num) #:transparent)
-(struct j-exp (label) #:transparent)
-(struct jif-exp (sig label) #:transparent)
-(struct jnif-exp (sig label) #:transparent)
+(struct subci-exp (num) #:transparent)
+;; Conditionals
+(struct jif-exp (label) #:transparent)
+(struct jnif-exp (label) #:transparent)
 
 ; Pseudoinstructions
+(struct j-exp (label) #:transparent)
 (struct move-exp (from to) #:transparent)
 (struct swap-exp (a b) #:transparent)
 (struct call-exp (label) #:transparent)
@@ -82,18 +138,6 @@
   (lambda (lbl)
     lbl))
 
-(define parse-sigout
-  (lambda (name)
-    (case name
-      [("brk" "0") 0]
-      [else (raise (string-append "Unrecognized output signal: " name))])))
-
-(define parse-sigin
-  (lambda (name)
-    (case name
-      [("carry" "0") 0]
-      [else (raise (string-append "Unrecognized input signal: " name))])))
-
 ; == Text -> instruction translation here
 (struct idesc (generator arg-parsers))
 (define instructions
@@ -101,32 +145,87 @@
    (list (cons "@define" (idesc @define-exp (list parse-label parse-number)))
          (cons "@include" (idesc @include-exp (list parse-fpath)))
          (cons "@static" (idesc @static-exp (list parse-number parse-label)))
+         (cons "@loc" (idesc @loc-exp (list parse-number)))
+         (cons "@memloc" (idesc @memloc-exp (list parse-number)))
          (cons "nop" (idesc nop-exp '()))
          (cons "rd" (idesc rd-exp (list parse-reg)))
          (cons "wr" (idesc wr-exp (list parse-reg)))
          (cons "sw" (idesc sw-exp (list parse-reg)))
          (cons "ja" (idesc ja-exp '()))
+         (cons "jri" (idesc jri-exp '()))
          (cons "jar" (idesc jar-exp '()))
-         (cons "sig" (idesc sig-exp (list parse-sigout)))
+         (cons "brk" (idesc brk-exp '()))
+         (cons "bell" (idesc bell-exp '()))
+         (cons "dint" (idesc dint-exp '()))
+         (cons "eint" (idesc eint-exp '()))
+         (cons "_isp" (idesc _isp-exp (list parse-number)))
          (cons "isp" (idesc isp-exp (list parse-number)))
+         (cons "xor" (idesc xor-exp (list parse-reg)))
+         (cons "and" (idesc xor-exp (list parse-reg)))
+         (cons "or" (idesc xor-exp (list parse-reg)))
+         (cons "inv" (idesc xor-exp (list parse-reg)))
+         (cons "xnor" (idesc xnor-exp (list parse-reg)))
+         (cons "nand" (idesc nand-exp (list parse-reg)))
+         (cons "nor" (idesc nor-exp (list parse-reg)))
+         (cons "_add" (idesc _add-exp (list parse-reg)))
+         (cons "_addc" (idesc _addc-exp (list parse-reg)))
+         (cons "_sub" (idesc _sub-exp (list parse-reg)))
+         (cons "_subc" (idesc _subc-exp (list parse-reg)))
+         (cons "_sl" (idesc _sl-exp '()))
+         (cons "_slc" (idesc _slc-exp '()))
+         (cons "_sla" (idesc _sla-exp '()))
+         (cons "_slr" (idesc _slr-exp '()))
+         (cons "_sr" (idesc _sr-exp '()))
+         (cons "_src" (idesc _src-exp '()))
+         (cons "_srr" (idesc _srr-exp '()))
+         (cons "_sra" (idesc _sra-exp '()))
+         (cons "cclr" (idesc cclr-exp '()))
+         (cons "nzero" (idesc nzero-exp '()))
+         (cons "par" (idesc par-exp '()))
+         (cons "cset" (idesc cset-exp '()))
+         (cons "ctog" (idesc ctog-exp '()))
+         (cons "zero" (idesc zero-exp '()))
+         (cons "npar" (idesc npar-exp '()))
          (cons "add" (idesc add-exp (list parse-reg)))
+         (cons "addc" (idesc add-exp (list parse-reg)))
+         (cons "sub" (idesc add-exp (list parse-reg)))
+         (cons "subc" (idesc add-exp (list parse-reg)))
+         
          (cons "sl" (idesc sl-exp '()))
          (cons "slc" (idesc slc-exp '()))
+         (cons "sla" (idesc sla-exp '()))
+         (cons "slr" (idesc slr-exp '()))
          (cons "sr" (idesc sr-exp '()))
          (cons "src" (idesc src-exp '()))
+         (cons "srr" (idesc srr-exp '()))
+         (cons "sra" (idesc sra-exp '()))
+         
          (cons "lda" (idesc lda-exp (list parse-number)))
          (cons "lds" (idesc lds-exp (list parse-number)))
          (cons "stra" (idesc stra-exp (list parse-number)))
          (cons "strs" (idesc strs-exp (list parse-number)))
+         
          (cons "rdi" (idesc rdi-exp (list parse-number)))
+         (cons "xori" (idesc xori-exp (list parse-number)))
+         (cons "andi" (idesc andi-exp (list parse-number)))
+         (cons "ori" (idesc ori-exp (list parse-number)))
+         (cons "xnori" (idesc xnori-exp (list parse-number)))
+         (cons "nandi" (idesc nandi-exp (list parse-number)))
+         (cons "nori" (idesc nori-exp (list parse-number)))
+         (cons "_addi" (idesc _addi-exp (list parse-number)))
+         (cons "_addci" (idesc _addci-exp (list parse-number)))
+         (cons "_subi" (idesc _subi-exp (list parse-number)))
+         (cons "_subci" (idesc _subci-exp (list parse-number)))
+         
          (cons "addi" (idesc addi-exp (list parse-number)))
          (cons "addci" (idesc addci-exp (list parse-number)))
-         (cons "_addi" (idesc _addi-exp (list parse-number)))
          (cons "subi" (idesc subi-exp (list parse-number)))
-         (cons "j" (idesc j-exp (list parse-label)))
-         (cons "jif" (idesc jif-exp (list parse-sigin parse-label)))
-         (cons "jnif" (idesc jnif-exp (list parse-sigin parse-label)))
+         (cons "subci" (idesc subci-exp (list parse-number)))
          
+         (cons "jif" (idesc jif-exp (list parse-label)))
+         (cons "jnif" (idesc jnif-exp (list parse-label)))
+         
+         (cons "j" (idesc j-exp (list parse-label)))
          (cons "call" (idesc call-exp (list parse-label)))
          (cons "goto" (idesc goto-exp (list parse-label)))
          (cons "move" (idesc move-exp (list parse-reg parse-reg))))))
@@ -193,7 +292,9 @@
 ; Macro definitions go here
 (define macro-expand
   (lambda (exp)
-    (cond [(@include-exp? exp) (expand-file (@include-exp-path exp))]
+    (cond [(j-exp? exp) (list-exp (list (jif-exp (j-exp-label exp))
+                                        (jnif-exp (j-exp-label exp))))]
+          [(@include-exp? exp) (expand-file (@include-exp-path exp))]
           [(call-exp? exp) (list-exp (list (wr-exp 'dy)
                                            (rdi-exp (bytenum (call-exp-label exp) 0))
                                            (wr-exp 'dx)
@@ -201,9 +302,9 @@
                                            (sw-exp 'dy)
                                            (jar-exp)))]
           [(goto-exp? exp) (list-exp (list (wr-exp 'dy)
-                                           (rdi-exp (bytenum (call-exp-label exp) 0))
+                                           (rdi-exp (bytenum (goto-exp-label exp) 0))
                                            (wr-exp 'dx)
-                                           (rdi-exp (bytenum (call-exp-label exp) 1))
+                                           (rdi-exp (bytenum (goto-exp-label exp) 1))
                                            (sw-exp 'dy)
                                            (ja-exp)))]
           [(move-exp? exp) (cond [(eq? (move-exp-to exp) (move-exp-from exp)) (none-exp)]
@@ -245,24 +346,76 @@
           [(wr-exp? exp) 1]
           [(sw-exp? exp) 1]
           [(ja-exp? exp) 1]
+          [(jri-exp? exp) 1]
           [(jar-exp? exp) 1]
-          [(sig-exp? exp) 1]
+          [(brk-exp? exp) 1]
+          [(bell-exp? exp) 1]
+          [(dint-exp? exp) 1]
+          [(eint-exp? exp) 1]
+          [(_isp-exp? exp) 1]
           [(isp-exp? exp) 1]
+
+          [(xor-exp? exp) 1]
+          [(and-exp? exp) 1]
+          [(or-exp? exp) 1]
+          [(inv-exp? exp) 1]
+          [(xnor-exp? exp) 1]
+          [(nand-exp? exp) 1]
+          [(nor-exp? exp) 1]
+          [(_add-exp? exp) 1]
+          [(_addc-exp? exp) 1]
+          [(_sub-exp? exp) 1]
+          [(_subc-exp? exp) 1]
+          [(_sl-exp? exp) 1]
+          [(_slc-exp? exp) 1]
+          [(_sla-exp? exp) 1]
+          [(_slr-exp? exp) 1]
+          [(_sr-exp? exp) 1]
+          [(_src-exp? exp) 1]
+          [(_srr-exp? exp) 1]
+          [(_sra-exp? exp) 1]
+
+          [(cclr-exp? exp) 1]
+          [(nzero-exp? exp) 1]
+          [(par-exp? exp) 1]
+          [(cset-exp? exp) 1]
+          [(ctog-exp? exp) 1]
+          [(zero-exp? exp) 1]
+          [(npar-exp? exp) 1]
           [(add-exp? exp) 1]
+          [(addc-exp? exp) 1]
+          [(sub-exp? exp) 1]
+          [(subc-exp? exp) 1]
           [(sl-exp? exp) 1]
           [(slc-exp? exp) 1]
+          [(sla-exp? exp) 1]
+          [(slr-exp? exp) 1]
           [(sr-exp? exp) 1]
           [(src-exp? exp) 1]
+          [(srr-exp? exp) 1]
+          [(sra-exp? exp) 1]
+          
           [(lda-exp? exp) 1]
           [(lds-exp? exp) 1]
           [(stra-exp? exp) 1]
           [(strs-exp? exp) 1]
+
           [(rdi-exp? exp) 2]
+          [(xori-exp? exp) 2]
+          [(andi-exp? exp) 2]
+          [(ori-exp? exp) 2]
+          [(nori-exp? exp) 2]
+          [(nandi-exp? exp) 2]
+          [(nori-exp? exp) 2]
+          [(_addi-exp? exp) 2]
+          [(_addci-exp? exp) 2]
+          [(_subi-exp? exp) 2]
+          [(_subci-exp? exp) 2]
           [(addi-exp? exp) 2]
           [(addci-exp? exp) 2]
-          [(_addi-exp? exp) 2]
           [(subi-exp? exp) 2]
-          [(j-exp? exp) 2]
+          [(subci-exp? exp) 2]
+          
           [(jif-exp? exp) 2]
           [(jnif-exp? exp) 2]
           [else (raise (string-append "Expression " (format "~a" exp) " has no defined length"))])))
@@ -299,24 +452,35 @@
   (lambda (lexp)
     (if (list-exp? lexp)
         (let recurse ([exps (list-exp-contents lexp)]
-                      [ltab (make-immutable-hash)]
+                      [ltab (hash-set (make-immutable-hash) "ISR" #x7F00)]
                       [clean-exps '()]
                       [index 0]
                       [static-index #x8000])
           (if (null? exps)
-              (labeled-program (hash-set ltab "FREE_MEM" static-index)
-                               (reverse clean-exps))
+              (cond [(> index #x8000) (raise "Program is too large for 32KB ROM, reduce size")]
+                    [(> static-index #xFF00) (raise "Static memory collides with stack, reduce static allocations")]
+                    [else (labeled-program (hash-set ltab "FREE_MEM" static-index)
+                                           (reverse clean-exps))])
               (cond [(none-exp? (car exps)) (recurse (cdr exps) ltab clean-exps index static-index)]
                     [(list-exp? (car exps)) (raise "Can only resolve labels on a flattened program")]
                     [(@define-exp? (car exps)) (recurse (cdr exps)
                                                         (hash-set ltab
                                                                   (@define-exp-sym exp)
-                                                                  (get-value (@define-exp-val exp)))
+                                                                  (get-value (@define-exp-val exp) ltab))
                                                         clean-exps index static-index)]
                     [(@static-exp? (car exps)) (recurse (cdr exps)
                                                         (hash-set ltab
                                                                   (@static-exp-sym (car exps)) static-index)
                                                         clean-exps index (+ static-index (@static-exp-len (car exps))))]
+                    [(@memloc-exp? (car exps)) (let ([new-addr (get-value (@memloc-exp-addr (car exps)) ltab)])
+                                                 (if (< new-addr static-index)
+                                                     (raise (format "Specified memory location ~a overlaps with previous allocation" new-addr))
+                                                     (recurse (cdr exps) ltab clean-exps index new-addr)))]
+                    [(@loc-exp? (car exps)) (let ([new-addr (get-value (@loc-exp-addr (car exps)) ltab)])
+                                              (if (< new-addr index)
+                                                  (raise (format "Specified program location ~a overlaps with previous code" new-addr))
+                                                  (recurse (cdr exps) ltab (append (build-list (- new-addr index) (lambda (a) (nop-exp)))
+                                                                                   clean-exps) new-addr static-index)))]
                     [(label-exp? (car exps)) (recurse (cons (label-exp-target (car exps)) (cdr exps))
                                                       (hash-set ltab (label-exp-label (car exps)) index)
                                                       clean-exps index static-index)]
@@ -331,18 +495,29 @@
     (let ([ltab (labeled-program-ltab lpgrm)]
           [ilist (labeled-program-ilist lpgrm)])
       (map (lambda (inst)
-             (cond [(isp-exp? inst) (isp-exp (get-value (isp-exp-num inst) ltab))]
+             (cond [(_isp-exp? inst) (_isp-exp (get-value (_isp-exp-num inst) ltab))]
+                   [(isp-exp? inst) (isp-exp (get-value (isp-exp-num inst) ltab))]
                    [(lda-exp? inst) (lda-exp (get-value (lda-exp-target inst) ltab))]
                    [(lds-exp? inst) (lds-exp (get-value (lds-exp-target inst) ltab))]
                    [(stra-exp? inst) (stra-exp (get-value (stra-exp-target inst) ltab))]
                    [(strs-exp? inst) (strs-exp (get-value (strs-exp-target inst) ltab))]
                    [(rdi-exp? inst) (rdi-exp (get-value (rdi-exp-num inst) ltab))]
+                   [(xori-exp? inst) (xori-exp (get-value (xori-exp-num inst) ltab))]
+                   [(andi-exp? inst) (andi-exp (get-value (andi-exp-num inst) ltab))]
+                   [(ori-exp? inst) (ori-exp (get-value (ori-exp-num inst) ltab))]
+                   [(xnori-exp? inst) (xnori-exp (get-value (xnori-exp-num inst) ltab))]
+                   [(nandi-exp? inst) (nandi-exp (get-value (nandi-exp-num inst) ltab))]
+                   [(nori-exp? inst) (nori-exp (get-value (nori-exp-num inst) ltab))]
+                   [(_addi-exp? inst) (_addi-exp (get-value (_addi-exp-num inst) ltab))]
+                   [(_addci-exp? inst) (_addci-exp (get-value (_addci-exp-num inst) ltab))]
+                   [(_subi-exp? inst) (_subi-exp (get-value (_subi-exp-num inst) ltab))]
+                   [(_subci-exp? inst) (_subci-exp (get-value (_subci-exp-num inst) ltab))]
                    [(addi-exp? inst) (addi-exp (get-value (addi-exp-num inst) ltab))]
                    [(addci-exp? inst) (addci-exp (get-value (addci-exp-num inst) ltab))]
                    [(subi-exp? inst) (subi-exp (get-value (subi-exp-num inst) ltab))]
-                   [(j-exp? inst) (j-exp (get-value (j-exp-label inst) ltab))]
-                   [(jif-exp? inst) (jif-exp (jif-exp-sig inst) (get-value (jif-exp-label inst) ltab))]
-                   [(jnif-exp? inst) (jnif-exp (jnif-exp-sig inst) (get-value (jnif-exp-label inst) ltab))]
+                   [(subci-exp? inst) (subci-exp (get-value (subci-exp-num inst) ltab))]
+                   [(jif-exp? inst) (jif-exp (get-value (jif-exp-label inst) ltab))]
+                   [(jnif-exp? inst) (jnif-exp (get-value (jnif-exp-label inst) ltab))]
                    [else inst])) ilist))))
 
 (define reg->bits
@@ -362,15 +537,15 @@
       [(dy) #b100000]
       [else (raise "Invalid register for math operation")])))
 
+(define num->u4bi
+  (lambda (num)
+    (if (and (exact-integer? num) (>= num 0) (< num 16)) (bitwise-and #xF num)
+        (raise (format "~a is not a valid unsigned 4-bit immediate" num)))))
+
 (define num->4bi
   (lambda (num)
     (if (and (exact-integer? num) (>= num -8) (< num 8)) (bitwise-and #xF num)
         (raise (format "~a is not a valid 4-bit immediate" num)))))
-
-(define num->u3bi
-  (lambda (num)
-    (if (and (exact-integer? num) (>= num 0) (< num 8)) num
-        (raise (format "~a is not a valid unsigned 3-bit immediate" num)))))
 
 (define num->8bi
   (lambda (num)
@@ -385,32 +560,77 @@
                      [(wr-exp? inst) (list (bitwise-ior #b00001000 (reg->bits (wr-exp-reg inst))))]
                      [(sw-exp? inst) (list (bitwise-ior #b00001100 (reg->bits (sw-exp-reg inst))))]
                      [(ja-exp? inst) (list #b00010000)]
+                     [(jri-exp? inst) (list #b00010010)]
                      [(jar-exp? inst) (list #b00010100)]
-                     [(sig-exp? inst) (list (bitwise-ior #b00011000 (num->u3bi (sig-exp-num inst))))]
+                     [(brk-exp? inst) (list #b00011000)]
+                     [(bell-exp? inst) (list #b00011001)]
+                     [(dint-exp? inst) (list #b00011100)]
+                     [(eint-exp? inst) (list #b00011101)]
+                     [(_isp-exp? inst) (list (bitwise-ior #b00100000 (num->4bi (_isp-exp-num inst))))]
                      [(isp-exp? inst) (list (bitwise-ior #b00110000 (num->4bi (isp-exp-num inst))))]
-                     [(add-exp? inst) (list (bitwise-ior #b01010100 (regmath->bits (add-exp-reg inst))))]
-                     [(sl-exp? inst) (list #b01011000)]
-                     [(slc-exp? inst) (list #b01011001)]
-                     [(sr-exp? inst) (list #b01011100)]
-                     [(src-exp? inst) (list #b01011101)]
-                     [(lda-exp? inst) (list (bitwise-ior #b10000000 (num->4bi (lda-exp-target inst))))] 
-                     [(lds-exp? inst) (list (bitwise-ior #b10010000 (num->4bi (lds-exp-target inst))))]
-                     [(stra-exp? inst) (list (bitwise-ior #b10100000 (num->4bi (stra-exp-target inst))))]
-                     [(strs-exp? inst) (list (bitwise-ior #b10110000 (num->4bi (strs-exp-target inst))))]
+                     [(xor-exp? inst) (list (bitwise-ior #b01000001 (regmath->bits (xor-exp-reg inst))))]
+                     [(and-exp? inst) (list (bitwise-ior #b01000010 (regmath->bits (and-exp-reg inst))))]
+                     [(or-exp? inst) (list (bitwise-ior #b01000011 (regmath->bits (or-exp-reg inst))))]
+                     [(inv-exp? inst) (list (bitwise-ior #b01000100 (regmath->bits (inv-exp-reg inst))))]
+                     [(xnor-exp? inst) (list (bitwise-ior #b01000101 (regmath->bits (xnor-exp-reg inst))))]
+                     [(nand-exp? inst) (list (bitwise-ior #b01000110 (regmath->bits (nand-exp-reg inst))))]
+                     [(nor-exp? inst) (list (bitwise-ior #b01000111 (regmath->bits (nor-exp-reg inst))))]
+                     [(_add-exp? inst) (list (bitwise-ior #b01001000 (regmath->bits (_add-exp-reg inst))))]
+                     [(_addc-exp? inst) (list (bitwise-ior #b01001001 (regmath->bits (_addc-exp-reg inst))))]
+                     [(_sub-exp? inst) (list (bitwise-ior #b01001010 (regmath->bits (_sub-exp-reg inst))))]
+                     [(_subc-exp? inst) (list (bitwise-ior #b01001011 (regmath->bits (_subc-exp-reg inst))))]
+                     [(_sl-exp? inst) (list #b01001100)]
+                     [(_slc-exp? inst) (list #b01001101)]
+                     [(_sla-exp? inst) (list #b01001110)]
+                     [(_slr-exp? inst) (list #b01001111)]
+                     [(_sr-exp? inst) (list #b01101100)]
+                     [(_src-exp? inst) (list #b01101101)]
+                     [(_srr-exp? inst) (list #b01101110)]
+                     [(_sra-exp? inst) (list #b01101111)]
+                     [(cclr-exp? inst) (list #b01010000)]
+                     [(nzero-exp? inst) (list #b01010010)]
+                     [(par-exp? inst) (list #b01010011)]
+                     [(cset-exp? inst) (list #b01010100)]
+                     [(ctog-exp? inst) (list #b01010101)]
+                     [(zero-exp? inst) (list #b01010110)]
+                     [(npar-exp? inst) (list #b01010111)]
+                     [(add-exp? inst) (list (bitwise-ior #b01011000 (regmath->bits (add-exp-reg inst))))]
+                     [(addc-exp? inst) (list (bitwise-ior #b01011001 (regmath->bits (addc-exp-reg inst))))]
+                     [(sub-exp? inst) (list (bitwise-ior #b01011010 (regmath->bits (sub-exp-reg inst))))]
+                     [(subc-exp? inst) (list (bitwise-ior #b01011011 (regmath->bits (subc-exp-reg inst))))]
+                     [(sl-exp? inst) (list #b01011100)]
+                     [(slc-exp? inst) (list #b01011101)]
+                     [(sla-exp? inst) (list #b01011110)]
+                     [(slr-exp? inst) (list #b01011111)]
+                     [(sr-exp? inst) (list #b01111100)]
+                     [(src-exp? inst) (list #b01111101)]
+                     [(srr-exp? inst) (list #b01111110)]
+                     [(sra-exp? inst) (list #b01111111)]
+                     [(lda-exp? inst) (list (bitwise-ior #b10000000 (num->u4bi (lda-exp-target inst))))] 
+                     [(lds-exp? inst) (list (bitwise-ior #b10010000 (num->u4bi (lds-exp-target inst))))]
+                     [(stra-exp? inst) (list (bitwise-ior #b10100000 (num->u4bi (stra-exp-target inst))))]
+                     [(strs-exp? inst) (list (bitwise-ior #b10110000 (num->u4bi (strs-exp-target inst))))]
                      [(rdi-exp? inst) (list #b11000000 (num->8bi (rdi-exp-num inst)))]
-                     [(addi-exp? inst) (list #b11010100 (num->8bi (addi-exp-num inst)))]
-                     [(addci-exp? inst) (list #b11010101 (num->8bi (addci-exp-num inst)))]
-                     [(_addi-exp? inst) (list #b11000100 (num->8bi (_addi-exp-num inst)))]
-                     [(subi-exp? inst) (list #b11010110 (num->8bi (subi-exp-num inst)))]
-                     [(j-exp? inst) (let ([offset (- (j-exp-label inst) (+ loc 1))])
+                     [(xori-exp? inst) (list #b11000001 (num->8bi (xori-exp-num inst)))]
+                     [(andi-exp? inst) (list #b11000010 (num->8bi (andi-exp-num inst)))]
+                     [(ori-exp? inst) (list #b11000011 (num->8bi (ori-exp-num inst)))]
+                     [(xnori-exp? inst) (list #b11000101 (num->8bi (xnori-exp-num inst)))]
+                     [(nandi-exp? inst) (list #b11000110 (num->8bi (nandi-exp-num inst)))]
+                     [(nori-exp? inst) (list #b11000111 (num->8bi (nori-exp-num inst)))]
+                     [(_addi-exp? inst) (list #b11001000 (num->8bi (_addi-exp-num inst)))]
+                     [(_addci-exp? inst) (list #b11001001 (num->8bi (_addci-exp-num inst)))]
+                     [(_subi-exp? inst) (list #b11001010 (num->8bi (_subi-exp-num inst)))]
+                     [(_subci-exp? inst) (list #b11001011 (num->8bi (_subci-exp-num inst)))]
+                     [(addi-exp? inst) (list #b11011000 (num->8bi (addi-exp-num inst)))]
+                     [(addci-exp? inst) (list #b11011001 (num->8bi (addci-exp-num inst)))]
+                     [(subi-exp? inst) (list #b11011010 (num->8bi (subi-exp-num inst)))]
+                     [(subci-exp? inst) (list #b11011011 (num->8bi (subci-exp-num inst)))]
+                     [(jif-exp? inst) (let ([offset (- (jif-exp-label inst) (+ loc 1))])
                                       (list (bitwise-ior #b11100000 (num->4bi (get-bnum offset 1)))
                                             (num->8bi (get-bnum offset 0))))]
-                     [(jif-exp? inst) (let ([offset (- (jif-exp-label inst) (+ loc 1))])
-                                        (list (bitwise-ior #b11110000 (num->u3bi (jif-exp-sig inst)))
-                                              (num->8bi offset)))]
                      [(jnif-exp? inst) (let ([offset (- (jnif-exp-label inst) (+ loc 1))])
-                                        (list (bitwise-ior #b11111000 (num->u3bi (jnif-exp-sig inst)))
-                                              (num->8bi offset)))]
+                                      (list (bitwise-ior #b11110000 (num->4bi (get-bnum offset 1)))
+                                            (num->8bi (get-bnum offset 0))))]
                      [else (raise (format "Could not convert ~a to binary" inst))])])
       (if (= (length rep) (exp-length inst))
           rep
@@ -430,8 +650,7 @@
            [poss (total-before lengths)]
            [bins (map inst->blist ilist poss)])
       (list->bytes (map sbyte->byte (apply append bins))))))
-           
-            
+
 (define assemble
   (lambda (iname oname)
     (let* ([ast (expand-file iname)]
@@ -439,5 +658,7 @@
            [labeled-program (resolve-labels flat)]
            [pure-ilist (resolve-values labeled-program)]
            [binary (build-binary pure-ilist)])
-      (display labeled-program)
+      (display "Assembly completed\nLabels:\n")
+      (map (lambda (a) (display (format "~a : ~a\n" (car a) (cdr a))))
+           (hash->list (labeled-program-ltab labeled-program)))
       (save-binfile! oname binary))))

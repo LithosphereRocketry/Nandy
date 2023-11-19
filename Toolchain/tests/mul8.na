@@ -2,15 +2,15 @@
 # Multiplies two 8-bit unsigned integers and generates an 8-bit result
     rdi -1
     wr sp
-    sig brk
+    brk
 top:
     rd io
     strs 0
-    sig brk
+    brk
     rd io
     call mul8
     wr io
-    sig brk
+    brk
     j top
 
 mul8:
@@ -38,7 +38,7 @@ mul8_loop:
     rd dx
     sl
     wr dx
-    jnif carry mul8_skip
+    jnif mul8_skip
 
     lds 2
     sw dx
@@ -60,7 +60,7 @@ mul8_skip:
     rd dy
     subi 1
     wr dy
-    jnif carry mul8_loop
+    jnif mul8_loop
 
     lds 0
     wr dx
