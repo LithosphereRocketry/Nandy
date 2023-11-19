@@ -57,6 +57,14 @@ enum ALUMode {
 	ALU_SLR = 0xF
 };
 
+#define SIGNAL_MASK 0x7
+enum Signal {
+	SIGNAL_BRK = 00,
+	SIGNAL_BEL = 01,
+	SIGNAL_DINT = 04,
+	SINGAL_EINT = 05
+};
+
 enum {
 	RADIX_DECIMAL,
 	RADIX_UNSIGNED,
@@ -277,8 +285,11 @@ bool step(bool debugint) {
 							x = oldpc & 0xFF;
 							y = oldpc >> 8;
 						}
-					} else { // break
-						if(debugint) return pause();
+					} else { // signal
+						switch(i & SIGNAL_MASK) {
+							case SIGNAL_BRK: if(debugint) return pause(); break;
+							case SIGNAL_BEL: putchar('\a'); break;
+						}
 					}
 				}
 			} else { // isp instructions
