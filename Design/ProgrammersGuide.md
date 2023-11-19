@@ -18,10 +18,10 @@ specifications, and other pieces of useful text. In general, code markdown with
 ## The NANDy Assembler
 
 ### Basic Syntax
-NANDy provides a referencce assembler design which supports all  core
-instructions as well as a number of helpful shortcuts and macros, which are
-detailed in their relevant sections throughout this guide. The basic structure
-of a line of assembly is:
+NANDy provides a reference assembler design which supports all core instructions
+as well as a number of helpful shortcuts and macros, which are detailed in their
+relevant sections throughout this guide. The basic structure of a line of
+assembly is:
 ```
 [<label>:] <command> [<operands>] [#<comment>]
 ```
@@ -119,6 +119,7 @@ and the other can be selected between DX and DY, with the result placed back in
 the acccumulator. A few operations have only one operand, such as `sl` - these
 always act directly on the accumulator. The basic arithmetic operations are as
 follows:
+
 * `add`: Adds the two operands
 * `sub`: Subtracts the second operand from the accumulator
 * `xor`: Bitwise-xors the two operands
@@ -232,7 +233,8 @@ true, it is said to be "valid."
 ### Program Flow
 NANDy program flow is provided by a small handful of jump instructions. Local
 conditional jumps are handled by the `jif` and `jnif` instructions. Both
-take the form `j[n]if <label>`, where the label may also be replaced by a direct memory address, but this practice is not recommended. These jumps have a range
+take the form `j[n]if <label>`, where the label may also be replaced by a direct
+memory address, but this practice is not recommended. These jumps have a range
 limit of [-2048, +2047] bytes; attempting to jump outside this range will cause
 an error in assembly. `jif` will jump to the specified label if the specified
 signal is high, while `jnif` will jump if the specified signal is low. There is
@@ -271,12 +273,14 @@ the previous values of X and Y anywhere in memory.
 #### Function Calling
 Function calling is typically accomplished with the `call` macro, along with use
 of the stack. The following conventions apply:
+
 * The stack must be valid at the time of call
 * Return address is passed in the X and Y registers
 * Functions must return the stack pointer to its original state
 * Arguments are passed in the accumulator and on the stack
 * Return values are passed in the accumulator and on the stack
 * At return, the stack pointer should be returned to its original state
+
 Upon call, a function "claims" a certain amount of stack space, which should be
 carefully documented as it may not be obvious. This is distinct from allocating
 stack space and is used for parameter passing. For example, a function that
@@ -289,5 +293,55 @@ argument, it should accept any value, and if it has no meaning as a return, it
 may return containing any value.
 
 ### Input/Output
+I/O on the NANDy is handled by a single 8-bit parallel I/O port. Data may be
+written to and read from the port using standard register-move instructions;
+`rd io` retrieves data from the input port, `wr io` writes it to the output
+port, and `sw io` performs both simultaneously. Other devices may interface with
+the I/O port via the signal pins `IOWrite` and `IORead`; a positive pulse is
+transmitted on `IOWrite` whenever data is written to the I/O port and on
+`IORead` whenever data is read from the I/O port.
+
+#### Interrupts
+For real-time operations, NANDy provides a single interrrupt service routine.
+To allow interrupts, they must first be enabled using the instruction `eint`;
+they can later be disabled with the instruction `dint`. Interrupts must only be
+enabled while the stack is valid. An interrupt will be triggered when the
+following conditions are met:
+
+* The CPU is about to execute an instruction (i.e. not halfway through a
+multicycle operation)
+* Interrupts are enabled
+* An interrupt service routine is not currently occurring
+* The INT pin is high
+* The INT pin was low last time an instruction was executed
+
+Upon triggering an interrupt, the CPU exchanges the normal DX and DY registers
+for alternate registers used only for interrupts, populates those registers with
+the intended next instruction, and then jumps to the adress 0x7F00, denoted by
+the label ISR. Execution continues from that point until a `jri` instruction is
+encountered. This instruction behaves identically to `ja` except that it also
+exits ISR mode, restoring DX and DY to their normal state and resuming the
+processing of new interrupts.
+
+A simple program which repeatedly outputs the letter 'a' and plays a bell sound
+whenever an interrupt is registered might look like this:
+```
+    rdi 0
+    wr sp
+    eint
+    rdi 65
+idle:
+    wr io
+    j idle
+
+@loc ISR
+    bell
+    jri
+```
+Interrupts follow similar calling convetions to functions except that they must
+leave all registers unmodified, including the carry bit. The alternate registers
+are interfaced exactly as DX and DY are in normal program execution. Currently,
+there is no way to access the alternate registers except during an interrupt,
+but this may change in future extensions of the architecture.
 
 ## Instruction Reference
