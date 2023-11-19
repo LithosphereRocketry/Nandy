@@ -302,9 +302,9 @@
                                            (sw-exp 'dy)
                                            (jar-exp)))]
           [(goto-exp? exp) (list-exp (list (wr-exp 'dy)
-                                           (rdi-exp (bytenum (call-exp-label exp) 0))
+                                           (rdi-exp (bytenum (goto-exp-label exp) 0))
                                            (wr-exp 'dx)
-                                           (rdi-exp (bytenum (call-exp-label exp) 1))
+                                           (rdi-exp (bytenum (goto-exp-label exp) 1))
                                            (sw-exp 'dy)
                                            (ja-exp)))]
           [(move-exp? exp) (cond [(eq? (move-exp-to exp) (move-exp-from exp)) (none-exp)]
