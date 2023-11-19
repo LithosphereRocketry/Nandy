@@ -1,3 +1,6 @@
+# Racket
+*.bak
+*.rkt~
 # NANDy specific
 *.nb
 assembler
