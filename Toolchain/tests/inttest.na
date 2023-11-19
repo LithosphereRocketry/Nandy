@@ -1,0 +1,25 @@
+    rdi 0
+    wr sp
+    eint
+
+idle:
+    goto idle
+
+@loc ISR
+    _isp -3
+    strs 2
+    sw dx
+    strs 0
+    rd dy
+    strs 1
+    rd dx
+    rdi 0
+    wr dx
+    wr dy
+    lds 0
+    wr dx
+    lds 1
+    wr dy
+    lds 2
+    _isp 3
+    jri
