@@ -40,4 +40,4 @@ $(OBJDIR):
 	@false
 
 clean:
-	rm -f waveforms/*.vd obj/*.vvp
+	rm -f $(WAVEDIR)*.vd $(OBJDIR)*.vvp $(LOGDIR)*.txt
