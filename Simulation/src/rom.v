@@ -12,19 +12,17 @@ AT28C16     150 ns
 
 */
 
-module rom(
-        input [7:0] address,
+module rom #(parameter PATH = "memory.txt") (
+        input [14:0] address,
         output [7:0] data
     );
-    
-    parameter ACCESS_TIME = 150;
 
-    reg [7:0] rom [0:255];
+    reg [7:0] rom [0:((1 << 15) - 1)];
 
     initial begin
-        $readmemh("memory.txt", rom);
+        $readmemh(PATH, rom);
     end
 
-    assign #(ACCESS_TIME) data = rom[address];
+    assign #(150) data = rom[address];
 
 endmodule
