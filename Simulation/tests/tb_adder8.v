@@ -1,4 +1,4 @@
-module tb_adder8c();
+module tb_adder8();
     wire [7:0] a;
     wire [7:0] b;
     wire cin;
@@ -14,7 +14,7 @@ module tb_adder8c();
         .cout(ans[8])
     );
 
-    combitest #("adder8c", 17, 9, 210) tester(
+    combitest #("adder8", 17, 9, 210) tester(
         .comp_in({a, b, cin}),
         .verify(realans),
         .comp_out(ans)
