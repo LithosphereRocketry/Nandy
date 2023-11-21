@@ -11,10 +11,9 @@ module tb_nand00();
         .q(q)
     );
 
-    combitest #("nand00", 2, 1, 20) tester(
+    combitest #("nand00", 2, 1, 13) tester(
         .comp_in({a, b}),
         .verify(realq),
         .comp_out(q)
     );
-
 endmodule

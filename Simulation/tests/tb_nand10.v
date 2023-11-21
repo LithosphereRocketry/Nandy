@@ -12,7 +12,7 @@ module tb_nand10();
         .q(q)
     );
     
-    combitest #("nand10", 3, 1, 20) tester(
+    combitest #("nand10", 3, 1, 11) tester(
         .comp_in({a, b, c}),
         .verify(realq),
         .comp_out(q)

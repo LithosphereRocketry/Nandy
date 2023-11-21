@@ -1,23 +1,20 @@
-`timescale 1ns/1ps
-
 module tb_xornand();
-    reg [1:0] inp;
-    wire q, n;
+    wire a, b, q, n;
+    wire realq;
+    wire realn;
+    assign realq = a ^ b;
+    assign realn = (a & b);
 
     xornand testGate(
-        .a(inp[0]),
-        .b(inp[1]),
+        .a(a),
+        .b(b),
         .q(q),
         .n(n)
     );
 
-    initial begin
-        inp = 0;
-        #50;
-        repeat (4) begin
-            inp = inp + 1;
-            #50;
-        end
-        $display("done");
-    end
+    combitest #("xornand", 2, 2, 35) tester(
+        .comp_in({a, b}),
+        .verify({realq, realn}),
+        .comp_out({q, n})
+    );
 endmodule

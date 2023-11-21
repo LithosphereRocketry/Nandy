@@ -1,25 +1,21 @@
 `timescale 1ns/1ps
 
 module tb_selmux();
-    reg [3:0] inp;
-    wire q;
+    wire a, b, sa, sb, q;
+    wire realq;
+    assign realq = (a & sa) | (b & sb);
 
     selmux testGate(
-        .a(inp[0]),
-        .b(inp[1]),
-        .sa(inp[2]),
-        .sb(inp[3]),
+        .a(a),
+        .b(b),
+        .sa(sa),
+        .sb(sb),
         .q(q)
     );
 
-    initial begin
-        inp = 0;
-        #50;
-        repeat (16) begin
-            inp = inp + 1;
-            #50;
-        end
-        $display("done");
-    end
-
+    combitest #("selmux", 4, 1, 21) tester(
+        .comp_in({a, b, sa, sb}),
+        .verify(realq),
+        .comp_out(q)
+    );
 endmodule
