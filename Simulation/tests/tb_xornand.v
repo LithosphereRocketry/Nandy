@@ -3,7 +3,7 @@ module tb_xornand();
     wire realq;
     wire realn;
     assign realq = a ^ b;
-    assign realn = (a & b);
+    assign realn = ~(a & b);
 
     xornand testGate(
         .a(a),
