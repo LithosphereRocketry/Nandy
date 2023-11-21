@@ -7,6 +7,8 @@ LOGDIR = logs/
 OBJDIR = obj/
 INCDIR = include/
 
+TMPFILE = $(LOGDIR)TEMP.txt
+
 # Each test gets compiled with all of the files in SRC
 SRC = $(wildcard $(SRCDIR)*.v)
 INC = $(wildcard $(INCDIR)*.vh)
@@ -22,6 +24,7 @@ all: $(TEST_OUT)
 
 $(TEST_OUT): $(LOGDIR)%.txt: $(OBJDIR)%.vvp | $(LOGDIR)
 	$(VVP) $< > $@
+	@if [ -s $@ ]; then cat $@; exit 1; fi
 
 $(OBJDIR)%.vvp: $(TESTDIR)%.v $(SRC) $(INC) | $(OBJDIR)
 	$(VLG) -I$(INCDIR) -s $* -o $@ $< $(SRC)
