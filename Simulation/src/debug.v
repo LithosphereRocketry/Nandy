@@ -11,16 +11,20 @@ module assert #(parameter message = "unspecified")
 endmodule
 
 module combitest #(parameter name = "unnamed", parameter inbits = 1,
-                   parameter outbits = 1, parameter delay = 10)
+                   parameter outbits = 1, parameter delay = 10,
+                   parameter cooldown = 1000)
                   (output reg [(inbits-1):0] comp_in,
                    input wire [(outbits-1):0] verify,
                    input wire [(outbits-1):0] comp_out);
     
+    reg [(inbits-1):0] counter = 0;
 
     initial begin
-        comp_in = 0;
         repeat (1 << inbits) begin
-            comp_in ++;
+            comp_in = {inbits{1'bx}};
+            #(cooldown);
+            comp_in = counter;
+            counter = counter + 1;
             #(delay);
             if (comp_out !== verify) begin
                 $display("Test %s failed: input %b -> expected %b, got %b",
