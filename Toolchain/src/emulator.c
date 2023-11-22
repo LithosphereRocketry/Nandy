@@ -40,13 +40,13 @@ bool parity(word_t w) {
 
 enum ALUMode {
 	ALU_B = 0x0,
-	ALU_XOR = 0x1,
+	ALU_OR = 0x1,
 	ALU_AND = 0x2,
-	ALU_OR = 0x3,
+	ALU_XOR = 0x3,
 	ALU_NB = 0x4,
-	ALU_XNOR = 0x5,
+	ALU_NOR = 0x5,
 	ALU_NAND = 0x6,
-	ALU_NOR = 0x7,
+	ALU_XNOR = 0x7,
 	ALU_ADD = 0x8,
 	ALU_ADDC = 0x9,
 	ALU_SUB = 0xA,
@@ -167,32 +167,32 @@ void aluop(enum ALUMode mode, bool isCarry, bool isXY, word_t a, word_t b, word_
 			newresult = b;
 			newcarry = 0;
 			break;
-		case ALU_XOR:
-			newresult = a ^ b;
+		case ALU_OR:
+			newresult = a | b;
 			newcarry = carry;
 			break;
 		case ALU_AND:
 			newresult = a & b;
 			newcarry = (a != 0);
 			break;
-		case ALU_OR:
-			newresult = a | b;
+		case ALU_XOR:
+			newresult = a ^ b;
 			newcarry = parity(a);
 			break;
 		case ALU_NB:
 			newresult = ~b;
 			newcarry = 1;
 			break;
-		case ALU_XNOR:
-			newresult = ~(a ^ b);
+		case ALU_NOR:
+			newresult = ~(a | b);
 			newcarry = !carry;
 			break;
 		case ALU_NAND:
 			newresult = ~(a & b);
 			newcarry = (a == 0);
 			break;
-		case ALU_NOR:
-			newresult = ~(a | b);
+		case ALU_XNOR:
+			newresult = ~(a ^ b);
 			newcarry = !parity(a);
 			break;
 		case ALU_ADD:

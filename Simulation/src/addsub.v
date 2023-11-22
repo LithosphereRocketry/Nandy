@@ -1,6 +1,5 @@
 `timescale 1ns/1ps
 
-
 /*
 2-input, 8-bit adder/subtractor
 
@@ -13,7 +12,7 @@ Truth table:
     0       1       1       a + b + 1
     1       0       x       a - b
     1       1       0       a - b - 1
-    1       1       1       a - b       
+    1       1       1       a - b
 */
 
 module addsub(
@@ -36,14 +35,14 @@ module addsub(
 
     wire adderCin;
 
-    mux cinMux(
+    mux #(1) cinMux(
         .s(isCarry),
         .a(isSub),
         .b(cin),
         .q(adderCin)
     );
 
-    adder8 adder(
+    addern #(8) adder(
         .a(a),
         .b(invb),
         .q(q),
