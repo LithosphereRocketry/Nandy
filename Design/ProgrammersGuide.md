@@ -385,9 +385,11 @@ Sets the carry bit to 0.
 ##### `ctog`
 Toggles the value of the carry bit.
 
-### Math
+### Arithmetic and Logic
 
 #### Addition & subtraction
+For all of the following, the carry bit is set to the carry-out value of the
+operation.
 ##### `add <dx/dy>`
 Adds the contents of the specified register to the accumulator.
 ##### `addc <dx/dy>`
@@ -398,5 +400,11 @@ Subtracts the contents of the specified register from the accumulator.
 ##### `subc <dx/dy>`
 Identical to `sub` but treats the carry bit as a carry-in bit from a less
 significant byte.
+##### `_add`, `_sub`, `_addc`, `_subc`
+Identical to their respective non-underscore variants, but do not modify the
+carry bit.
+##### `addi`, `addci`, `subi`, `subci`, `_addi`, `_addci`, `_subi`, `_subci`
+Identical to their respective non-`i` variants, but use the provided immediate
+value in place of the DX or DY register.
 
 ### Memory
