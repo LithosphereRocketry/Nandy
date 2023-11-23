@@ -61,4 +61,4 @@ $(OBJDIR):
 
 # clean deletes all objects and target executables
 clean:
-	rm -f $(OBJDIR)* $(TARGETS) *.nb *.logi
+	rm -f $(OBJDIR)* $(TARGETS) $(RKT_TARGETS) *.nb *.logi
