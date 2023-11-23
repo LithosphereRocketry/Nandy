@@ -345,3 +345,58 @@ there is no way to access the alternate registers except during an interrupt,
 but this may change in future extensions of the architecture.
 
 ## Instruction Reference
+
+### General-purpose
+
+#### Control
+##### `nop`
+Does nothing.
+##### `brk`
+Stops program execution. In emulation, exits to the debugger interface.
+##### `bell`
+Plays an audible alert tone.
+##### `eint`, `dint`
+Enables or disables interrupts, respectively.
+##### `jif <label>`, `jnif <label>`
+Jumps to the specified label if the carry bit is 1 or 0, respectively.
+##### `ja`
+Jumps to the address formed by the combination of DY and DX.
+##### `jar`
+Identical to `ja`, but replaces the contents of DY and DX with the address of
+the following instruction.
+##### `jci`
+Identical to `ja`, but also clears interrupt status if it is present.
+
+#### Registers
+##### `rd <register>`
+Moves the contents of the specified register into the accumulator.
+##### `wr <register>`
+Moves the contents of the accumulator into the specified register.
+##### `sw <register>`
+Exchanges the contents of the accumulator with the specified register.
+##### `rdi <value>`
+Loads the specified 8-bit value into the accumulator.
+
+#### Carry
+##### `cset`
+Sets the carry bit to 1.
+##### `cclr`
+Sets the carry bit to 0.
+##### `ctog`
+Toggles the value of the carry bit.
+
+### Math
+
+#### Addition & subtraction
+##### `add <dx/dy>`
+Adds the contents of the specified register to the accumulator.
+##### `addc <dx/dy>`
+Identical to `add` but treats the carry bit as a carry-in bit from a less
+significant byte.
+##### `sub <dx/dy>`
+Subtracts the contents of the specified register from the accumulator.
+##### `subc <dx/dy>`
+Identical to `sub` but treats the carry bit as a carry-in bit from a less
+significant byte.
+
+### Memory
