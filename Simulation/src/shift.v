@@ -36,7 +36,7 @@ module shift(
         .q(newbit)
     );
     mux #(.WIDTH(9)) m_out(
-        .a({in[7], in[6:0], newbit}),
+        .a({in[7:0], newbit}),
         .b({in[0], newbit, in[7:1]}),
         .s(mode[2]),
         .q({cout, out})
