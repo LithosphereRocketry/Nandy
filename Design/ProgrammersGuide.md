@@ -407,4 +407,79 @@ carry bit.
 Identical to their respective non-`i` variants, but use the provided immediate
 value in place of the DX or DY register.
 
+#### Comparison
+##### `zero`
+Sets the carry bit to 1 if the accumulator holds the value 0, and sets it to 0
+otherwise.
+##### `nzero`
+Sets the carry bit to 0 if the accumulator holds the value 0, and sets it to 1 
+otherwise.
+##### `par`, `npar`
+Sets the carry bit to 1 if the accumulator contains an odd or even number of
+high bits, respecitvely.
+
+#### Bitwise logic
+##### `inv <dx/dy>`
+Sets the contents of the accumulator to the bitwise inverse of the specified
+register.
+##### `and <dx/dy>`
+Bitwise-ands the contents of the accumulator with the specified register and
+stores the results in the accumulator.
+##### `nand <dx/dy>`
+Bitwise-nands the contents of the accumulator with the specified register and
+stores the results in the accumulator.
+##### `or <dx/dy>`
+Bitwise-ors the contents of the accumulator with the specified register and
+stores the results in the accumulator.
+##### `nor <dx/dy>`
+Bitwise-nors the contents of the accumulator with the specified register and
+stores the results in the accumulator.
+##### `xor <dx/dy>`
+Bitwise-xors the contents of the accumulator with the specified register and
+stores the results in the accumulator.
+##### `xnor <dx/dy>`
+Bitwise-xnors the contents of the accumulator with the specified register and
+stores the results in the accumulator.
+##### `andi`, `nandi`, `ori`, `nori`, `xori`, `xnori`
+Identical to their respective non-`i` variants, but use the provided immediate
+value in place of the DX or DY register.
+
+#### Shifts
+For all of the following, the carry bit is set to the value shifted off the end
+of the accumulator.
+##### `sl`, `sr`
+Shifts the accumulator left or right, respectively, by one bit, inserting a 0 at
+the vacated place.
+##### `slc`, `src`
+Shifts the accumulator left or right, respectively, by one bit, inserting the previous value of the carry bit at the vacated place.
+##### `sla`, `sra`
+Shifts the accumulator left or right, respectively, by one bit, copying the
+value of the vacated place from the bit adjacent to it.
+##### `slr`, `srr`
+Shifts the accumulator left or right, respectively, by one bit, copying the
+value of the vacated place from the bit shifted off the end.
+##### `_sl`, `_sr`, `_slc`, `_src`, `_sla`, `_sra`, `_slr`, `_srr`
+Identical to their respective non-underscore variants, but do not modify the
+carry bit.
+
 ### Memory
+#### Stack pointer
+##### `isp`
+Increments the stack pointer by the provided signed 4-bit value, and sets the
+carry bit to the carry-out value of the addition or subtraction.
+##### `_isp`
+Identical to `isp` but does not set the carry bit.
+#### Loads
+##### `lda <offset>`
+Loads the value at the combined address stored in DY and DX plus the specified
+unsigned 4-bit offset into the accumulator.
+##### `lds <offset>`
+Loads the value at the address formed by 0xFF00 + SP + offset into the
+accumulator.
+#### Stores
+##### `stra <offset>`
+Stores the value of the accumulator at the combined address stored in DY and DX
+plus the specified unsigned 4-bit offset.
+##### `strs <offset>`
+Stores the value of the accumulator at the address formed by 0xFF00 + SP +
+offset.
