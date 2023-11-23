@@ -14,7 +14,7 @@ module tb_adder8();
         .cout(ans[8])
     );
 
-    combitest #("adder8", 17, 9, 210) tester(
+    randtest #("adder8", 17, 9, 210) tester(
         .comp_in({a, b, cin}),
         .verify(realans),
         .comp_out(ans)

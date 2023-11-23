@@ -35,3 +35,36 @@ module combitest #(parameter name = "unnamed", parameter inbits = 1,
         $finish(0);
     end
 endmodule
+
+module randomizer #(parameter width = 1) (output reg [(width-1):0] value);
+    task roll;
+        value = {((width+31)/32){$random}} & {width{1'b1}};
+    endtask
+endmodule
+
+module randtest #(parameter name = "unnamed", parameter inbits = 1,
+                 parameter outbits = 1, parameter delay = 10,
+                 parameter cooldown = 1000)
+                (output reg [(inbits-1):0] comp_in,
+                 input wire [(outbits-1):0] verify,
+                 input wire [(outbits-1):0] comp_out);
+    
+    wire [(inbits-1):0] value;
+    randomizer #(inbits) r (.value(value));
+
+    initial begin
+        repeat (65536) begin
+            comp_in = {inbits{1'bx}};
+            #(cooldown);
+            r.roll();
+            comp_in = value;
+            #(delay);
+            if (comp_out !== verify) begin
+                $display("Test %s failed: input %b -> expected %b, got %b",
+                    name, comp_in, verify, comp_out);
+                $finish(1);
+            end
+        end
+        $finish(0);
+    end
+endmodule
