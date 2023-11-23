@@ -451,7 +451,8 @@ of the accumulator.
 Shifts the accumulator left or right, respectively, by one bit, inserting a 0 at
 the vacated place.
 ##### `slc`, `src`
-Shifts the accumulator left or right, respectively, by one bit, inserting the previous value of the carry bit at the vacated place.
+Shifts the accumulator left or right, respectively, by one bit, inserting the
+previous value of the carry bit at the vacated place.
 ##### `sla`, `sra`
 Shifts the accumulator left or right, respectively, by one bit, copying the
 value of the vacated place from the bit adjacent to it.
