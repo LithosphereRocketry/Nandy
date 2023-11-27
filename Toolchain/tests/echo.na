@@ -1,0 +1,8 @@
+    eint
+idle:
+    goto idle
+
+@loc ISR
+    rd io
+    wr io
+    jri

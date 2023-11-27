@@ -38,6 +38,8 @@ bool parity(word_t w) {
 
 #define WRITABLE_REGION (1<<15)
 
+unsigned int cpufreq = 1000000;
+unsigned int baudrate = 9600;
 
 enum ALUMode {
 	ALU_B = 0x0,
@@ -88,6 +90,8 @@ word_t ioin, ioout;
 bool intEnabled;
 bool isInterrupt;
 
+unsigned long ioCooldown;
+
 word_t signExt(word_t value, int bits) {
 	word_t mask = (-1) << bits;
 	if(value & (1 << (bits-1))) {
@@ -98,26 +102,43 @@ word_t signExt(word_t value, int bits) {
 }
 
 bool wantsInterrupt() {
-	return (cycles/2) % 50 == 0;
+	if(ioCooldown == 0) {
+		int nextChar = getc(stdin);
+		if(nextChar == EOF) {
+			return false;
+		} else {
+			ioin = nextChar;
+			ioCooldown = (cpufreq / baudrate);
+			return true;
+		}
+	} else {
+		return false;
+	}
 }
 
 bool step(bool debugint);
 bool pause() {
 	// PC increments early in this implementation so we subtract 1
-	printf("Breakpoint\n");
+	printf("\nBreakpoint\n");
 	while(1) {
 		switch(radix) {
 			case RADIX_DECIMAL:
-				printf("    PC %hhi\t   ACC %hhi\t  IOIN %hhi\tCycles %lu\t Carry %hhi\n  Inst %hhi\t    SP %hhi\t    DX %hhi\t    DY %hhi\tIOOUT %hhi\n> ",
+				printf("    PC %hhi\t   ACC %hhi\t  IOIN %hhi\tCycles %lu\t Carry %hhi\n"\
+					   "Inst %hhi\t    SP %hhi\t    DX %hhi\t    DY %hhi\tIOOUT %hhi\n"\
+					   "DEBUG> ",
 					pc, acc, ioin, cycles, carry, mem[pc], sp, x, y, ioout);
 				break;
 			case RADIX_UNSIGNED:
-				printf("    PC %hhu\t   ACC %hhu\t  IOIN %hhu\tCycles %lu\t Carry %hhi\n  Inst %hhu\t    SP %hhu\t    DX %hhu\t    DY %hhu\tIOOUT %hhu\n> ",
+				printf("    PC %hhu\t   ACC %hhu\t  IOIN %hhu\tCycles %lu\t Carry %hhi\n"\
+					   "Inst %hhu\t    SP %hhu\t    DX %hhu\t    DY %hhu\tIOOUT %hhu\n"\
+					   "DEBUG> ",
 					pc, acc, ioin, cycles, carry, mem[pc], sp, x, y, ioout);
 				break;
 			case RADIX_HEX:
 			default:
-				printf("    PC 0x%hhx\t   ACC 0x%hhx\t  IOIN 0x%hhx\tCycles 0x%lx\t Carry %hhi\n  Inst 0x%hhx\t    SP 0x%hhx\t    DX 0x%hhx\t    DY 0x%hhx\tIOOUT 0x%hhx\n> ",
+				printf("    PC 0x%hhx\t   ACC 0x%hhx\t  IOIN 0x%hhx\tCycles 0x%lx\t Carry %hhi\n"\
+					   "Inst 0x%hhx\t    SP 0x%hhx\t    DX 0x%hhx\t    DY 0x%hhx\tIOOUT 0x%hhx\n"\
+					   "DEBUG> ",
 					pc, acc, ioin, cycles, carry, mem[pc], sp, x, y, ioout);
 		}
 		char input[256];
@@ -162,6 +183,7 @@ bool pause() {
 }
 
 inst_t fetch() {
+	if(ioCooldown != 0) { ioCooldown--; }
 	cycles++;
 	return mem[++pc];
 }
