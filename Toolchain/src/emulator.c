@@ -123,7 +123,6 @@ bool wantsInterrupt() {
 
 bool step(bool debugint);
 bool pauseToDbg() {
-	// PC increments early in this implementation so we subtract 1
 	printf("\nBreakpoint\n");
 	while(1) {
 		switch(radix) {
@@ -328,7 +327,7 @@ bool step(bool debugint) {
 					if(i & RD_MASK) {
 						acc = from;
 					}
-				} else { // prorgam flow
+				} else { // program flow
 					if(!(i & SIG_MASK)) { // ret/call
 						addr_t oldpc = pc + 1;
 						pc = (((addr_t) (isInterrupt ? iy : y)) << 8)
@@ -337,7 +336,7 @@ bool step(bool debugint) {
 							*(isInterrupt ? &ix : &x) = oldpc & 0xFF;
 							*(isInterrupt ? &iy : &y) = oldpc >> 8;
 						}
-						if(i & CI_MASK) {
+						if(i & CI_MASK) { // jci only
 							isInterrupt = false;
 						}
 					} else { // signal
