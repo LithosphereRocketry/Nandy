@@ -131,20 +131,23 @@ bool pauseToDbg() {
 				printf("    PC %hi\t   ACC %hhi\t  IOIN %hhi\tCycles %lu\t Carry %hhi\n"\
 					   "Inst %hhi\t    SP %hhi\t    DX %hhi\t    DY %hhi\tIOOUT %hhi\n"\
 					   "DEBUG> ",
-					pc, acc, ioin, cycles, carry, mem[pc], sp, x, y, ioout);
+					pc, acc, ioin, cycles, carry, mem[pc], sp,
+					isInterrupt ? ix : x, isInterrupt ? iy : y, ioout);
 				break;
 			case RADIX_UNSIGNED:
 				printf("    PC %hu\t   ACC %hhu\t  IOIN %hhu\tCycles %lu\t Carry %hhi\n"\
 					   "Inst %hhu\t    SP %hhu\t    DX %hhu\t    DY %hhu\tIOOUT %hhu\n"\
 					   "DEBUG> ",
-					pc, acc, ioin, cycles, carry, mem[pc], sp, x, y, ioout);
+					pc, acc, ioin, cycles, carry, mem[pc], sp,
+					isInterrupt ? ix : x, isInterrupt ? iy : y, ioout);
 				break;
 			case RADIX_HEX:
 			default:
 				printf("    PC 0x%hx\t   ACC 0x%hhx\t  IOIN 0x%hhx\tCycles 0x%lx\t Carry %hhi\n"\
 					   "Inst 0x%hhx\t    SP 0x%hhx\t    DX 0x%hhx\t    DY 0x%hhx\tIOOUT 0x%hhx\n"\
 					   "DEBUG> ",
-					pc, acc, ioin, cycles, carry, mem[pc], sp, x, y, ioout);
+					pc, acc, ioin, cycles, carry, mem[pc], sp,
+					isInterrupt ? ix : x, isInterrupt ? iy : y, ioout);
 		}
 		char input[256];
 		fgets(input, 255, stdin);
