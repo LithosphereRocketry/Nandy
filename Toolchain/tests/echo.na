@@ -1,6 +1,6 @@
     eint
 idle:
-    goto idle
+    j idle
 
 @loc ISR
     rd io

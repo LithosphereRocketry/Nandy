@@ -3,6 +3,11 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <string.h>
+#include <time.h>
+
+#ifdef __unix__
+#include <unistd.h>
+#endif
 
 typedef int8_t word_t;
 typedef uint16_t addr_t;
@@ -117,7 +122,7 @@ bool wantsInterrupt() {
 }
 
 bool step(bool debugint);
-bool pause() {
+bool pauseToDbg() {
 	// PC increments early in this implementation so we subtract 1
 	printf("\nBreakpoint\n");
 	while(1) {
@@ -183,6 +188,13 @@ bool pause() {
 }
 
 inst_t fetch() {
+#ifdef __unix__
+	// We assume the actual emulator takes zero time at all
+	// we can probably get better timing precision by using a different timing
+	// method but this is pretty OK
+	static const struct timespec us = {0, 1000};
+	nanosleep(&us, NULL);
+#endif
 	if(ioCooldown != 0) { ioCooldown--; }
 	cycles++;
 	return mem[++pc];
@@ -327,7 +339,7 @@ bool step(bool debugint) {
 						}
 					} else { // signal
 						switch(i & SIGNAL_MASK) {
-							case SIGNAL_BRK: if(debugint) return pause(); break;
+							case SIGNAL_BRK: if(debugint) return pauseToDbg(); break;
 							case SIGNAL_BEL: putchar('\a'); break;
 							case SIGNAL_DINT: intEnabled = false; break;
 							case SIGNAL_EINT: intEnabled = true; break;
@@ -386,7 +398,7 @@ int main(int argc, char** argv) {
 	printf("%lu bytes loaded\n", loaded);
 	// A bit of a hack to start in the debug menu but then continue running with
 	// no debug afterward
-	if(pause()) {
+	if(pauseToDbg()) {
 		while(step(true));
 	}
 	// char* path = NULL;
