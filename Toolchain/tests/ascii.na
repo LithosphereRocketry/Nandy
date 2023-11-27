@@ -1,0 +1,57 @@
+    rdi 0
+    wr sp
+    eint
+idle:
+    j idle
+
+mul10_8:
+    sl
+    isp -1
+    sw x
+    strs 0
+    rd x
+    sl
+    sl
+    add x
+    wr x
+    lds 0
+    sw x
+    isp 1
+    ja
+
+
+@loc ISR
+    isp -3
+    sw x
+    strs 0
+    rd y
+    strs 1
+    
+    rd io
+    subi 10 # is newline?
+    zero
+    jnif is_numeral
+    
+    rd x
+    wr io
+    rdi 10
+    wr io
+    rdi 0
+    j done
+is_numeral:
+    subi 38 # '0' - '\n'
+    strs 2
+    rd x
+    call mul10_8
+    wr x
+    lds 2
+    add x
+    
+done:
+    wr y
+    lds 0
+    wr x
+    lds 1
+    sw y
+    isp 2
+    jri

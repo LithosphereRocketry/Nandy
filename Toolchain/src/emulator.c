@@ -39,7 +39,7 @@ bool parity(word_t w) {
 #define WRITABLE_REGION (1<<15)
 
 unsigned int cpufreq = 1000000;
-unsigned int baudrate = 9600;
+unsigned int baudrate = 1200;
 
 enum ALUMode {
 	ALU_B = 0x0,
@@ -123,20 +123,20 @@ bool pause() {
 	while(1) {
 		switch(radix) {
 			case RADIX_DECIMAL:
-				printf("    PC %hhi\t   ACC %hhi\t  IOIN %hhi\tCycles %lu\t Carry %hhi\n"\
+				printf("    PC %hi\t   ACC %hhi\t  IOIN %hhi\tCycles %lu\t Carry %hhi\n"\
 					   "Inst %hhi\t    SP %hhi\t    DX %hhi\t    DY %hhi\tIOOUT %hhi\n"\
 					   "DEBUG> ",
 					pc, acc, ioin, cycles, carry, mem[pc], sp, x, y, ioout);
 				break;
 			case RADIX_UNSIGNED:
-				printf("    PC %hhu\t   ACC %hhu\t  IOIN %hhu\tCycles %lu\t Carry %hhi\n"\
+				printf("    PC %hu\t   ACC %hhu\t  IOIN %hhu\tCycles %lu\t Carry %hhi\n"\
 					   "Inst %hhu\t    SP %hhu\t    DX %hhu\t    DY %hhu\tIOOUT %hhu\n"\
 					   "DEBUG> ",
 					pc, acc, ioin, cycles, carry, mem[pc], sp, x, y, ioout);
 				break;
 			case RADIX_HEX:
 			default:
-				printf("    PC 0x%hhx\t   ACC 0x%hhx\t  IOIN 0x%hhx\tCycles 0x%lx\t Carry %hhi\n"\
+				printf("    PC 0x%hx\t   ACC 0x%hhx\t  IOIN 0x%hhx\tCycles 0x%lx\t Carry %hhi\n"\
 					   "Inst 0x%hhx\t    SP 0x%hhx\t    DX 0x%hhx\t    DY 0x%hhx\tIOOUT 0x%hhx\n"\
 					   "DEBUG> ",
 					pc, acc, ioin, cycles, carry, mem[pc], sp, x, y, ioout);
