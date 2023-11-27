@@ -15,20 +15,21 @@ bool parity(word_t w) {
 	return w & 1;
 }
 
-#define MULTICYCLE_MASK 1<<7
-#define ALU_SEL_MASK 1<<6
-#define ISP_MASK 1<<5
-#define XY_MASK 1<<5
-#define MEM_WRITE_MASK 1<<5
-#define JUMP_MASK 1<<5
-#define CARRY_SEL_MASK 1<<4
-#define PROGFLOW_MASK 1<<4
-#define MEM_STACK_MASK 1<<4
-#define COND_INV_MASK 1<<4
-#define SIG_MASK 1<<3
-#define WR_MASK 1<<3
-#define RD_MASK 1<<2
-#define RET_MASK 1<<2
+#define MULTICYCLE_MASK (1<<7)
+#define ALU_SEL_MASK (1<<6)
+#define ISP_MASK (1<<5)
+#define XY_MASK (1<<5)
+#define MEM_WRITE_MASK (1<<5)
+#define JUMP_MASK (1<<5)
+#define CARRY_SEL_MASK (1<<4)
+#define PROGFLOW_MASK (1<<4)
+#define MEM_STACK_MASK (1<<4)
+#define COND_INV_MASK (1<<4)
+#define SIG_MASK (1<<3)
+#define WR_MASK (1<<3)
+#define RD_MASK (1<<2)
+#define RET_MASK (1<<2)
+#define CI_MASK (1<<1)
 
 #define ALU_INST_MASK 0xF
 #define ALU_WRITESBOTH_MASK 0b1000 // any instruction with either of these bits can
@@ -62,7 +63,7 @@ enum Signal {
 	SIGNAL_BRK = 00,
 	SIGNAL_BEL = 01,
 	SIGNAL_DINT = 04,
-	SINGAL_EINT = 05
+	SIGNAL_EINT = 05
 };
 
 enum {
@@ -79,11 +80,13 @@ enum RegID {
 };
 
 unsigned long cycles = -1;
-word_t acc, x, y, sp;
+word_t acc, x, y, sp, ix, iy;
 bool carry;
 addr_t pc = -1;
 inst_t mem[65536];
 word_t ioin, ioout;
+bool intEnabled;
+bool isInterrupt;
 
 word_t signExt(word_t value, int bits) {
 	word_t mask = (-1) << bits;
@@ -92,6 +95,10 @@ word_t signExt(word_t value, int bits) {
 	} else {
 		return value & ~mask;
 	}
+}
+
+bool wantsInterrupt() {
+	return (cycles/2) % 50 == 0;
 }
 
 bool step(bool debugint);
@@ -243,6 +250,13 @@ void aluop(enum ALUMode mode, bool isCarry, bool isXY, word_t a, word_t b, word_
 }
 
 bool step(bool debugint) {
+	if(intEnabled && !isInterrupt && wantsInterrupt()) {
+		isInterrupt = true;
+		ix = (pc+1) & 0xFF;
+		iy = (pc+1) >> 8;
+		pc = 0x7EFF;
+	}
+
 	inst_t i = fetch();
 	if(!(i & MULTICYCLE_MASK)) { // single cycle operations
 		if(!(i & ALU_SEL_MASK)) { // basic instructions
@@ -260,12 +274,12 @@ bool step(bool debugint) {
 							to = &ioout;
 							break;
 						case REGID_DX:
-							from = x;
-							to = &x;
+							from = isInterrupt ? ix : x;
+							to = isInterrupt ? &ix : &x;
 							break;
 						case REGID_DY:
-							from = y;
-							to = &y;
+							from = isInterrupt ? iy : y;
+							to = isInterrupt ? &iy : &y;
 							break;
 					}
 					if(i & WR_MASK) {
@@ -280,15 +294,21 @@ bool step(bool debugint) {
 				} else { // prorgam flow
 					if(!(i & SIG_MASK)) { // ret/call
 						addr_t oldpc = pc + 1;
-						pc = (((addr_t) y) << 8) + x - 1;
+						pc = (((addr_t) (isInterrupt ? iy : y)) << 8)
+						   + (isInterrupt ? ix : x) - 1;
 						if(i & RET_MASK) { // call only
-							x = oldpc & 0xFF;
-							y = oldpc >> 8;
+							*(isInterrupt ? &ix : &x) = oldpc & 0xFF;
+							*(isInterrupt ? &iy : &y) = oldpc >> 8;
+						}
+						if(i & CI_MASK) {
+							isInterrupt = false;
 						}
 					} else { // signal
 						switch(i & SIGNAL_MASK) {
 							case SIGNAL_BRK: if(debugint) return pause(); break;
 							case SIGNAL_BEL: putchar('\a'); break;
+							case SIGNAL_DINT: intEnabled = false; break;
+							case SIGNAL_EINT: intEnabled = true; break;
 						}
 					}
 				}
@@ -296,14 +316,16 @@ bool step(bool debugint) {
 				aluop(ALU_ADD, i & CARRY_SEL_MASK, i & XY_MASK, sp, signExt(i, 4), &sp);
 			}
 		} else { // normal math
-			word_t alub = (i & XY_MASK) ? y : x;
+			word_t alub = (i & XY_MASK) ? (isInterrupt ? iy : y)
+										: (isInterrupt ? ix : x);
 			aluop(i & ALU_INST_MASK, i & CARRY_SEL_MASK, i & XY_MASK, acc, alub, &acc);
 		}
 	} else { // multicycle operations
 		if(!(i & ALU_SEL_MASK)) { // memory 
 			addr_t memaddr;
 			if(!(i & MEM_STACK_MASK)) {
-				memaddr = (((int) y) << 8 | x) + signExt(i, 4);
+				memaddr = (((int) (isInterrupt ? iy : y)) << 8 
+								| (isInterrupt ? ix : x)) + signExt(i, 4);
 			} else {
 				memaddr = ((unsigned) sp) + signExt(i, 4);
 			}

@@ -1,0 +1,10 @@
+rdi 65
+eint
+idle: 
+    wr io
+    j idle
+
+@loc ISR
+    addi 1
+    brk
+    jri
