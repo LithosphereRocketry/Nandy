@@ -38,7 +38,7 @@ mul8_loop:
     rd dx
     sl
     wr dx
-    jnif mul8_skip
+    jcz mul8_skip
 
     lds 2
     sw dx
@@ -60,7 +60,7 @@ mul8_skip:
     rd dy
     subi 1
     wr dy
-    jnif mul8_loop
+    jcz mul8_loop
 
     lds 0
     wr dx

@@ -7,5 +7,5 @@ _addi 48
 wr io
 _subi 48
 subi 1
-jnif start
+jcz start
 brk

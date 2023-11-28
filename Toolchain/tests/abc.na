@@ -2,11 +2,12 @@
 	rdi 25
 	wr sp
 	rdi 65 # 'A'
-	brk
-	
-lbl: nop
-	wr io
+
+lbl:wr io
 	isp -1
 	_addi 1
-	jnif lbl
+	jcz lbl
 	brk
+
+@loc ISR
+	jri

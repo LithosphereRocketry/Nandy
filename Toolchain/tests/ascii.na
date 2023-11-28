@@ -30,7 +30,7 @@ mul10_8:
     rd io
     subi 10 # is newline?
     zero
-    jnif is_numeral
+    jcz is_numeral
     
     rd x
     wr io

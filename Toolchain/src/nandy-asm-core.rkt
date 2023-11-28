@@ -96,12 +96,11 @@
 (struct addci-exp (num) #:transparent)
 (struct subi-exp (num) #:transparent)
 (struct subci-exp (num) #:transparent)
-;; Conditionals
-(struct jif-exp (label) #:transparent)
-(struct jnif-exp (label) #:transparent)
+;; Relative jumps
+(struct j-exp (label) #:transparent)
+(struct jcz-exp (label) #:transparent)
 
 ; Pseudoinstructions
-(struct j-exp (label) #:transparent)
 (struct move-exp (from to) #:transparent)
 (struct swap-exp (a b) #:transparent)
 (struct call-exp (label) #:transparent)
@@ -222,10 +221,9 @@
          (cons "subi" (idesc subi-exp (list parse-number)))
          (cons "subci" (idesc subci-exp (list parse-number)))
          
-         (cons "jif" (idesc jif-exp (list parse-label)))
-         (cons "jnif" (idesc jnif-exp (list parse-label)))
-         
          (cons "j" (idesc j-exp (list parse-label)))
+         (cons "jcz" (idesc jcz-exp (list parse-label)))
+
          (cons "call" (idesc call-exp (list parse-label)))
          (cons "goto" (idesc goto-exp (list parse-label)))
          (cons "move" (idesc move-exp (list parse-reg parse-reg))))))
@@ -292,9 +290,7 @@
 ; Macro definitions go here
 (define macro-expand
   (lambda (exp)
-    (cond [(j-exp? exp) (list-exp (list (jif-exp (j-exp-label exp))
-                                        (jnif-exp (j-exp-label exp))))]
-          [(@include-exp? exp) (expand-file (@include-exp-path exp))]
+    (cond [(@include-exp? exp) (expand-file (@include-exp-path exp))]
           [(call-exp? exp) (list-exp (list (wr-exp 'dy)
                                            (rdi-exp (bytenum (call-exp-label exp) 0))
                                            (wr-exp 'dx)
@@ -416,8 +412,8 @@
           [(subi-exp? exp) 2]
           [(subci-exp? exp) 2]
           
-          [(jif-exp? exp) 2]
-          [(jnif-exp? exp) 2]
+          [(j-exp? exp) 2]
+          [(jcz-exp? exp) 2]
           [else (raise (string-append "Expression " (format "~a" exp) " has no defined length"))])))
 
 (define byte->sbyte
@@ -516,8 +512,8 @@
                    [(addci-exp? inst) (addci-exp (get-value (addci-exp-num inst) ltab))]
                    [(subi-exp? inst) (subi-exp (get-value (subi-exp-num inst) ltab))]
                    [(subci-exp? inst) (subci-exp (get-value (subci-exp-num inst) ltab))]
-                   [(jif-exp? inst) (jif-exp (get-value (jif-exp-label inst) ltab))]
-                   [(jnif-exp? inst) (jnif-exp (get-value (jnif-exp-label inst) ltab))]
+                   [(j-exp? inst) (j-exp (get-value (j-exp-label inst) ltab))]
+                   [(jcz-exp? inst) (jcz-exp (get-value (jcz-exp-label inst) ltab))]
                    [else inst])) ilist))))
 
 (define reg->bits
@@ -625,10 +621,10 @@
                      [(addci-exp? inst) (list #b11011001 (num->8bi (addci-exp-num inst)))]
                      [(subi-exp? inst) (list #b11011010 (num->8bi (subi-exp-num inst)))]
                      [(subci-exp? inst) (list #b11011011 (num->8bi (subci-exp-num inst)))]
-                     [(jif-exp? inst) (let ([offset (- (jif-exp-label inst) (+ loc 1))])
+                     [(j-exp? inst) (let ([offset (- (j-exp-label inst) (+ loc 1))])
                                       (list (bitwise-ior #b11100000 (num->4bi (get-bnum offset 1)))
                                             (num->8bi (get-bnum offset 0))))]
-                     [(jnif-exp? inst) (let ([offset (- (jnif-exp-label inst) (+ loc 1))])
+                     [(jcz-exp? inst) (let ([offset (- (jcz-exp-label inst) (+ loc 1))])
                                       (list (bitwise-ior #b11110000 (num->4bi (get-bnum offset 1)))
                                             (num->8bi (get-bnum offset 0))))]
                      [else (raise (format "Could not convert ~a to binary" inst))])])

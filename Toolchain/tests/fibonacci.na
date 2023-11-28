@@ -19,7 +19,8 @@ fib:isp -3
 fib_loop:
     lds 0
     subi 1
-    jif fib_done
+    ctog
+    jcz fib_done
     strs 0
     rd x
     add y

@@ -29,7 +29,7 @@ bool parity(word_t w) {
 #define CARRY_SEL_MASK (1<<4)
 #define PROGFLOW_MASK (1<<4)
 #define MEM_STACK_MASK (1<<4)
-#define COND_INV_MASK (1<<4)
+#define COND_MASK (1<<4)
 #define SIG_MASK (1<<3)
 #define WR_MASK (1<<3)
 #define RD_MASK (1<<2)
@@ -336,7 +336,7 @@ bool step(bool debugint) {
 							*(isInterrupt ? &ix : &x) = oldpc & 0xFF;
 							*(isInterrupt ? &iy : &y) = oldpc >> 8;
 						}
-						if(i & CI_MASK) { // jci only
+						if(i & CI_MASK) { // jri only
 							isInterrupt = false;
 						}
 					} else { // signal
@@ -379,7 +379,7 @@ bool step(bool debugint) {
 			} else { // jumps
 				int offs = ((((int) signExt(i, 4)) << 8)
 							| (((int) imm) & 0xFF)) - 1;
-				if((carry && !(i & COND_INV_MASK)) || (!carry && (i & COND_INV_MASK))) {
+				if(!((i & COND_MASK) && carry)) {
 					pc += offs;
 				}
 			}
