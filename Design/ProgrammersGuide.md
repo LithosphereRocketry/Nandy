@@ -232,32 +232,30 @@ true, it is said to be "valid."
 
 ### Program Flow
 NANDy program flow is provided by a small handful of jump instructions. Local
-conditional jumps are handled by the `jif` and `jnif` instructions. Both
-take the form `j[n]if <label>`, where the label may also be replaced by a direct
-memory address, but this practice is not recommended. These jumps have a range
-limit of [-2048, +2047] bytes; attempting to jump outside this range will cause
-an error in assembly. `jif` will jump to the specified label if the specified
-signal is high, while `jnif` will jump if the specified signal is low. There is
-no unconditional local jump; however, the `j` macro is provided that fulfils the
-same function, equivalent to `jif` followed by `jnif`.
+jumps are handled by the `j` and `jcz` instructions. Both take the form
+`j[cz] <label>`, where the label may also be replaced by a direct memory
+address; however, using direct addresses is not recommended. These jumps have a
+range limit of [-2048, +2047] bytes; attempting to jump outside this range will
+cause an error in assembly. `j` will jump to the specified label
+unconditionally, while `jcz` will jump if the carry bit is zero.
 
 Of note for optimization is that relative jump instructions will take two
 cycles - this includes when the jump is not taken. Therefore it is usually
-faster to let a loop fall through when it is finished. The `j` macro is
-especially disadvantageous for performance-sensitive code; it may take either 2
-or 4 cycles depending on the state of the carry bit.
+faster to let a loop fall through when it is finished, rather than breaking out
+of it when a condition is met:
 ```
 loop:
     # this is fast
     ...
-    jnif loop
+    ctog
+    jcz loop
     # done
 ```
 ```
 loop:
     # this is slow
     ...
-    jif done
+    jcz done
     j loop
 done: # done
 ```
@@ -357,14 +355,16 @@ Stops program execution. In emulation, exits to the debugger interface.
 Plays an audible alert tone.
 ##### `eint`, `dint`
 Enables or disables interrupts, respectively.
-##### `jif <label>`, `jnif <label>`
-Jumps to the specified label if the carry bit is 1 or 0, respectively.
+##### `j <label>`
+Jumps to the specified label.
+##### `jcz <label>`
+Jumps to the specified label if the carry bit is 0.
 ##### `ja`
 Jumps to the address formed by the combination of DY and DX.
 ##### `jar`
 Identical to `ja`, but replaces the contents of DY and DX with the address of
 the following instruction.
-##### `jci`
+##### `jri`
 Identical to `ja`, but also clears interrupt status if it is present.
 
 #### Registers
