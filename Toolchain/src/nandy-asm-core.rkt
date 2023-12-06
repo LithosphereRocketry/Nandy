@@ -33,6 +33,8 @@
 (struct bell-exp () #:transparent)
 (struct dint-exp () #:transparent)
 (struct eint-exp () #:transparent)
+(struct iclr-exp () #:transparent)
+(struct iset-exp () #:transparent)
 (struct _isp-exp (num) #:transparent)
 (struct isp-exp (num) #:transparent)
 ;; Register ALU, no carry
@@ -157,6 +159,8 @@
          (cons "bell" (idesc bell-exp '()))
          (cons "dint" (idesc dint-exp '()))
          (cons "eint" (idesc eint-exp '()))
+         (cons "iclr" (idesc eint-exp '()))
+         (cons "iset" (idesc dint-exp '()))
          (cons "_isp" (idesc _isp-exp (list parse-number)))
          (cons "isp" (idesc isp-exp (list parse-number)))
          (cons "or" (idesc xor-exp (list parse-reg)))
@@ -348,6 +352,8 @@
           [(bell-exp? exp) 1]
           [(dint-exp? exp) 1]
           [(eint-exp? exp) 1]
+          [(iclr-exp? exp) 1]
+          [(iset-exp? exp) 1]
           [(_isp-exp? exp) 1]
           [(isp-exp? exp) 1]
 
@@ -562,6 +568,8 @@
                      [(bell-exp? inst) (list #b00011001)]
                      [(dint-exp? inst) (list #b00011100)]
                      [(eint-exp? inst) (list #b00011101)]
+                     [(iclr-exp? inst) (list #b00011110)]
+                     [(iset-exp? inst) (list #b00011111)]
                      [(_isp-exp? inst) (list (bitwise-ior #b00100000 (num->4bi (_isp-exp-num inst))))]
                      [(isp-exp? inst) (list (bitwise-ior #b00110000 (num->4bi (isp-exp-num inst))))]
                      [(or-exp? inst) (list (bitwise-ior #b01000001 (regmath->bits (xor-exp-reg inst))))]

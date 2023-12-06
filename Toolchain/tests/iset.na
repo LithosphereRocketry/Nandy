@@ -1,0 +1,14 @@
+    eint
+idle:
+    dint
+    iset
+    wr x
+    wr y
+    iclr
+    eint
+    j idle
+
+@loc ISR
+    rd io
+    wr io
+    jri

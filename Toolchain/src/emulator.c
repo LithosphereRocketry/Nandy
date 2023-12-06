@@ -70,7 +70,9 @@ enum Signal {
 	SIGNAL_BRK = 00,
 	SIGNAL_BEL = 01,
 	SIGNAL_DINT = 04,
-	SIGNAL_EINT = 05
+	SIGNAL_EINT = 05,
+	SIGNAL_ICLR = 06,
+	SIGNAL_ISET = 07
 };
 
 enum {
@@ -345,6 +347,8 @@ bool step(bool debugint) {
 							case SIGNAL_BEL: putchar('\a'); break;
 							case SIGNAL_DINT: intEnabled = false; break;
 							case SIGNAL_EINT: intEnabled = true; break;
+							case SIGNAL_ICLR: isInterrupt = false; break;
+							case SIGNAL_ISET: isInterrupt = true; break;
 						}
 					}
 				}
