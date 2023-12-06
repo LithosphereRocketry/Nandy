@@ -223,12 +223,11 @@ their contents may change at any time. Reading off the top of the stack (offset
 above 0xFFFF) is also undefined behavior, and will usually result in reading the
 first bytes of program memory.
 
-In some cases, it may be necessary or advantageous to neglect the stack memory
-region and instead use the stack pointer as an extra general-purpose register.
-This is referred to as "stack-pointer abuse." Anytime the stack pointer does not
-represent the lowest allocated memory address on the stack, whether due to abuse
-or non-initialization, the stack is said to be "invalid"; when that condition is
-true, it is said to be "valid." 
+Like other registers, the stack pointer has no guaranteed initial value.
+Therefore, it must be initialized before the stack can be used.  Anytime the
+stack pointer does not represent the lowest allocated memory address on the
+stack, whether due to abuse or non-initialization, the stack is said to be
+"invalid"; when that condition is true, it is said to be "valid." 
 
 ### Program Flow
 NANDy program flow is provided by a small handful of jump instructions. Local
@@ -338,9 +337,34 @@ idle:
 ```
 Interrupts follow similar calling convetions to functions except that they must
 leave all registers unmodified, including the carry bit. The alternate registers
-are interfaced exactly as DX and DY are in normal program execution. Currently,
-there is no way to access the alternate registers except during an interrupt,
-but this may change in future extensions of the architecture.
+are interfaced exactly as DX and DY are in normal program execution, and their
+contents are undefined whenever an interrupt is not occurring and interrupts are
+enabled. Their behavior with interrupts disabled is further discussed in
+[Interrupt Register Reuse](#interrupt-register-reuse).
+
+### Advanced Techniques
+
+#### Stack-Pointer Abuse
+
+In some cases, it may be necessary or advantageous to neglect the stack memory
+region and instead use the stack pointer as an extra general-purpose register.
+This is referred to as "stack-pointer abuse." Because the stack pointer has
+dedicated increment instructions that can set the carry bit, applications such
+as loop counters benefit greatly from this technique as it removes the need for
+register moves. However, since both functions and interrupts expect to be able
+to access the stack, no functions can be called during stack-pointer abuse, and
+interrupts must be disabled.
+
+#### Interrupt Register Reuse
+
+Similarly, when interrupts are disabled, the alternate DX and DY registers are
+not populated with the interrupt return address and can be used for other
+purposes. For this purpose, two instructions are provided, `iset` and `iclr`.
+`iset` enables the interrupt status bit without jumping to the ISR location,
+while `iclr` disables it, causing the primary and alternate DX and DY registers
+to flip without affecting program flow. This effectively increases the number of
+available registers from 4 to 6. These instructions should not be used while
+interrupts are enabled, as undefined behavior will result in most cases.
 
 ## Instruction Reference
 
@@ -355,6 +379,9 @@ Stops program execution. In emulation, exits to the debugger interface.
 Plays an audible alert tone.
 ##### `eint`, `dint`
 Enables or disables interrupts, respectively.
+##### `iset`, `iclr`
+Sets or clears interrupt status, respectively. Does not trigger an interrupt;
+behavior is undefined while external interrupts are enabled.
 ##### `j <label>`
 Jumps to the specified label.
 ##### `jcz <label>`
