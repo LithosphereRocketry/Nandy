@@ -149,11 +149,12 @@ operations which only modify the carry bit, and do not affect the accumulator at
 all:
 * `zero`: Set the carry bit high if the accumulator is zero, and low otherwise.
 * `nzero`: Inverse of `zero`.
+* `sgn`: Set the carry bit high if the accumulator is negative, and low
+otherwise.
+* `nsgn`: Inverse of `sgn`.
 * `par`: Set the carry bit high if the accumulator contains an odd number of
 high bits, and low otherwise.
 * `npar`: Inverse of `par`. 
-* `cset`: Set the carry bit high unconditionally.
-* `cclr`: Set the carry bit low unconditionally.
 * `ctog`: Invert the value of the carry bit.
 
 Several instructions allow a suffix of `c` to indicate that the carry bit should
@@ -403,12 +404,6 @@ Moves the contents of the accumulator into the specified register.
 Exchanges the contents of the accumulator with the specified register.
 ##### `rdi <value>`
 Loads the specified 8-bit value into the accumulator.
-
-#### Carry
-##### `cset`
-Sets the carry bit to 1.
-##### `cclr`
-Sets the carry bit to 0.
 ##### `ctog`
 Toggles the value of the carry bit.
 
@@ -444,6 +439,9 @@ otherwise.
 ##### `par`, `npar`
 Sets the carry bit to 1 if the accumulator contains an odd or even number of
 high bits, respecitvely.
+##### `sgn`, `nsgn`
+Sets the carry bit to 1 if the accumulator contains a negative or positive
+twos' complement value, respectively.
 
 #### Bitwise logic
 ##### `inv <dx/dy>`

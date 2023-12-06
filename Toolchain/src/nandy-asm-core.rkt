@@ -58,10 +58,10 @@
 (struct _srr-exp () #:transparent)
 (struct _sra-exp () #:transparent)
 ;; Register ALU, carry
-(struct cclr-exp () #:transparent)
+(struct sgn-exp () #:transparent)
 (struct nzero-exp () #:transparent)
 (struct par-exp () #:transparent)
-(struct cset-exp () #:transparent)
+(struct nsgn-exp () #:transparent)
 (struct ctog-exp () #:transparent)
 (struct zero-exp () #:transparent)
 (struct npar-exp () #:transparent)
@@ -182,10 +182,10 @@
          (cons "_src" (idesc _src-exp '()))
          (cons "_srr" (idesc _srr-exp '()))
          (cons "_sra" (idesc _sra-exp '()))
-         (cons "cclr" (idesc cclr-exp '()))
+         (cons "sgn" (idesc sgn-exp '()))
          (cons "nzero" (idesc nzero-exp '()))
          (cons "par" (idesc par-exp '()))
-         (cons "cset" (idesc cset-exp '()))
+         (cons "nsgn" (idesc nsgn-exp '()))
          (cons "ctog" (idesc ctog-exp '()))
          (cons "zero" (idesc zero-exp '()))
          (cons "npar" (idesc npar-exp '()))
@@ -377,10 +377,10 @@
           [(_srr-exp? exp) 1]
           [(_sra-exp? exp) 1]
 
-          [(cclr-exp? exp) 1]
+          [(sgn-exp? exp) 1]
           [(nzero-exp? exp) 1]
           [(par-exp? exp) 1]
-          [(cset-exp? exp) 1]
+          [(nsgn-exp? exp) 1]
           [(ctog-exp? exp) 1]
           [(zero-exp? exp) 1]
           [(npar-exp? exp) 1]
@@ -591,10 +591,10 @@
                      [(_src-exp? inst) (list #b01101101)]
                      [(_srr-exp? inst) (list #b01101110)]
                      [(_sra-exp? inst) (list #b01101111)]
-                     [(cclr-exp? inst) (list #b01010000)]
+                     [(sgn-exp? inst) (list #b01010000)]
                      [(nzero-exp? inst) (list #b01010010)]
                      [(par-exp? inst) (list #b01010011)]
-                     [(cset-exp? inst) (list #b01010100)]
+                     [(nsgn-exp? inst) (list #b01010100)]
                      [(ctog-exp? inst) (list #b01010101)]
                      [(zero-exp? inst) (list #b01010110)]
                      [(npar-exp? inst) (list #b01010111)]

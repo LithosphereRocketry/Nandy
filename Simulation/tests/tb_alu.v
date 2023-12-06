@@ -12,7 +12,7 @@ module tb_alu();
         case (op)
             4'h0: begin
                 realans = b;
-                realcarry = 0;
+                realcarry = a[7];
             end
             4'h1: begin
                 realans = a | b;
@@ -29,7 +29,7 @@ module tb_alu();
             end
             4'h4: begin
                 realans = ~b;
-                realcarry = 1;
+                realcarry = ~a[7];
             end
             4'h5: begin
                 realans = ~(a | b);

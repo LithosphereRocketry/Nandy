@@ -31,13 +31,13 @@ module bitwise(
         .q(preq[7:0])
     );
 
-    wire zcarry, zpar;
-    selmux gzcarry(
-        .a(1'b0),
+    wire scarry, zpar;
+    selmux gscarry(
+        .a(a[7]),
         .sa(nop[0]),
         .b(cin),
         .sb(op[0]),
-        .q(zcarry)
+        .q(scarry)
     );
 
     zeroparity gzpar(
@@ -47,7 +47,7 @@ module bitwise(
     );
 
     selmux gcarry(
-        .a(zcarry),
+        .a(scarry),
         .sa(nop[1]),
         .b(zpar),
         .sb(op[1]),
