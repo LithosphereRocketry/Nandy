@@ -441,7 +441,7 @@ Sets the carry bit to 1 if the accumulator contains an odd or even number of
 high bits, respecitvely.
 ##### `sgn`, `nsgn`
 Sets the carry bit to 1 if the accumulator contains a negative or positive
-twos' complement value, respectively.
+two's-complement value, respectively.
 
 #### Bitwise logic
 ##### `inv <dx/dy>`
