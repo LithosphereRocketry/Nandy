@@ -1,0 +1,1493 @@
+** Drc report for Nandy/register/register.kicad_pcb **
+** Created on 2023-12-18 11:18:36 **
+
+** Found 371 DRC violations **
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Rule: board setup constraints silk; Severity: warning
+    @(2000.00 mils, 1000.00 mils): Reference 'H1'
+    @(2000.00 mils, 1000.00 mils): Through hole pad 1 [GND] of H1
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Rule: board setup constraints silk; Severity: warning
+    @(3750.00 mils, 1000.00 mils): Reference 'H3'
+    @(3750.00 mils, 1000.00 mils): Through hole pad 1 [GND] of H3
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Rule: board setup constraints silk; Severity: warning
+    @(3750.00 mils, 4250.00 mils): Reference 'H2'
+    @(3750.00 mils, 4250.00 mils): Through hole pad 1 [GND] of H2
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Rule: board setup constraints silk; Severity: warning
+    @(2000.00 mils, 4250.00 mils): Reference 'H4'
+    @(2000.00 mils, 4250.00 mils): Through hole pad 1 [GND] of H4
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3851.79 mils, 2451.79 mils): Track [+5VL] on F.Cu, length 200.00 mils
+    @(3800.00 mils, 2500.00 mils): Through hole pad 1 [Net-(D1-Pad1)] of D1
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3380.00 mils, 900.00 mils): Track [+5VL] on B.Cu, length 330.00 mils
+    @(3200.00 mils, 928.52 mils): Via [/WR] on F.Cu - B.Cu
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3450.00 mils, 970.00 mils): Track [+5VL] on B.Cu, length 98.99 mils
+    @(3383.50 mils, 928.52 mils): Track [/WR] on B.Cu, length 183.50 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3450.00 mils, 970.00 mils): Track [+5VL] on B.Cu, length 98.99 mils
+    @(3432.30 mils, 977.33 mils): Track [/WR] on B.Cu, length 69.02 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3450.00 mils, 970.00 mils): Track [+5VL] on B.Cu, length 98.99 mils
+    @(3432.30 mils, 1110.00 mils): Track [/WR] on B.Cu, length 132.67 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3450.00 mils, 1950.00 mils): Track [+5VL] on B.Cu, length 980.00 mils
+    @(3432.30 mils, 977.33 mils): Track [/WR] on B.Cu, length 69.02 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3450.00 mils, 1950.00 mils): Track [+5VL] on B.Cu, length 980.00 mils
+    @(3432.30 mils, 1317.70 mils): Track [/WR] on B.Cu, length 207.70 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3450.00 mils, 1950.00 mils): Track [+5VL] on B.Cu, length 980.00 mils
+    @(3432.30 mils, 1110.00 mils): Track [/WR] on B.Cu, length 132.67 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3450.00 mils, 1950.00 mils): Track [+5VL] on B.Cu, length 980.00 mils
+    @(3350.00 mils, 1400.00 mils): Track [/WR] on B.Cu, length 116.39 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3901.79 mils, 2651.79 mils): Track [Net-(D2-Pad1)] on F.Cu, length 453.58 mils
+    @(3500.00 mils, 2700.00 mils): Through hole pad 2 [+5VL] of D2
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3901.79 mils, 3051.79 mils): Track [Net-(D4-Pad1)] on F.Cu, length 453.58 mils
+    @(3500.00 mils, 3100.00 mils): Through hole pad 2 [+5VL] of D4
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3901.79 mils, 3451.79 mils): Track [Net-(D6-Pad1)] on F.Cu, length 453.58 mils
+    @(3500.00 mils, 3500.00 mils): Through hole pad 2 [+5VL] of D6
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3901.79 mils, 3948.21 mils): Track [Net-(D8-Pad1)] on B.Cu, length 453.58 mils
+    @(3500.00 mils, 3900.00 mils): Through hole pad 2 [+5VL] of D8
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2658.48 mils, 1783.52 mils): Track [/D3] on F.Cu, length 424.95 mils
+    @(2327.20 mils, 1755.00 mils): Via [/S1] on F.Cu - B.Cu
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2292.30 mils, 2755.91 mils): Via [/D4] on F.Cu - B.Cu
+    @(2263.78 mils, 3012.23 mils): Track [/D7] on B.Cu, length 1024.04 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2292.30 mils, 2755.91 mils): Via [/D4] on F.Cu - B.Cu
+    @(2320.83 mils, 2744.09 mils): Track [/D5] on B.Cu, length 30.62 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2292.30 mils, 2755.91 mils): Via [/D4] on F.Cu - B.Cu
+    @(2320.83 mils, 2797.28 mils): Track [/D5] on B.Cu, length 53.19 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2281.48 mils, 1966.08 mils): Track [/D4] on B.Cu, length 302.80 mils
+    @(2299.17 mils, 2722.44 mils): Track [/D5] on B.Cu, length 773.26 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2281.48 mils, 1966.08 mils): Track [/D4] on B.Cu, length 302.80 mils
+    @(2050.00 mils, 1800.00 mils): Through hole pad 10 [/D7] of J1
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2281.48 mils, 2745.08 mils): Track [/D4] on B.Cu, length 779.00 mils
+    @(2263.78 mils, 1988.19 mils): Track [/D7] on B.Cu, length 266.14 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2281.48 mils, 2745.08 mils): Track [/D4] on B.Cu, length 779.00 mils
+    @(2299.17 mils, 2722.44 mils): Track [/D5] on B.Cu, length 773.26 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2281.48 mils, 2745.08 mils): Track [/D4] on B.Cu, length 779.00 mils
+    @(2263.78 mils, 3012.23 mils): Track [/D7] on B.Cu, length 1024.04 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2281.48 mils, 2745.08 mils): Track [/D4] on B.Cu, length 779.00 mils
+    @(2320.83 mils, 2744.09 mils): Track [/D5] on B.Cu, length 30.62 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2292.30 mils, 2755.91 mils): Track [/D4] on B.Cu, length 15.31 mils
+    @(2263.78 mils, 3012.23 mils): Track [/D7] on B.Cu, length 1024.04 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2349.27 mils, 3544.27 mils): Track [/D5] on F.Cu, length 425.35 mils
+    @(2531.97 mils, 3561.97 mils): Track [/Q6] on F.Cu, length 221.94 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2349.27 mils, 3544.27 mils): Track [/D5] on F.Cu, length 425.35 mils
+    @(2753.91 mils, 3561.97 mils): Track [/Q6] on F.Cu, length 13.95 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2349.27 mils, 3544.27 mils): Track [/D5] on F.Cu, length 425.35 mils
+    @(2531.97 mils, 3561.97 mils): Track [/Q6] on F.Cu, length 3.03 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2349.27 mils, 3544.27 mils): Track [/D5] on F.Cu, length 425.35 mils
+    @(2325.17 mils, 3561.97 mils): Track [/Q6] on F.Cu, length 206.80 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2349.27 mils, 3544.27 mils): Track [/D5] on F.Cu, length 425.35 mils
+    @(2400.39 mils, 3500.00 mils): Through hole pad 7 [GND] of Ux00_3
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2349.27 mils, 3544.27 mils): Track [/D5] on F.Cu, length 425.35 mils
+    @(2700.39 mils, 3500.00 mils): Through hole pad 8 [/S5] of Ux00_3
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2315.00 mils, 3510.00 mils): Track [/D5] on F.Cu, length 48.47 mils
+    @(2325.17 mils, 3561.97 mils): Track [/Q6] on F.Cu, length 206.80 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2775.59 mils, 3543.31 mils): Via [/D5] on F.Cu - B.Cu
+    @(2753.91 mils, 3561.97 mils): Track [/Q6] on F.Cu, length 13.95 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2775.59 mils, 3543.31 mils): Via [/D5] on F.Cu - B.Cu
+    @(2763.78 mils, 3571.83 mils): Track [/Q6] on F.Cu, length 23.63 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2775.59 mils, 3543.31 mils): Via [/D5] on F.Cu - B.Cu
+    @(2787.41 mils, 3571.83 mils): Track [/Q6] on F.Cu, length 13.95 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2775.59 mils, 3543.31 mils): Via [/D5] on F.Cu - B.Cu
+    @(2780.00 mils, 3588.06 mils): Track [/S5] on B.Cu, length 112.58 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2298.09 mils, 3021.51 mils): Track [/D5] on B.Cu, length 23.50 mils
+    @(2263.78 mils, 3012.23 mils): Track [/D7] on B.Cu, length 1024.04 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2298.09 mils, 3021.51 mils): Track [/D5] on B.Cu, length 23.50 mils
+    @(2280.40 mils, 3028.84 mils): Track [/D7] on B.Cu, length 23.50 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2298.09 mils, 3021.51 mils): Track [/D5] on B.Cu, length 23.50 mils
+    @(2280.40 mils, 3767.36 mils): Track [/D7] on B.Cu, length 738.52 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2298.09 mils, 3493.09 mils): Track [/D5] on B.Cu, length 471.58 mils
+    @(2280.40 mils, 3028.84 mils): Track [/D7] on B.Cu, length 23.50 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2298.09 mils, 3493.09 mils): Track [/D5] on B.Cu, length 471.58 mils
+    @(2280.40 mils, 3767.36 mils): Track [/D7] on B.Cu, length 738.52 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2281.48 mils, 3004.90 mils): Track [/D5] on B.Cu, length 168.26 mils
+    @(2263.78 mils, 3012.23 mils): Track [/D7] on B.Cu, length 1024.04 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2281.48 mils, 3004.90 mils): Track [/D5] on B.Cu, length 168.26 mils
+    @(2280.40 mils, 3028.84 mils): Track [/D7] on B.Cu, length 23.50 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2315.00 mils, 3510.00 mils): Track [/D5] on B.Cu, length 23.91 mils
+    @(2280.40 mils, 3767.36 mils): Track [/D7] on B.Cu, length 738.52 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2281.48 mils, 2836.63 mils): Track [/D5] on B.Cu, length 55.65 mils
+    @(2263.78 mils, 3012.23 mils): Track [/D7] on B.Cu, length 1024.04 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2273.19 mils, 3800.49 mils): Via [/D6] on F.Cu - B.Cu
+    @(2244.67 mils, 3858.84 mils): Track [/R6] on F.Cu, length 177.37 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2273.19 mils, 3800.49 mils): Via [/D6] on F.Cu - B.Cu
+    @(2301.71 mils, 3788.68 mils): Track [/D7] on B.Cu, length 30.15 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2273.19 mils, 3800.49 mils): Via [/D6] on F.Cu - B.Cu
+    @(2301.71 mils, 4282.39 mils): Track [/D7] on B.Cu, length 493.71 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2244.67 mils, 3019.05 mils): Track [/D6] on B.Cu, length 1010.60 mils
+    @(2200.39 mils, 2699.80 mils): Through hole pad 11 [/DELAY2] of Ux00_7
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2244.67 mils, 3019.05 mils): Track [/D6] on B.Cu, length 1010.60 mils
+    @(2200.39 mils, 2599.80 mils): Through hole pad 12 [+5V] of Ux00_7
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2244.67 mils, 3019.05 mils): Track [/D6] on B.Cu, length 1010.60 mils
+    @(2200.39 mils, 2999.80 mils): Through hole pad 8 [/DELAY3] of Ux00_7
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2244.67 mils, 3019.05 mils): Track [/D6] on B.Cu, length 1010.60 mils
+    @(2200.39 mils, 2899.80 mils): Through hole pad 9 [+5V] of Ux00_7
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2244.67 mils, 3019.05 mils): Track [/D6] on B.Cu, length 1010.60 mils
+    @(2200.39 mils, 2799.80 mils): Through hole pad 10 [/DELAY2] of Ux00_7
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2244.67 mils, 3019.05 mils): Track [/D6] on B.Cu, length 1010.60 mils
+    @(2200.39 mils, 2499.80 mils): Through hole pad 13 [/DELAY1] of Ux00_7
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2244.67 mils, 3019.05 mils): Track [/D6] on B.Cu, length 1010.60 mils
+    @(2200.39 mils, 2399.80 mils): Through hole pad 14 [+5V] of Ux00_7
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2244.67 mils, 3019.05 mils): Track [/D6] on B.Cu, length 1010.60 mils
+    @(2245.00 mils, 3044.41 mils): Track [/DELAY3] on B.Cu, length 63.08 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2262.70 mils, 3790.00 mils): Track [/D6] on B.Cu, length 752.92 mils
+    @(2301.71 mils, 3788.68 mils): Track [/D7] on B.Cu, length 30.15 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2262.70 mils, 3790.00 mils): Track [/D6] on B.Cu, length 752.92 mils
+    @(2200.39 mils, 3599.80 mils): Track [/DELAY3] on B.Cu, length 63.08 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2262.70 mils, 3790.00 mils): Track [/D6] on B.Cu, length 752.92 mils
+    @(2280.40 mils, 3767.36 mils): Track [/D7] on B.Cu, length 738.52 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2262.70 mils, 3790.00 mils): Track [/D6] on B.Cu, length 752.92 mils
+    @(2245.00 mils, 3555.20 mils): Track [/DELAY3] on B.Cu, length 510.79 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2262.70 mils, 3790.00 mils): Track [/D6] on B.Cu, length 752.92 mils
+    @(2245.00 mils, 3044.41 mils): Track [/DELAY3] on B.Cu, length 63.08 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2262.70 mils, 3037.08 mils): Track [/D6] on B.Cu, length 25.50 mils
+    @(2280.40 mils, 3767.36 mils): Track [/D7] on B.Cu, length 738.52 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2262.70 mils, 3037.08 mils): Track [/D6] on B.Cu, length 25.50 mils
+    @(2245.00 mils, 3555.20 mils): Track [/DELAY3] on B.Cu, length 510.79 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2262.70 mils, 3037.08 mils): Track [/D6] on B.Cu, length 25.50 mils
+    @(2245.00 mils, 3044.41 mils): Track [/DELAY3] on B.Cu, length 63.08 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2089.98 mils, 1853.76 mils): Track [/D6] on B.Cu, length 86.22 mils
+    @(2050.00 mils, 1900.00 mils): Through hole pad 12 [/inport/CARRY] of J1
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2401.57 mils, 4344.27 mils): Track [/D7] on F.Cu, length 37.98 mils
+    @(2400.39 mils, 4300.00 mils): Through hole pad 6 [/R7] of Ux00_4
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2316.75 mils, 4297.43 mils): Via [/D7] on F.Cu - B.Cu
+    @(2089.83 mils, 4030.17 mils): Track [/R7] on F.Cu, length 381.60 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3178.12 mils, 1805.92 mils): Track [/CLK] on F.Cu, length 427.81 mils
+    @(3196.46 mils, 1850.20 mils): Through hole pad 1 [+5V] of C5
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3017.94 mils, 1805.92 mils): Track [/CLK] on F.Cu, length 31.22 mils
+    @(2999.61 mils, 1850.20 mils): Through hole pad 2 [GND] of C5
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2069.15 mils, 1946.24 mils): Track [/CLK] on F.Cu, length 198.44 mils
+    @(2050.00 mils, 1900.00 mils): Through hole pad 12 [/inport/CARRY] of J1
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3156.04 mils, 1828.00 mils): Track [/CLK] on F.Cu, length 31.22 mils
+    @(3196.46 mils, 1850.20 mils): Through hole pad 1 [+5V] of C5
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2209.47 mils, 1805.92 mils): Track [/CLK] on F.Cu, length 808.48 mils
+    @(2501.57 mils, 1850.20 mils): Through hole pad 2 [GND] of C2
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2209.47 mils, 1805.92 mils): Track [/CLK] on F.Cu, length 808.48 mils
+    @(2698.43 mils, 1850.20 mils): Through hole pad 1 [+5V] of C2
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2209.47 mils, 1805.92 mils): Track [/CLK] on F.Cu, length 808.48 mils
+    @(2999.61 mils, 1850.20 mils): Through hole pad 2 [GND] of C5
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(1996.24 mils, 1946.24 mils): Track [/CLK] on F.Cu, length 72.91 mils
+    @(2050.00 mils, 1900.00 mils): Through hole pad 12 [/inport/CARRY] of J1
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(1850.00 mils, 3750.00 mils): Via [/CLK] on F.Cu - B.Cu
+    @(1838.42 mils, 3778.76 mils): Track [/Q7] on F.Cu, length 23.97 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(1850.00 mils, 3750.00 mils): Via [/CLK] on F.Cu - B.Cu
+    @(1821.48 mils, 3761.82 mils): Track [/Q7] on F.Cu, length 183.09 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3700.00 mils, 1900.00 mils): Track [/CLK] on B.Cu, length 150.00 mils
+    @(3682.30 mils, 1980.00 mils): Track [/Q7] on B.Cu, length 77.33 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3700.00 mils, 1900.00 mils): Track [/CLK] on B.Cu, length 150.00 mils
+    @(3650.00 mils, 1947.70 mils): Track [/Q7] on B.Cu, length 45.68 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3700.00 mils, 1900.00 mils): Track [/CLK] on B.Cu, length 150.00 mils
+    @(3682.30 mils, 2057.33 mils): Track [/Q7] on B.Cu, length 73.24 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(1830.00 mils, 2469.41 mils): Track [/CLK] on B.Cu, length 28.28 mils
+    @(1812.30 mils, 3774.32 mils): Track [/WR] on B.Cu, length 2816.62 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(1830.00 mils, 3730.00 mils): Track [/CLK] on B.Cu, length 1260.59 mils
+    @(1812.30 mils, 3774.32 mils): Track [/WR] on B.Cu, length 2816.62 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(1850.00 mils, 3750.00 mils): Track [/CLK] on B.Cu, length 28.28 mils
+    @(1812.30 mils, 3774.32 mils): Track [/WR] on B.Cu, length 2816.62 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3700.00 mils, 2050.00 mils): Track [/CLK] on B.Cu, length 282.84 mils
+    @(3682.30 mils, 1980.00 mils): Track [/Q7] on B.Cu, length 77.33 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3700.00 mils, 2050.00 mils): Track [/CLK] on B.Cu, length 282.84 mils
+    @(3682.30 mils, 2057.33 mils): Track [/Q7] on B.Cu, length 73.24 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3700.00 mils, 2050.00 mils): Track [/CLK] on B.Cu, length 282.84 mils
+    @(3734.09 mils, 2109.12 mils): Track [/Q7] on B.Cu, length 1222.35 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3286.57 mils, 1326.57 mils): Track [/Q0] on F.Cu, length 59.82 mils
+    @(3127.20 mils, 1344.27 mils): Track [/Q1] on F.Cu, length 303.37 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3437.91 mils, 1326.57 mils): Track [/Q0] on F.Cu, length 151.33 mils
+    @(3430.58 mils, 1344.27 mils): Track [/Q1] on F.Cu, length 285.63 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3437.91 mils, 1326.57 mils): Track [/Q0] on F.Cu, length 151.33 mils
+    @(3127.20 mils, 1344.27 mils): Track [/Q1] on F.Cu, length 303.37 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3611.33 mils, 1500.00 mils): Track [/Q0] on F.Cu, length 245.26 mils
+    @(3430.58 mils, 1344.27 mils): Track [/Q1] on F.Cu, length 285.63 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3611.33 mils, 1500.00 mils): Track [/Q0] on F.Cu, length 245.26 mils
+    @(3127.20 mils, 1344.27 mils): Track [/Q1] on F.Cu, length 303.37 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3700.00 mils, 1500.00 mils): Track [/Q0] on F.Cu, length 88.67 mils
+    @(3430.58 mils, 1344.27 mils): Track [/Q1] on F.Cu, length 285.63 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3244.27 mils, 1281.66 mils): Track [/Q0] on F.Cu, length 44.78 mils
+    @(3200.00 mils, 1300.00 mils): Through hole pad 12 [/NQ0] of Ux10_1
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2944.27 mils, 2155.73 mils): Track [/Q0] on B.Cu, length 199.15 mils
+    @(2900.00 mils, 2000.00 mils): Through hole pad 1 [/S0] of Ux00_5
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2944.27 mils, 2155.73 mils): Track [/Q0] on B.Cu, length 199.15 mils
+    @(2900.00 mils, 2100.00 mils): Through hole pad 2 [/NQ0] of Ux00_5
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2917.61 mils, 1545.00 mils): Track [/Q0] on B.Cu, length 38.73 mils
+    @(2900.00 mils, 1500.00 mils): Through hole pad 5 [/RST] of Ux10_1
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2944.27 mils, 1956.57 mils): Track [/Q0] on B.Cu, length 125.69 mils
+    @(2837.70 mils, 1709.33 mils): Track [/Q3] on B.Cu, length 728.37 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2855.40 mils, 1867.70 mils): Track [/Q0] on B.Cu, length 288.09 mils
+    @(2837.70 mils, 1709.33 mils): Track [/Q3] on B.Cu, length 728.37 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2855.40 mils, 1867.70 mils): Track [/Q0] on B.Cu, length 288.09 mils
+    @(2822.70 mils, 1694.33 mils): Track [/Q3] on B.Cu, length 21.21 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3632.55 mils, 1546.24 mils): Track [/Q1] on F.Cu, length 121.21 mils
+    @(3700.00 mils, 1500.00 mils): Through hole pad 3 [/Q0] of J2
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3127.20 mils, 1344.27 mils): Track [/Q1] on F.Cu, length 303.37 mils
+    @(3200.00 mils, 1300.00 mils): Through hole pad 12 [/NQ0] of Ux10_1
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3127.20 mils, 1344.27 mils): Via [/Q1] on F.Cu - B.Cu
+    @(3155.73 mils, 1355.73 mils): Track [/RST] on B.Cu, length 111.46 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3128.00 mils, 1596.71 mils): Track [/Q1] on B.Cu, length 21.82 mils
+    @(3118.00 mils, 1625.24 mils): Via [/NQ1] on F.Cu - B.Cu
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3089.48 mils, 1797.32 mils): Track [/Q1] on B.Cu, length 36.98 mils
+    @(3133.32 mils, 1800.83 mils): Track [/S1] on B.Cu, length 332.50 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3089.48 mils, 1797.32 mils): Track [/Q1] on B.Cu, length 36.98 mils
+    @(3122.50 mils, 1790.00 mils): Via [/S1] on F.Cu - B.Cu
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3089.48 mils, 1613.42 mils): Track [/Q1] on B.Cu, length 183.90 mils
+    @(3118.00 mils, 1625.24 mils): Via [/NQ1] on F.Cu - B.Cu
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3106.18 mils, 1596.71 mils): Track [/Q1] on B.Cu, length 23.63 mils
+    @(3118.00 mils, 1625.24 mils): Via [/NQ1] on F.Cu - B.Cu
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3115.63 mils, 1823.47 mils): Track [/Q1] on B.Cu, length 392.16 mils
+    @(3133.32 mils, 1800.83 mils): Track [/S1] on B.Cu, length 332.50 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3115.63 mils, 1823.47 mils): Track [/Q1] on B.Cu, length 392.16 mils
+    @(3133.32 mils, 2133.32 mils): Track [/S1] on B.Cu, length 94.30 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3155.73 mils, 2555.73 mils): Track [/Q2] on B.Cu, length 179.96 mils
+    @(3200.00 mils, 2500.00 mils): Through hole pad 9 [/S2] of Ux00_5
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3155.73 mils, 2555.73 mils): Track [/Q2] on B.Cu, length 179.96 mils
+    @(3200.00 mils, 2400.00 mils): Through hole pad 10 [/NQ2] of Ux00_5
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3155.73 mils, 1718.34 mils): Track [/Q2] on B.Cu, length 74.07 mils
+    @(3200.00 mils, 1700.00 mils): Through hole pad 8 [/NQ2] of Ux10_1
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3250.02 mils, 2320.85 mils): Track [/Q2] on B.Cu, length 508.22 mils
+    @(3267.72 mils, 1767.72 mils): Track [/NQ2] on B.Cu, length 564.57 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3250.02 mils, 1812.63 mils): Track [/Q2] on B.Cu, length 133.35 mils
+    @(3267.72 mils, 1767.72 mils): Track [/NQ2] on B.Cu, length 564.57 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3250.02 mils, 1812.63 mils): Track [/Q2] on B.Cu, length 133.35 mils
+    @(3200.00 mils, 1700.00 mils): Through hole pad 8 [/NQ2] of Ux10_1
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3220.87 mils, 2350.00 mils): Track [/Q2] on B.Cu, length 41.23 mils
+    @(3267.72 mils, 1767.72 mils): Track [/NQ2] on B.Cu, length 564.57 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2841.12 mils, 1653.76 mils): Track [/Q3] on F.Cu, length 905.12 mils
+    @(3700.00 mils, 1700.00 mils): Through hole pad 7 [/Q4] of J2
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2841.12 mils, 1653.76 mils): Track [/Q3] on F.Cu, length 905.12 mils
+    @(3118.00 mils, 1625.24 mils): Via [/NQ1] on F.Cu - B.Cu
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2819.88 mils, 1675.00 mils): Via [/Q3] on F.Cu - B.Cu
+    @(2791.35 mils, 1659.33 mils): Track [/RST] on B.Cu, length 28.68 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2822.70 mils, 1677.82 mils): Track [/Q3] on B.Cu, length 16.50 mils
+    @(2791.35 mils, 1688.01 mils): Track [/RST] on B.Cu, length 40.51 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2855.73 mils, 2544.27 mils): Track [/Q3] on B.Cu, length 311.06 mils
+    @(2900.00 mils, 2600.00 mils): Through hole pad 7 [GND] of Ux00_5
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2837.70 mils, 1709.33 mils): Track [/Q3] on B.Cu, length 728.37 mils
+    @(2791.35 mils, 1688.01 mils): Track [/RST] on B.Cu, length 40.51 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2837.70 mils, 1709.33 mils): Track [/Q3] on B.Cu, length 728.37 mils
+    @(2820.00 mils, 1716.66 mils): Track [/RST] on B.Cu, length 1217.82 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2822.70 mils, 1694.33 mils): Track [/Q3] on B.Cu, length 21.21 mils
+    @(2791.35 mils, 1688.01 mils): Track [/RST] on B.Cu, length 40.51 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2822.70 mils, 1694.33 mils): Track [/Q3] on B.Cu, length 21.21 mils
+    @(2820.00 mils, 1716.66 mils): Track [/RST] on B.Cu, length 1217.82 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2837.70 mils, 2437.70 mils): Track [/Q3] on B.Cu, length 88.11 mils
+    @(2820.00 mils, 1716.66 mils): Track [/RST] on B.Cu, length 1217.82 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2790.22 mils, 1739.17 mils): Track [/Q4] on F.Cu, length 15.31 mils
+    @(3100.19 mils, 1767.70 mils): Track [/S1] on F.Cu, length 332.69 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2801.05 mils, 1750.00 mils): Track [/Q4] on F.Cu, length 848.95 mils
+    @(3100.19 mils, 1767.70 mils): Track [/S1] on F.Cu, length 332.69 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2801.05 mils, 1750.00 mils): Track [/Q4] on F.Cu, length 848.95 mils
+    @(3122.50 mils, 1790.00 mils): Track [/S1] on F.Cu, length 31.54 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2790.22 mils, 1739.17 mils): Via [/Q4] on F.Cu - B.Cu
+    @(3100.19 mils, 1767.70 mils): Track [/S1] on F.Cu, length 332.69 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2790.22 mils, 1739.17 mils): Via [/Q4] on F.Cu - B.Cu
+    @(2761.70 mils, 1765.70 mils): Track [/R2] on B.Cu, length 39.56 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2838.42 mils, 3938.03 mils): Track [/Q4] on B.Cu, length 776.06 mils
+    @(2820.73 mils, 3789.17 mils): Track [/S4] on B.Cu, length 568.84 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2838.42 mils, 3938.03 mils): Track [/Q4] on B.Cu, length 776.06 mils
+    @(2856.12 mils, 3444.27 mils): Track [/NQ5] on B.Cu, length 62.61 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2838.42 mils, 3938.03 mils): Track [/Q4] on B.Cu, length 776.06 mils
+    @(2810.65 mils, 3944.52 mils): Via [/S5] on F.Cu - B.Cu
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2838.42 mils, 3938.03 mils): Track [/Q4] on B.Cu, length 776.06 mils
+    @(2820.73 mils, 3220.33 mils): Track [/S4] on B.Cu, length 170.18 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2838.42 mils, 3938.03 mils): Track [/Q4] on B.Cu, length 776.06 mils
+    @(2809.90 mils, 3800.00 mils): Via [/S4] on F.Cu - B.Cu
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2838.42 mils, 3938.03 mils): Track [/Q4] on B.Cu, length 776.06 mils
+    @(2856.12 mils, 3855.73 mils): Track [/NQ5] on B.Cu, length 411.46 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2838.42 mils, 3938.03 mils): Track [/Q4] on B.Cu, length 776.06 mils
+    @(2809.90 mils, 3800.00 mils): Track [/S4] on B.Cu, length 15.31 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2838.42 mils, 3938.03 mils): Track [/Q4] on B.Cu, length 776.06 mils
+    @(2900.39 mils, 3900.00 mils): Track [/NQ5] on B.Cu, length 62.61 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2900.39 mils, 4000.00 mils): Track [/Q4] on B.Cu, length 87.64 mils
+    @(2810.65 mils, 3944.52 mils): Via [/S5] on F.Cu - B.Cu
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2801.71 mils, 1750.67 mils): Track [/Q4] on B.Cu, length 1250.65 mils
+    @(2784.02 mils, 1788.02 mils): Track [/R2] on B.Cu, length 31.56 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2801.71 mils, 1750.67 mils): Track [/Q4] on B.Cu, length 1250.65 mils
+    @(2700.39 mils, 2300.00 mils): Track [/R2] on B.Cu, length 118.26 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2801.71 mils, 1750.67 mils): Track [/Q4] on B.Cu, length 1250.65 mils
+    @(2784.02 mils, 2216.38 mils): Track [/R2] on B.Cu, length 428.36 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3745.00 mils, 3360.00 mils): Via [/Q5] on F.Cu - B.Cu
+    @(3733.18 mils, 3331.48 mils): Track [/Q7] on B.Cu, length 23.63 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3745.00 mils, 3360.00 mils): Via [/Q5] on F.Cu - B.Cu
+    @(3716.48 mils, 3371.82 mils): Track [/Q7] on B.Cu, length 19.13 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3745.00 mils, 3360.00 mils): Via [/Q5] on F.Cu - B.Cu
+    @(3716.48 mils, 3348.18 mils): Track [/Q7] on B.Cu, length 23.63 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3200.39 mils, 4062.61 mils): Track [/Q5] on B.Cu, length 90.42 mils
+    @(3200.39 mils, 4000.00 mils): Through hole pad 12 [/S5] of Ux00_6
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3751.79 mils, 2448.21 mils): Track [/Q5] on B.Cu, length 217.70 mils
+    @(3734.09 mils, 2109.12 mils): Track [/Q7] on B.Cu, length 1222.35 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3136.46 mils, 3998.67 mils): Track [/Q5] on B.Cu, length 534.73 mils
+    @(3156.12 mils, 3693.88 mils): Track [Net-(R6-Pad1)] on B.Cu, length 2.78 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3136.46 mils, 3998.67 mils): Track [/Q5] on B.Cu, length 534.73 mils
+    @(3154.15 mils, 3691.91 mils): Track [Net-(R6-Pad1)] on B.Cu, length 145.67 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3136.46 mils, 3998.67 mils): Track [/Q5] on B.Cu, length 534.73 mils
+    @(3154.15 mils, 3546.24 mils): Track [Net-(R6-Pad1)] on B.Cu, length 65.39 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3944.27 mils, 2268.34 mils): Track [/Q5] on B.Cu, length 424.07 mils
+    @(3900.00 mils, 2250.00 mils): Through hole pad 1 [/CLK] of R9
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3751.79 mils, 3353.21 mils): Track [/Q5] on B.Cu, length 905.00 mils
+    @(3734.09 mils, 3331.48 mils): Track [/Q7] on B.Cu, length 0.91 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3751.79 mils, 3353.21 mils): Track [/Q5] on B.Cu, length 905.00 mils
+    @(3734.09 mils, 2109.12 mils): Track [/Q7] on B.Cu, length 1222.35 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3751.79 mils, 3353.21 mils): Track [/Q5] on B.Cu, length 905.00 mils
+    @(3800.00 mils, 2900.00 mils): Through hole pad 1 [Net-(D3-Pad1)] of D3
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3751.79 mils, 3353.21 mils): Track [/Q5] on B.Cu, length 905.00 mils
+    @(3800.00 mils, 3300.00 mils): Through hole pad 1 [Net-(D5-Pad1)] of D5
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3751.79 mils, 3353.21 mils): Track [/Q5] on B.Cu, length 905.00 mils
+    @(3800.00 mils, 2500.00 mils): Through hole pad 1 [Net-(D1-Pad1)] of D1
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3918.34 mils, 2294.27 mils): Track [/Q5] on B.Cu, length 36.68 mils
+    @(3900.00 mils, 2250.00 mils): Through hole pad 1 [/CLK] of R9
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3340.91 mils, 3565.91 mils): Track [/Q6] on F.Cu, length 25.75 mils
+    @(3333.58 mils, 3530.00 mils): Track [Net-(R6-Pad1)] on F.Cu, length 103.19 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3699.41 mils, 3565.91 mils): Track [/Q6] on F.Cu, length 358.50 mils
+    @(3601.79 mils, 3548.21 mils): Track [Net-(R6-Pad1)] on F.Cu, length 250.00 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3699.41 mils, 3565.91 mils): Track [/Q6] on F.Cu, length 358.50 mils
+    @(3351.79 mils, 3548.21 mils): Track [Net-(R6-Pad1)] on F.Cu, length 25.75 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3699.41 mils, 3565.91 mils): Track [/Q6] on F.Cu, length 358.50 mils
+    @(3650.00 mils, 3500.00 mils): Track [Net-(R6-Pad1)] on F.Cu, length 68.18 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2797.27 mils, 3561.97 mils): Track [/Q6] on F.Cu, length 275.76 mils
+    @(2794.74 mils, 3589.53 mils): Track [/NQ6] on F.Cu, length 13.95 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2797.27 mils, 3561.97 mils): Track [/Q6] on F.Cu, length 275.76 mils
+    @(2804.60 mils, 3579.67 mils): Track [/NQ6] on F.Cu, length 500.07 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2531.97 mils, 3561.97 mils): Track [/Q6] on F.Cu, length 221.94 mils
+    @(2746.58 mils, 3579.67 mils): Track [/NQ6] on F.Cu, length 13.95 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2531.97 mils, 3561.97 mils): Track [/Q6] on F.Cu, length 221.94 mils
+    @(2385.33 mils, 3579.67 mils): Track [/NQ6] on F.Cu, length 361.25 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2763.78 mils, 3571.83 mils): Track [/Q6] on F.Cu, length 23.63 mils
+    @(2746.58 mils, 3579.67 mils): Track [/NQ6] on F.Cu, length 13.95 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2763.78 mils, 3571.83 mils): Track [/Q6] on F.Cu, length 23.63 mils
+    @(2794.74 mils, 3589.53 mils): Track [/NQ6] on F.Cu, length 13.95 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2763.78 mils, 3571.83 mils): Track [/Q6] on F.Cu, length 23.63 mils
+    @(2756.44 mils, 3589.53 mils): Track [/NQ6] on F.Cu, length 38.29 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3322.70 mils, 3547.70 mils): Track [/Q6] on F.Cu, length 210.00 mils
+    @(3230.39 mils, 3530.00 mils): Track [Net-(R6-Pad1)] on F.Cu, length 42.43 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3322.70 mils, 3547.70 mils): Track [/Q6] on F.Cu, length 210.00 mils
+    @(3333.58 mils, 3530.00 mils): Track [Net-(R6-Pad1)] on F.Cu, length 103.19 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2753.91 mils, 3561.97 mils): Track [/Q6] on F.Cu, length 13.95 mils
+    @(2746.58 mils, 3579.67 mils): Track [/NQ6] on F.Cu, length 13.95 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2753.91 mils, 3561.97 mils): Track [/Q6] on F.Cu, length 13.95 mils
+    @(2756.44 mils, 3589.53 mils): Track [/NQ6] on F.Cu, length 38.29 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2753.91 mils, 3561.97 mils): Track [/Q6] on F.Cu, length 13.95 mils
+    @(2385.33 mils, 3579.67 mils): Track [/NQ6] on F.Cu, length 361.25 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2531.97 mils, 3561.97 mils): Track [/Q6] on F.Cu, length 3.03 mils
+    @(2385.33 mils, 3579.67 mils): Track [/NQ6] on F.Cu, length 361.25 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3073.03 mils, 3561.97 mils): Track [/Q6] on F.Cu, length 38.14 mils
+    @(2804.60 mils, 3579.67 mils): Track [/NQ6] on F.Cu, length 500.07 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2213.20 mils, 3450.00 mils): Track [/Q6] on F.Cu, length 158.35 mils
+    @(2200.39 mils, 3499.80 mils): Through hole pad 12 [/NQ6] of Ux10_3
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2325.17 mils, 3561.97 mils): Track [/Q6] on F.Cu, length 206.80 mils
+    @(2385.33 mils, 3579.67 mils): Track [/NQ6] on F.Cu, length 361.25 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2325.17 mils, 3561.97 mils): Track [/Q6] on F.Cu, length 206.80 mils
+    @(2385.00 mils, 3580.00 mils): Track [/NQ6] on F.Cu, length 0.47 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2787.41 mils, 3571.83 mils): Track [/Q6] on F.Cu, length 13.95 mils
+    @(2794.74 mils, 3589.53 mils): Track [/NQ6] on F.Cu, length 13.95 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2787.41 mils, 3571.83 mils): Track [/Q6] on F.Cu, length 13.95 mils
+    @(2756.44 mils, 3589.53 mils): Track [/NQ6] on F.Cu, length 38.29 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2787.41 mils, 3571.83 mils): Track [/Q6] on F.Cu, length 13.95 mils
+    @(2804.60 mils, 3579.67 mils): Track [/NQ6] on F.Cu, length 500.07 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3701.48 mils, 3563.84 mils): Via [/Q6] on F.Cu - B.Cu
+    @(3730.00 mils, 3385.34 mils): Track [/Q7] on B.Cu, length 199.66 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3664.60 mils, 2064.66 mils): Track [/Q6] on B.Cu, length 73.24 mils
+    @(3682.30 mils, 1980.00 mils): Track [/Q7] on B.Cu, length 77.33 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3664.60 mils, 2064.66 mils): Track [/Q6] on B.Cu, length 73.24 mils
+    @(3682.30 mils, 2057.33 mils): Track [/Q7] on B.Cu, length 73.24 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3664.60 mils, 2064.66 mils): Track [/Q6] on B.Cu, length 73.24 mils
+    @(3734.09 mils, 2109.12 mils): Track [/Q7] on B.Cu, length 1222.35 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3716.40 mils, 2116.45 mils): Track [/Q6] on B.Cu, length 1206.78 mils
+    @(3682.30 mils, 2057.33 mils): Track [/Q7] on B.Cu, length 73.24 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3716.40 mils, 2116.45 mils): Track [/Q6] on B.Cu, length 1206.78 mils
+    @(3734.09 mils, 2109.12 mils): Track [/Q7] on B.Cu, length 1222.35 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3716.40 mils, 2116.45 mils): Track [/Q6] on B.Cu, length 1206.78 mils
+    @(3733.18 mils, 3331.48 mils): Track [/Q7] on B.Cu, length 23.63 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3632.30 mils, 1867.70 mils): Track [/Q6] on B.Cu, length 87.33 mils
+    @(3676.24 mils, 1853.76 mils): Track [/Q7] on B.Cu, length 37.11 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3632.30 mils, 1867.70 mils): Track [/Q6] on B.Cu, length 87.33 mils
+    @(3650.00 mils, 1947.70 mils): Track [/Q7] on B.Cu, length 45.68 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3632.30 mils, 1867.70 mils): Track [/Q6] on B.Cu, length 87.33 mils
+    @(3650.00 mils, 1880.00 mils): Track [/Q7] on B.Cu, length 67.70 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3698.78 mils, 3379.15 mils): Track [/Q6] on B.Cu, length 19.13 mils
+    @(3730.00 mils, 3385.34 mils): Track [/Q7] on B.Cu, length 199.66 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3698.78 mils, 3379.15 mils): Track [/Q6] on B.Cu, length 19.13 mils
+    @(3716.48 mils, 3371.82 mils): Track [/Q7] on B.Cu, length 19.13 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3698.78 mils, 3379.15 mils): Track [/Q6] on B.Cu, length 19.13 mils
+    @(3716.48 mils, 3348.18 mils): Track [/Q7] on B.Cu, length 23.63 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3632.30 mils, 1955.03 mils): Track [/Q6] on B.Cu, length 45.68 mils
+    @(3682.30 mils, 1980.00 mils): Track [/Q7] on B.Cu, length 77.33 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3632.30 mils, 1955.03 mils): Track [/Q6] on B.Cu, length 45.68 mils
+    @(3650.00 mils, 1947.70 mils): Track [/Q7] on B.Cu, length 45.68 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3632.30 mils, 1955.03 mils): Track [/Q6] on B.Cu, length 45.68 mils
+    @(3650.00 mils, 1880.00 mils): Track [/Q7] on B.Cu, length 67.70 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3664.60 mils, 1987.33 mils): Track [/Q6] on B.Cu, length 77.33 mils
+    @(3682.30 mils, 1980.00 mils): Track [/Q7] on B.Cu, length 77.33 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3664.60 mils, 1987.33 mils): Track [/Q6] on B.Cu, length 77.33 mils
+    @(3650.00 mils, 1947.70 mils): Track [/Q7] on B.Cu, length 45.68 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3664.60 mils, 1987.33 mils): Track [/Q6] on B.Cu, length 77.33 mils
+    @(3682.30 mils, 2057.33 mils): Track [/Q7] on B.Cu, length 73.24 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3712.30 mils, 3553.02 mils): Track [/Q6] on B.Cu, length 15.31 mils
+    @(3730.00 mils, 3385.34 mils): Track [/Q7] on B.Cu, length 199.66 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3712.30 mils, 3392.67 mils): Track [/Q6] on B.Cu, length 160.35 mils
+    @(3730.00 mils, 3385.34 mils): Track [/Q7] on B.Cu, length 199.66 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3712.30 mils, 3392.67 mils): Track [/Q6] on B.Cu, length 160.35 mils
+    @(3716.48 mils, 3371.82 mils): Track [/Q7] on B.Cu, length 19.13 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3698.78 mils, 3340.85 mils): Track [/Q6] on B.Cu, length 38.29 mils
+    @(3733.18 mils, 3331.48 mils): Track [/Q7] on B.Cu, length 23.63 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3698.78 mils, 3340.85 mils): Track [/Q6] on B.Cu, length 38.29 mils
+    @(3716.48 mils, 3371.82 mils): Track [/Q7] on B.Cu, length 19.13 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3698.78 mils, 3340.85 mils): Track [/Q6] on B.Cu, length 38.29 mils
+    @(3716.48 mils, 3348.18 mils): Track [/Q7] on B.Cu, length 23.63 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3111.48 mils, 4311.08 mils): Track [/Q6] on B.Cu, length 764.61 mils
+    @(3140.00 mils, 4060.00 mils): Via [/S6] on F.Cu - B.Cu
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3716.40 mils, 3323.24 mils): Track [/Q6] on B.Cu, length 24.91 mils
+    @(3734.09 mils, 2109.12 mils): Track [/Q7] on B.Cu, length 1222.35 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3716.40 mils, 3323.24 mils): Track [/Q6] on B.Cu, length 24.91 mils
+    @(3733.18 mils, 3331.48 mils): Track [/Q7] on B.Cu, length 23.63 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3716.40 mils, 3323.24 mils): Track [/Q6] on B.Cu, length 24.91 mils
+    @(3716.48 mils, 3348.18 mils): Track [/Q7] on B.Cu, length 23.63 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2825.00 mils, 3597.36 mils): Track [/Q7] on F.Cu, length 13.95 mils
+    @(2804.60 mils, 3579.67 mils): Track [/NQ6] on F.Cu, length 500.07 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2844.67 mils, 4244.27 mils): Track [/Q7] on F.Cu, length 500.39 mils
+    @(2700.39 mils, 4200.00 mils): Through hole pad 10 [/TICK] of Ux00_4
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2844.67 mils, 4244.27 mils): Track [/Q7] on F.Cu, length 500.39 mils
+    @(2400.39 mils, 4200.00 mils): Through hole pad 5 [/TICK] of Ux00_4
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(1856.74 mils, 3961.77 mils): Track [/Q7] on F.Cu, length 25.91 mils
+    @(1856.12 mils, 3936.12 mils): Track [/NQ7] on F.Cu, length 92.05 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(1856.74 mils, 3961.77 mils): Track [/Q7] on F.Cu, length 25.91 mils
+    @(2069.10 mils, 3944.08 mils): Track [/NQ7] on F.Cu, length 205.03 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(1856.74 mils, 3961.77 mils): Track [/Q7] on F.Cu, length 25.91 mils
+    @(1864.08 mils, 3944.08 mils): Track [/NQ7] on F.Cu, length 11.25 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2273.26 mils, 3597.70 mils): Track [/Q7] on F.Cu, length 60.38 mils
+    @(2200.39 mils, 3499.80 mils): Track [/NQ6] on F.Cu, length 113.42 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2273.26 mils, 3597.70 mils): Track [/Q7] on F.Cu, length 60.38 mils
+    @(2280.59 mils, 3580.00 mils): Track [/NQ6] on F.Cu, length 104.41 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(1930.19 mils, 3355.53 mils): Track [/Q7] on F.Cu, length 48.13 mils
+    @(1900.39 mils, 3399.80 mils): Through hole pad 2 [/R6] of Ux10_3
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2815.14 mils, 3607.23 mils): Track [/Q7] on F.Cu, length 66.02 mils
+    @(2746.58 mils, 3579.67 mils): Track [/NQ6] on F.Cu, length 13.95 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2815.14 mils, 3607.23 mils): Track [/Q7] on F.Cu, length 66.02 mils
+    @(2794.74 mils, 3589.53 mils): Track [/NQ6] on F.Cu, length 13.95 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2815.14 mils, 3607.23 mils): Track [/Q7] on F.Cu, length 66.02 mils
+    @(2756.44 mils, 3589.53 mils): Track [/NQ6] on F.Cu, length 38.29 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2425.00 mils, 3597.36 mils): Track [/Q7] on F.Cu, length 0.47 mils
+    @(2385.33 mils, 3579.67 mils): Track [/NQ6] on F.Cu, length 361.25 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(1882.06 mils, 3355.53 mils): Track [/Q7] on F.Cu, length 36.68 mils
+    @(1900.39 mils, 3399.80 mils): Through hole pad 2 [/R6] of Ux10_3
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3507.61 mils, 3605.00 mils): Track [/Q7] on F.Cu, length 196.96 mils
+    @(3350.00 mils, 3700.00 mils): Through hole pad 1 [/NQ6] of R7
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(1838.42 mils, 3943.45 mils): Track [/Q7] on F.Cu, length 164.69 mils
+    @(1856.12 mils, 3936.12 mils): Track [/NQ7] on F.Cu, length 92.05 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(1838.42 mils, 3943.45 mils): Track [/Q7] on F.Cu, length 164.69 mils
+    @(1856.12 mils, 3844.08 mils): Track [/NQ7] on F.Cu, length 62.61 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(1838.42 mils, 3943.45 mils): Track [/Q7] on F.Cu, length 164.69 mils
+    @(1864.08 mils, 3944.08 mils): Track [/NQ7] on F.Cu, length 11.25 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2739.25 mils, 3597.36 mils): Track [/Q7] on F.Cu, length 314.25 mils
+    @(2746.58 mils, 3579.67 mils): Track [/NQ6] on F.Cu, length 13.95 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2739.25 mils, 3597.36 mils): Track [/Q7] on F.Cu, length 314.25 mils
+    @(2385.33 mils, 3579.67 mils): Track [/NQ6] on F.Cu, length 361.25 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3305.73 mils, 3718.34 mils): Track [/Q7] on F.Cu, length 25.25 mils
+    @(3350.00 mils, 3700.00 mils): Through hole pad 1 [/NQ6] of R7
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3368.34 mils, 3744.27 mils): Track [/Q7] on F.Cu, length 36.68 mils
+    @(3350.00 mils, 3700.00 mils): Through hole pad 1 [/NQ6] of R7
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2749.11 mils, 3607.23 mils): Track [/Q7] on F.Cu, length 13.95 mils
+    @(2746.58 mils, 3579.67 mils): Track [/NQ6] on F.Cu, length 13.95 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2749.11 mils, 3607.23 mils): Track [/Q7] on F.Cu, length 13.95 mils
+    @(2756.44 mils, 3589.53 mils): Track [/NQ6] on F.Cu, length 38.29 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2749.11 mils, 3607.23 mils): Track [/Q7] on F.Cu, length 13.95 mils
+    @(2385.33 mils, 3579.67 mils): Track [/NQ6] on F.Cu, length 361.25 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2424.67 mils, 3597.70 mils): Track [/Q7] on F.Cu, length 151.41 mils
+    @(2200.39 mils, 3499.80 mils): Track [/NQ6] on F.Cu, length 113.42 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2424.67 mils, 3597.70 mils): Track [/Q7] on F.Cu, length 151.41 mils
+    @(2280.59 mils, 3580.00 mils): Track [/NQ6] on F.Cu, length 104.41 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2424.67 mils, 3597.70 mils): Track [/Q7] on F.Cu, length 151.41 mils
+    @(2385.00 mils, 3580.00 mils): Track [/NQ6] on F.Cu, length 0.47 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2061.77 mils, 3961.77 mils): Track [/Q7] on F.Cu, length 205.03 mils
+    @(2280.76 mils, 4155.73 mils): Track [/NQ7] on F.Cu, length 299.32 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2061.77 mils, 3961.77 mils): Track [/Q7] on F.Cu, length 205.03 mils
+    @(2069.10 mils, 3944.08 mils): Track [/NQ7] on F.Cu, length 205.03 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2061.77 mils, 3961.77 mils): Track [/Q7] on F.Cu, length 205.03 mils
+    @(1864.08 mils, 3944.08 mils): Track [/NQ7] on F.Cu, length 11.25 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2344.27 mils, 4244.27 mils): Track [/Q7] on F.Cu, length 399.51 mils
+    @(2856.12 mils, 4155.73 mils): Track [/NQ7] on F.Cu, length 575.37 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2344.27 mils, 4244.27 mils): Track [/Q7] on F.Cu, length 399.51 mils
+    @(2089.83 mils, 4030.17 mils): Via [/R7] on F.Cu - B.Cu
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2344.27 mils, 4244.27 mils): Track [/Q7] on F.Cu, length 399.51 mils
+    @(2280.76 mils, 4155.73 mils): Track [/NQ7] on F.Cu, length 299.32 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2344.27 mils, 4244.27 mils): Track [/Q7] on F.Cu, length 399.51 mils
+    @(2069.10 mils, 3944.08 mils): Track [/NQ7] on F.Cu, length 205.03 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3210.00 mils, 3597.36 mils): Track [/Q7] on F.Cu, length 385.00 mils
+    @(2804.60 mils, 3579.67 mils): Track [/NQ6] on F.Cu, length 500.07 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3331.66 mils, 3744.27 mils): Track [/Q7] on F.Cu, length 36.68 mils
+    @(3350.00 mils, 3700.00 mils): Through hole pad 1 [/NQ6] of R7
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2230.56 mils, 3555.00 mils): Track [/Q7] on F.Cu, length 100.91 mils
+    @(2200.39 mils, 3499.80 mils): Track [/NQ6] on F.Cu, length 113.42 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3305.73 mils, 3693.09 mils): Track [/Q7] on F.Cu, length 135.38 mils
+    @(2804.60 mils, 3579.67 mils): Track [/NQ6] on F.Cu, length 500.07 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(1856.12 mils, 3381.47 mils): Track [/Q7] on F.Cu, length 74.07 mils
+    @(1900.39 mils, 3399.80 mils): Through hole pad 2 [/R6] of Ux10_3
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3746.24 mils, 1853.76 mils): Track [/Q7] on B.Cu, length 70.00 mils
+    @(3700.00 mils, 1900.00 mils): Through hole pad 11 [/CLK] of J2
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2874.97 mils, 3300.00 mils): Track [/RST] on F.Cu, length 70.71 mils
+    @(2755.73 mils, 3444.27 mils): Track [/R5] on F.Cu, length 133.32 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2874.97 mils, 3300.00 mils): Track [/RST] on F.Cu, length 70.71 mils
+    @(2850.00 mils, 3350.00 mils): Track [/R5] on F.Cu, length 75.37 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2824.97 mils, 3350.00 mils): Track [/RST] on F.Cu, length 574.77 mils
+    @(2755.73 mils, 3444.27 mils): Track [/R5] on F.Cu, length 133.32 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(1900.39 mils, 3699.80 mils): Track [/RST] on F.Cu, length 239.41 mils
+    @(2081.48 mils, 3671.28 mils): Via [/R7] on F.Cu - B.Cu
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2840.52 mils, 2955.00 mils): Via [/RST] on F.Cu - B.Cu
+    @(2845.18 mils, 3000.00 mils): Track [/R3] on F.Cu, length 68.55 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2140.00 mils, 3700.00 mils): Via [/RST] on F.Cu - B.Cu
+    @(2111.48 mils, 3688.18 mils): Track [/NTICK] on B.Cu, length 122.70 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2140.00 mils, 3700.00 mils): Via [/RST] on F.Cu - B.Cu
+    @(2122.30 mils, 3677.36 mils): Track [/NTICK] on B.Cu, length 15.31 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2802.18 mils, 1624.87 mils): Track [/RST] on B.Cu, length 23.63 mils
+    @(2773.65 mils, 1636.68 mils): Via [/R2] on F.Cu - B.Cu
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2140.00 mils, 3700.00 mils): Track [/RST] on B.Cu, length 239.80 mils
+    @(2122.30 mils, 3677.36 mils): Track [/NTICK] on B.Cu, length 15.31 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2140.00 mils, 3700.00 mils): Track [/RST] on B.Cu, length 239.80 mils
+    @(2122.30 mils, 3086.87 mils): Track [/NTICK] on B.Cu, length 590.49 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3156.12 mils, 3155.73 mils): Track [/RST] on B.Cu, length 111.46 mils
+    @(3200.39 mils, 3100.00 mils): Through hole pad 12 [/NQ3] of Ux10_2
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2140.00 mils, 3460.20 mils): Track [/RST] on B.Cu, length 85.41 mils
+    @(2122.30 mils, 3086.87 mils): Track [/NTICK] on B.Cu, length 590.49 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3155.73 mils, 1355.73 mils): Track [/RST] on B.Cu, length 111.46 mils
+    @(3200.00 mils, 1300.00 mils): Through hole pad 12 [/NQ0] of Ux10_1
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2788.65 mils, 1611.35 mils): Track [/RST] on B.Cu, length 19.13 mils
+    @(2773.65 mils, 1636.68 mils): Via [/R2] on F.Cu - B.Cu
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2802.18 mils, 1648.50 mils): Track [/RST] on B.Cu, length 15.31 mils
+    @(2773.65 mils, 1636.68 mils): Via [/R2] on F.Cu - B.Cu
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3174.41 mils, 954.11 mils): Track [/WR] on F.Cu, length 432.50 mils
+    @(3050.00 mils, 900.00 mils): Through hole pad 1 [+5VL] of J3
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3174.41 mils, 954.11 mils): Track [/WR] on F.Cu, length 432.50 mils
+    @(2868.90 mils, 900.00 mils): Through hole pad 2 [+5V] of J3
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(1887.98 mils, 3850.00 mils): Track [/WR] on B.Cu, length 107.02 mils
+    @(1900.39 mils, 3799.80 mils): Through hole pad 6 [/NQ7] of Ux10_3
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2444.27 mils, 1644.47 mils): Track [/R1] on F.Cu, length 281.26 mils
+    @(2700.00 mils, 1600.20 mils): Through hole pad 9 [/D1] of Ux00_1
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2725.53 mils, 1644.47 mils): Track [/R1] on F.Cu, length 176.03 mils
+    @(2773.65 mils, 1636.68 mils): Via [/R2] on F.Cu - B.Cu
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(1856.12 mils, 3018.14 mils): Track [/NTICK] on B.Cu, length 174.07 mils
+    @(1900.39 mils, 2899.80 mils): Through hole pad 6 [/TICK] of Ux00_7
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(1856.12 mils, 3018.14 mils): Track [/NTICK] on B.Cu, length 174.07 mils
+    @(1900.39 mils, 2999.80 mils): Through hole pad 7 [GND] of Ux00_7
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3122.50 mils, 1790.00 mils): Via [/S1] on F.Cu - B.Cu
+    @(3151.02 mils, 1778.18 mils): Track [/NQ1] on B.Cu, length 272.84 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3122.50 mils, 1790.00 mils): Via [/S1] on F.Cu - B.Cu
+    @(3120.00 mils, 1747.16 mils): Track [/NQ1] on B.Cu, length 43.87 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2327.20 mils, 1755.00 mils): Via [/S1] on F.Cu - B.Cu
+    @(2355.73 mils, 1544.47 mils): Track [/TICK] on B.Cu, length 510.87 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3133.32 mils, 1800.83 mils): Track [/S1] on B.Cu, length 332.50 mils
+    @(3151.02 mils, 2051.02 mils): Track [/NQ1] on B.Cu, length 69.27 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3133.32 mils, 1800.83 mils): Track [/S1] on B.Cu, length 332.50 mils
+    @(3151.02 mils, 1778.18 mils): Track [/NQ1] on B.Cu, length 272.84 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2400.00 mils, 1437.59 mils): Track [/S1] on B.Cu, length 87.64 mils
+    @(2400.00 mils, 1500.20 mils): Through hole pad 5 [/TICK] of Ux00_1
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2338.03 mils, 1744.17 mils): Track [/S1] on B.Cu, length 15.31 mils
+    @(2355.73 mils, 1544.47 mils): Track [/TICK] on B.Cu, length 510.87 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2338.03 mils, 1499.56 mils): Track [/S1] on B.Cu, length 244.62 mils
+    @(2400.00 mils, 1500.20 mils): Track [/TICK] on B.Cu, length 62.61 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2338.03 mils, 1499.56 mils): Track [/S1] on B.Cu, length 244.62 mils
+    @(2355.73 mils, 1544.47 mils): Track [/TICK] on B.Cu, length 510.87 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3122.50 mils, 1790.00 mils): Track [/S1] on B.Cu, length 15.31 mils
+    @(3151.02 mils, 1778.18 mils): Track [/NQ1] on B.Cu, length 272.84 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2283.08 mils, 2944.08 mils): Track [/TICK] on F.Cu, length 338.41 mils
+    @(2200.39 mils, 2899.80 mils): Through hole pad 9 [+5V] of Ux00_7
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2321.48 mils, 2965.62 mils): Track [/TICK] on B.Cu, length 26.44 mils
+    @(2350.00 mils, 2951.00 mils): Via [/R3] on F.Cu - B.Cu
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2444.67 mils, 3255.73 mils): Track [/TICK] on B.Cu, length 211.46 mils
+    @(2400.39 mils, 3100.00 mils): Through hole pad 3 [/S4] of Ux00_3
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2444.67 mils, 3255.73 mils): Track [/TICK] on B.Cu, length 211.46 mils
+    @(2400.39 mils, 3200.00 mils): Through hole pad 4 [/S5] of Ux00_3
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2321.48 mils, 2939.18 mils): Track [/TICK] on B.Cu, length 15.31 mils
+    @(2350.00 mils, 2951.00 mils): Via [/R3] on F.Cu - B.Cu
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2321.48 mils, 2939.18 mils): Track [/TICK] on B.Cu, length 15.31 mils
+    @(2350.00 mils, 2951.00 mils): Track [/R3] on B.Cu, length 83.07 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2355.73 mils, 1544.47 mils): Track [/TICK] on B.Cu, length 510.87 mils
+    @(2400.00 mils, 1600.20 mils): Through hole pad 6 [/R1] of Ux00_1
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2355.73 mils, 1544.47 mils): Track [/TICK] on B.Cu, length 510.87 mils
+    @(2400.00 mils, 1700.20 mils): Through hole pad 7 [GND] of Ux00_1
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2364.19 mils, 2828.71 mils): Track [/TICK] on B.Cu, length 177.28 mils
+    @(2381.89 mils, 2644.11 mils): Track [/R3] on B.Cu, length 36.44 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2364.19 mils, 2828.71 mils): Track [/TICK] on B.Cu, length 177.28 mils
+    @(2350.00 mils, 2867.93 mils): Track [/R3] on B.Cu, length 45.10 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2364.19 mils, 2828.71 mils): Track [/TICK] on B.Cu, length 177.28 mils
+    @(2381.89 mils, 2836.04 mils): Track [/R3] on B.Cu, length 191.94 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2338.42 mils, 2625.67 mils): Track [/TICK] on B.Cu, length 163.70 mils
+    @(2381.89 mils, 2644.11 mils): Track [/R3] on B.Cu, length 36.44 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2338.42 mils, 2625.67 mils): Track [/TICK] on B.Cu, length 163.70 mils
+    @(2356.12 mils, 2618.34 mils): Track [/R3] on B.Cu, length 74.07 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2338.42 mils, 2625.67 mils): Track [/TICK] on B.Cu, length 163.70 mils
+    @(2356.12 mils, 2544.27 mils): Track [/R3] on B.Cu, length 62.61 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2332.30 mils, 2860.60 mils): Track [/TICK] on B.Cu, length 45.10 mils
+    @(2350.00 mils, 2951.00 mils): Track [/R3] on B.Cu, length 83.07 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2332.30 mils, 2860.60 mils): Track [/TICK] on B.Cu, length 45.10 mils
+    @(2350.00 mils, 2867.93 mils): Track [/R3] on B.Cu, length 45.10 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2332.30 mils, 2860.60 mils): Track [/TICK] on B.Cu, length 45.10 mils
+    @(2381.89 mils, 2836.04 mils): Track [/R3] on B.Cu, length 191.94 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2444.27 mils, 1455.92 mils): Track [/TICK] on B.Cu, length 211.46 mils
+    @(2400.00 mils, 1300.20 mils): Through hole pad 3 [/S0] of Ux00_1
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2444.27 mils, 1455.92 mils): Track [/TICK] on B.Cu, length 211.46 mils
+    @(2400.00 mils, 1400.20 mils): Through hole pad 4 [/S1] of Ux00_1
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2444.67 mils, 2355.73 mils): Track [/TICK] on B.Cu, length 211.46 mils
+    @(2400.39 mils, 2200.00 mils): Through hole pad 3 [/S2] of Ux00_2
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2444.67 mils, 2355.73 mils): Track [/TICK] on B.Cu, length 211.46 mils
+    @(2400.39 mils, 2300.00 mils): Through hole pad 4 [/S3] of Ux00_2
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2356.12 mils, 3855.73 mils): Track [/TICK] on B.Cu, length 511.46 mils
+    @(2400.39 mils, 3500.00 mils): Through hole pad 7 [GND] of Ux00_3
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2356.12 mils, 3855.73 mils): Track [/TICK] on B.Cu, length 511.46 mils
+    @(2400.39 mils, 3800.00 mils): Through hole pad 1 [/D6] of Ux00_4
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2356.12 mils, 3855.73 mils): Track [/TICK] on B.Cu, length 511.46 mils
+    @(2400.39 mils, 3400.00 mils): Through hole pad 6 [/R5] of Ux00_3
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2444.67 mils, 4155.73 mils): Track [/TICK] on B.Cu, length 211.46 mils
+    @(2400.39 mils, 4000.00 mils): Through hole pad 3 [/S6] of Ux00_4
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2444.67 mils, 4155.73 mils): Track [/TICK] on B.Cu, length 211.46 mils
+    @(2400.39 mils, 4100.00 mils): Through hole pad 4 [/S7] of Ux00_4
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2332.30 mils, 2928.36 mils): Track [/TICK] on B.Cu, length 67.76 mils
+    @(2350.00 mils, 2951.00 mils): Track [/R3] on B.Cu, length 83.07 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2332.30 mils, 2928.36 mils): Track [/TICK] on B.Cu, length 67.76 mils
+    @(2350.00 mils, 2867.93 mils): Track [/R3] on B.Cu, length 45.10 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2364.19 mils, 2651.44 mils): Track [/TICK] on B.Cu, length 36.44 mils
+    @(2381.89 mils, 2644.11 mils): Track [/R3] on B.Cu, length 36.44 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2364.19 mils, 2651.44 mils): Track [/TICK] on B.Cu, length 36.44 mils
+    @(2381.89 mils, 2836.04 mils): Track [/R3] on B.Cu, length 191.94 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2364.19 mils, 2651.44 mils): Track [/TICK] on B.Cu, length 36.44 mils
+    @(2356.12 mils, 2618.34 mils): Track [/R3] on B.Cu, length 74.07 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2755.49 mils, 2000.00 mils): Via [/S0] on F.Cu - B.Cu
+    @(2700.39 mils, 2000.00 mils): Through hole pad 14 [+5V] of Ux00_2
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2755.49 mils, 2000.00 mils): Via [/S0] on F.Cu - B.Cu
+    @(2784.02 mils, 2216.38 mils): Track [/R2] on B.Cu, length 428.36 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2744.00 mils, 1988.51 mils): Track [/S0] on B.Cu, length 269.70 mils
+    @(2784.02 mils, 1788.02 mils): Track [/R2] on B.Cu, length 31.56 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2744.00 mils, 1988.51 mils): Track [/S0] on B.Cu, length 269.70 mils
+    @(2761.70 mils, 1765.70 mils): Track [/R2] on B.Cu, length 39.56 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2744.00 mils, 1988.51 mils): Track [/S0] on B.Cu, length 269.70 mils
+    @(2761.70 mils, 1726.14 mils): Track [/R2] on B.Cu, length 0.38 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2744.27 mils, 1718.54 mils): Track [/S0] on B.Cu, length 374.07 mils
+    @(2761.97 mils, 1725.87 mils): Track [/R2] on B.Cu, length 77.50 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2744.27 mils, 1718.54 mils): Track [/S0] on B.Cu, length 374.07 mils
+    @(2700.00 mils, 1700.20 mils): Through hole pad 8 [/S1] of Ux00_1
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2744.27 mils, 1718.54 mils): Track [/S0] on B.Cu, length 374.07 mils
+    @(2700.00 mils, 1600.20 mils): Through hole pad 9 [/D1] of Ux00_1
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2744.27 mils, 1718.54 mils): Track [/S0] on B.Cu, length 374.07 mils
+    @(2761.97 mils, 1648.37 mils): Track [/R2] on B.Cu, length 16.52 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2744.27 mils, 1718.54 mils): Track [/S0] on B.Cu, length 374.07 mils
+    @(2700.00 mils, 1500.20 mils): Through hole pad 10 [/TICK] of Ux00_1
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2744.27 mils, 1718.54 mils): Track [/S0] on B.Cu, length 374.07 mils
+    @(2700.00 mils, 1400.20 mils): Through hole pad 11 [/R0] of Ux00_1
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2744.00 mils, 1718.81 mils): Track [/S0] on B.Cu, length 0.38 mils
+    @(2761.97 mils, 1725.87 mils): Track [/R2] on B.Cu, length 77.50 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2955.73 mils, 2255.73 mils): Track [/S2] on F.Cu, length 199.61 mils
+    @(2900.00 mils, 2300.00 mils): Through hole pad 4 [/S3] of Ux00_5
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2866.07 mils, 1544.27 mils): Track [/R2] on F.Cu, length 289.66 mils
+    @(2900.00 mils, 1500.00 mils): Through hole pad 5 [/RST] of Ux10_1
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2356.12 mils, 2344.27 mils): Track [/S3] on F.Cu, length 74.07 mils
+    @(2400.39 mils, 2400.00 mils): Through hole pad 5 [/TICK] of Ux00_2
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2356.12 mils, 2418.34 mils): Track [/S3] on F.Cu, length 44.78 mils
+    @(2400.39 mils, 2400.00 mils): Through hole pad 5 [/TICK] of Ux00_2
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2855.73 mils, 2444.67 mils): Track [/S3] on F.Cu, length 100.39 mils
+    @(2900.00 mils, 2400.00 mils): Through hole pad 5 [/NQ3] of Ux00_5
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2381.89 mils, 2644.11 mils): Track [/R3] on B.Cu, length 36.44 mils
+    @(2400.39 mils, 2600.00 mils): Through hole pad 7 [GND] of Ux00_2
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2356.12 mils, 2618.34 mils): Track [/R3] on B.Cu, length 74.07 mils
+    @(2400.39 mils, 2600.00 mils): Through hole pad 7 [GND] of Ux00_2
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2810.90 mils, 3944.27 mils): Track [/S5] on F.Cu, length 118.37 mils
+    @(2900.39 mils, 3900.00 mils): Through hole pad 2 [/NQ5] of Ux00_6
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3162.36 mils, 3338.03 mils): Track [/R5] on F.Cu, length 53.78 mils
+    @(3294.27 mils, 3355.73 mils): Track [/NQ5] on F.Cu, length 349.61 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2937.34 mils, 3338.03 mils): Track [/R5] on F.Cu, length 225.03 mils
+    @(3294.27 mils, 3355.73 mils): Track [/NQ5] on F.Cu, length 349.61 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2937.34 mils, 3338.03 mils): Track [/R5] on F.Cu, length 225.03 mils
+    @(2944.67 mils, 3355.73 mils): Track [/NQ5] on F.Cu, length 62.61 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2850.00 mils, 3350.00 mils): Track [/R5] on F.Cu, length 75.37 mils
+    @(2944.67 mils, 3355.73 mils): Track [/NQ5] on F.Cu, length 62.61 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2925.37 mils, 3350.00 mils): Track [/R5] on F.Cu, length 16.93 mils
+    @(3294.27 mils, 3355.73 mils): Track [/NQ5] on F.Cu, length 349.61 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2925.37 mils, 3350.00 mils): Track [/R5] on F.Cu, length 16.93 mils
+    @(2944.67 mils, 3355.73 mils): Track [/NQ5] on F.Cu, length 62.61 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2444.67 mils, 3444.27 mils): Track [/R5] on F.Cu, length 311.06 mils
+    @(2700.39 mils, 3400.00 mils): Through hole pad 9 [/D5] of Ux00_3
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2875.42 mils, 4050.00 mils): Track [/S6] on F.Cu, length 70.71 mils
+    @(2444.67 mils, 4055.73 mils): Track [/S7] on F.Cu, length 411.46 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2875.42 mils, 4050.00 mils): Track [/S6] on F.Cu, length 70.71 mils
+    @(2856.12 mils, 4055.73 mils): Track [/S7] on F.Cu, length 62.61 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.86 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3130.00 mils, 4050.00 mils): Track [/S6] on F.Cu, length 254.58 mils
+    @(2856.12 mils, 4055.73 mils): Track [/S7] on F.Cu, length 62.61 mils
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2207.28 mils, 3644.08 mils): Track [/R6] on F.Cu, length 62.61 mils
+    @(2200.39 mils, 3599.80 mils): Through hole pad 11 [/DELAY3] of Ux10_3
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2244.67 mils, 3858.84 mils): Track [/R6] on F.Cu, length 177.37 mils
+    @(2200.39 mils, 3799.80 mils): Through hole pad 9 [/WR] of Ux10_3
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2244.67 mils, 3858.84 mils): Track [/R6] on F.Cu, length 177.37 mils
+    @(2200.39 mils, 3699.80 mils): Through hole pad 10 [/CLK] of Ux10_3
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2244.67 mils, 3681.47 mils): Track [/R6] on F.Cu, length 52.88 mils
+    @(2200.39 mils, 3699.80 mils): Through hole pad 10 [/CLK] of Ux10_3
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2444.67 mils, 4055.73 mils): Track [/S7] on F.Cu, length 411.46 mils
+    @(2700.39 mils, 4100.00 mils): Through hole pad 11 [/R6] of Ux00_4
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3601.79 mils, 3548.21 mils): Track [Net-(R6-Pad1)] on F.Cu, length 250.00 mils
+    @(3500.00 mils, 3500.00 mils): Through hole pad 2 [+5VL] of D6
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3601.79 mils, 3548.21 mils): Track [Net-(R6-Pad1)] on F.Cu, length 250.00 mils
+    @(3400.00 mils, 3500.00 mils): Through hole pad 1 [Net-(D6-Pad1)] of D6
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3156.12 mils, 3855.73 mils): Track [Net-(R6-Pad1)] on B.Cu, length 161.85 mils
+    @(3200.39 mils, 3800.00 mils): Through hole pad 14 [+5V] of Ux00_6
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3154.15 mils, 3691.91 mils): Track [Net-(R6-Pad1)] on B.Cu, length 145.67 mils
+    @(3198.43 mils, 3650.20 mils): Through hole pad 1 [+5V] of C6
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3555.73 mils, 2118.72 mils): Track [/NQ1] on B.Cu, length 487.01 mils
+    @(3600.00 mils, 2250.00 mils): Through hole pad 2 [Net-(D9-Pad1)] of R9
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3305.73 mils, 2855.73 mils): Track [/NQ2] on B.Cu, length 350.00 mils
+    @(3277.20 mils, 2559.06 mils): Via [/NQ3] on F.Cu - B.Cu
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3601.79 mils, 3148.21 mils): Track [/NQ3] on F.Cu, length 353.19 mils
+    @(3500.00 mils, 3100.00 mils): Through hole pad 2 [+5VL] of D4
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3601.79 mils, 3148.21 mils): Track [/NQ3] on F.Cu, length 353.19 mils
+    @(3400.00 mils, 3100.00 mils): Through hole pad 1 [Net-(D4-Pad1)] of D4
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3273.88 mils, 2555.73 mils): Track [/NQ3] on F.Cu, length 218.15 mils
+    @(3200.00 mils, 2600.00 mils): Through hole pad 8 [/Q2] of Ux00_5
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3294.27 mils, 3355.73 mils): Track [/NQ5] on F.Cu, length 349.61 mils
+    @(3200.39 mils, 3400.00 mils): Through hole pad 9 [/Q5] of Ux10_2
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2856.12 mils, 3855.73 mils): Track [/NQ5] on B.Cu, length 411.46 mils
+    @(2900.39 mils, 3500.00 mils): Through hole pad 7 [GND] of Ux10_2
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2856.12 mils, 3855.73 mils): Track [/NQ5] on B.Cu, length 411.46 mils
+    @(2900.39 mils, 3800.00 mils): Through hole pad 1 [/S4] of Ux00_6
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2069.10 mils, 3944.08 mils): Track [/NQ7] on F.Cu, length 205.03 mils
+    @(1900.39 mils, 3899.80 mils): Through hole pad 7 [GND] of Ux10_3
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2856.12 mils, 4155.73 mils): Track [/NQ7] on F.Cu, length 575.37 mils
+    @(2700.39 mils, 4200.00 mils): Through hole pad 10 [/TICK] of Ux00_4
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(2856.12 mils, 4155.73 mils): Track [/NQ7] on F.Cu, length 575.37 mils
+    @(2400.39 mils, 4200.00 mils): Through hole pad 5 [/TICK] of Ux00_4
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(1856.12 mils, 3936.12 mils): Track [/NQ7] on F.Cu, length 92.05 mils
+    @(1900.39 mils, 3899.80 mils): Through hole pad 7 [GND] of Ux10_3
+[clearance]: Clearance violation (netclass 'Default' clearance 7.87 mils; actual 7.85 mils)
+    Rule: netclass 'Default'; Severity: error
+    @(3551.79 mils, 2201.79 mils): Track [Net-(D9-Pad1)] on F.Cu, length 153.58 mils
+    @(3450.00 mils, 2250.00 mils): Through hole pad 2 [+5VL] of D9
+[track_dangling]: Track has unconnected end
+    Local override; Severity: warning
+    @(2531.97 mils, 3561.97 mils): Track [/Q6] on F.Cu, length 3.03 mils
+
+** Found 0 unconnected pads **
+
+** Found 0 Footprint errors **
+
+** End of Report **

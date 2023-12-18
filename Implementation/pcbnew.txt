@@ -1,0 +1,1 @@
+<pcbnew.BOARD; proxy of <Swig Object of type 'BOARD *' at 0x7f8872107c00> >
