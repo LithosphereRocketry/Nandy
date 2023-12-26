@@ -49,4 +49,4 @@ $(OBJDIR):
 	@false
 
 clean:
-	rm -f $(WAVEDIR)*.vd $(OBJDIR)*.vvp $(LOGDIR)*.txt
+	rm -f $(WAVEDIR)*.vcd $(OBJDIR)*.vvp $(LOGDIR)*.txt
