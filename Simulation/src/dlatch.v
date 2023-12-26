@@ -9,6 +9,7 @@ Active high D latch
 module dlatch(
         input en,
         input d,
+        input nclr,
         output q
     );
 
@@ -29,9 +30,10 @@ module dlatch(
         .b(nq),
         .q(q)
     );
-    nand00 gl(
+    nand10 gl(
         .a(r),
         .b(q),
+        .c(nclr),
         .q(nq)
     );
 endmodule 

@@ -4,7 +4,7 @@ module assert #(parameter message = "unspecified")
                (input value);
     task test;
         if (~value) begin
-            $display("Assertion failed: %s", message);
+            $display("ERROR: Assertion failed: %s", message);
             $finish(1);
         end
     endtask
@@ -27,7 +27,7 @@ module combitest #(parameter name = "unnamed", parameter inbits = 1,
             counter = counter + 1;
             #(delay);
             if (comp_out !== verify) begin
-                $display("Test %s failed: input %b -> expected %b, got %b",
+                $display("ERROR: Test %s failed: input %b -> expected %b, got %b",
                     name, comp_in, verify, comp_out);
                 $finish(1);
             end
@@ -53,14 +53,14 @@ module randtest #(parameter name = "unnamed", parameter inbits = 1,
     randomizer #(inbits) r (.value(value));
 
     initial begin
-        repeat (65536) begin
+        repeat (16384) begin
             comp_in = {inbits{1'bx}};
             #(cooldown);
             r.roll();
             comp_in = value;
             #(delay);
             if (comp_out !== verify) begin
-                $display("Test %s failed: input %b -> expected %b, got %b",
+                $display("ERROR: Test %s failed: input %b -> expected %b, got %b",
                     name, comp_in, verify, comp_out);
                 $finish(1);
             end

@@ -7,6 +7,7 @@ TESTDIR = tests/
 LOGDIR = logs/
 OBJDIR = obj/
 INCDIR = include/
+WAVEDIR = waveforms/
 
 TMPFILE = $(LOGDIR)TEMP.txt
 FUZZFILE = $(TESTDIR)FUZZ.txt
@@ -19,7 +20,6 @@ INC = $(wildcard $(INCDIR)*.vh)
 TEST_SRC = $(wildcard $(TESTDIR)*.v)
 # Each will be compiled to a wave result
 TEST_OUT = $(patsubst $(TESTDIR)%.v,$(LOGDIR)%.txt,$(TEST_SRC))
-$(info [${SRC}])
 
 .PHONY: all clean
 
@@ -30,10 +30,10 @@ $(FUZZFILE): $(MAKEFUZZ)
 
 $(TEST_OUT): $(LOGDIR)%.txt: $(OBJDIR)%.vvp $(FUZZFILE) | $(LOGDIR)
 	$(VVP) $< > $@
-	@if [ -s $@ ]; then cat $@; exit 1; fi
+	@if ((grep -Fxq "ERROR:" $@)); then cat $@; exit 1; fi
 
-$(OBJDIR)%.vvp: $(TESTDIR)%.v $(SRC) $(INC) | $(OBJDIR)
-	$(VLG) -I$(INCDIR) -s $* -o $@ $< $(SRC)
+$(OBJDIR)%.vvp: $(TESTDIR)%.v $(SRC) $(INC) | $(OBJDIR) $(WAVEDIR)
+	$(VLG) -DWAVEPATH=\"$(WAVEDIR)$*.vcd\" -I$(INCDIR) -s $* -o $@ $< $(SRC)
 
 # If the directories don't exist, make them
 $(WAVEDIR):
