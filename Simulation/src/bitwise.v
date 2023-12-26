@@ -14,9 +14,8 @@ module bitwise(
 
     wire [1:0] nop;
 
-    nand00 opinv [1:0] (
+    invert opinv [1:0] (
         .a(op[1:0]),
-        .b(1'b1),
         .q(nop)
     );
 
