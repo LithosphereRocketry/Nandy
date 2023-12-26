@@ -16,9 +16,8 @@ module edgegate #(parameter REPEATS = 1) (
     wire [REPEATS*2:0] delchain;
     wire nout;
 
-    nand00 delay [REPEATS*2:0] (
+    invert delay [REPEATS*2:0] (
         .a({clk, delchain[REPEATS*2:1]}),
-        .b(1'b1),
         .q(delchain[REPEATS*2:0])
     );
 
@@ -29,9 +28,8 @@ module edgegate #(parameter REPEATS = 1) (
         .q(nout)
     );
 
-    nand00 inv(
+    invert inv(
         .a(nout),
-        .b(1'b1),
         .q(out)
     );
 

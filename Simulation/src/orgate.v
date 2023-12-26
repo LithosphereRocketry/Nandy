@@ -1,4 +1,7 @@
 `timescale 1ns/1ps
+/*
+Basic 2-input or gate
+*/
 
 module orgate(
         input a,
@@ -6,14 +9,12 @@ module orgate(
         output q
     );
     wire na, nb;
-    nand00 inva(
+    invert inva(
         .a(a),
-        .b(1'b1),
         .q(na)
     );
-    nand00 invb(
+    invert invb(
         .a(b),
-        .b(1'b1),
         .q(nb)
     );
     nand00 org(
