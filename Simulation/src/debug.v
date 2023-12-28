@@ -20,8 +20,6 @@ module combitest #(parameter name = "unnamed", parameter inbits = 1,
     reg [(inbits-1):0] counter = 0;
 
     initial begin
-        $dumpfile(`WAVEPATH);
-        $dumpvars;
         repeat (1 << inbits) begin
             comp_in = {inbits{1'bx}};
             #(cooldown);
@@ -55,8 +53,6 @@ module randtest #(parameter name = "unnamed", parameter inbits = 1,
     randomizer #(inbits) r (.value(value));
 
     initial begin
-        $dumpfile(`WAVEPATH);
-        $dumpvars;
         repeat (16384) begin
             comp_in = {inbits{1'bx}};
             #(cooldown);
