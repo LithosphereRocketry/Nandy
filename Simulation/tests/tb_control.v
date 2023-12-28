@@ -109,9 +109,9 @@ module tb_control();
         .SIG(SIG)
     );
 
-    combitest #("control", 10, 10, 1000) tester(
+    combitest #("control", 10, 11, 1000) tester(
         .comp_in({inst, cycle, carry}),
-        .verify({realM, realS, realMC, realY, realRS, realALU}),
-        .comp_out({M, S, MC, Y, RS, ALU})
+        .verify({realM, realS, realJ, realMC, realY, realRS, realALU}),
+        .comp_out({M, S, J, MC, Y, RS, ALU})
     );
 endmodule

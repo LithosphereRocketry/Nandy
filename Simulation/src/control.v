@@ -45,6 +45,25 @@ module control(
 
     assign S = inst[4];
 
+    wire jtype, jactive;
+    and3 gjtype(
+        .a(inst[7]),
+        .b(inst[6]),
+        .c(inst[5]),
+        .q(jtype)
+    );
+    nand00 gjactive(
+        .a(inst[4]),
+        .b(carry),
+        .q(jactive)
+    );
+    and3 gJ(
+        .a(jtype),
+        .b(cycle),
+        .c(jactive),
+        .q(J)
+    );
+
     wire ncycle;
     invert invcycle(
         .a(cycle),
