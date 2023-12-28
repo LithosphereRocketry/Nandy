@@ -31,9 +31,9 @@ module control(
     );
 
     wire [7:0] ninst;
-    invert invinst [7:4] (
-        .a(inst[7:4]),
-        .q(ninst[7:4])
+    invert invinst [7:3] (
+        .a(inst[7:3]),
+        .q(ninst[7:3])
     );
 
     and3 gM(
@@ -62,6 +62,33 @@ module control(
         .b(cycle),
         .c(jactive),
         .q(J)
+    );
+
+    wire simple;
+    and3 gsimple(
+        .a(ninst[7]),
+        .b(ninst[6]),
+        .c(ninst[5]),
+        .q(simple)
+    );
+
+    and3 gLJ(
+        .a(simple),
+        .b(inst[4]),
+        .c(ninst[3]),
+        .q(LJ)
+    );
+
+    andgate gCLI(
+        .a(LJ),
+        .b(inst[1]),
+        .q(CLI)
+    );
+
+    andgate gLJR(
+        .a(LJ),
+        .b(inst[2]),
+        .q(LJR)
     );
 
     wire ncycle;
