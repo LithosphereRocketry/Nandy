@@ -31,9 +31,9 @@ module control(
     );
 
     wire [7:0] ninst;
-    invert invinst [7:3] (
-        .a(inst[7:3]),
-        .q(ninst[7:3])
+    invert invinst [7:0] (
+        .a(inst[7:0]),
+        .q(ninst[7:0])
     );
 
     and3 gM(
@@ -211,6 +211,67 @@ module control(
         .q(ALU[2:0])
     );
 
+    wire issig;
+    wire [7:0] dec;
+    and3 gissig(
+        .a(simple),
+        .b(inst[4]),
+        .c(inst[3]),
+        .q(issig)
+    );
 
+    and3 gdec0(
+        .a(ninst[2]),
+        .b(ninst[1]),
+        .c(ninst[0]),
+        .q(dec[0])
+    );
+    and3 gdec1(
+        .a(ninst[2]),
+        .b(ninst[1]),
+        .c(inst[0]),
+        .q(dec[1])
+    );
+    and3 gdec2(
+        .a(ninst[2]),
+        .b(inst[1]),
+        .c(ninst[0]),
+        .q(dec[2])
+    );
+    and3 gdec3(
+        .a(ninst[2]),
+        .b(inst[1]),
+        .c(inst[0]),
+        .q(dec[3])
+    );
+    and3 gdec4(
+        .a(inst[2]),
+        .b(ninst[1]),
+        .c(ninst[0]),
+        .q(dec[4])
+    );
+    and3 gdec5(
+        .a(inst[2]),
+        .b(ninst[1]),
+        .c(inst[0]),
+        .q(dec[5])
+    );
+    and3 gdec6(
+        .a(inst[2]),
+        .b(inst[1]),
+        .c(ninst[0]),
+        .q(dec[6])
+    );
+    and3 gdec7(
+        .a(inst[2]),
+        .b(inst[1]),
+        .c(inst[0]),
+        .q(dec[7])
+    );
 
+    andgate gSIG [7:0] (
+        .a(dec),
+        .b(issig),
+        .q(SIG)
+    );
 endmodule
