@@ -124,6 +124,50 @@ module control(
 
     assign Y = inst[5];
     assign RS = inst[1:0];
+
+    // ALL of the garbage that follows is to calculate Writes Accumulator (WA).
+    // This is what you get when all of your instructions edit the same register
+    wire isalu, nalur, nalui;
+    nand00 galur(
+        .a(ninst[7]),
+        .b(inst[6]),
+        .q(nalur)
+    );
+    nand10 galui(
+        .a(cycle),
+        .b(inst[6]),
+        .c(ninst[5]),
+        .q(nalui)
+    );
+    nand00 galu(
+        .a(nalur),
+        .b(nalui),
+        .q(isalu)
+    );
+    wire writesacc;
+    nand00 gwritesacc(
+        .a(inst[4]),
+        .b(ninst[3]),
+        .q(writesacc)
+    );
+    wire nwam, nwaa;
+    nand00 gwam(
+        .a(M),
+        .b(ninst[5]),
+        .q(nwam)
+    );
+    nand00 gwaa(
+        .a(isalu),
+        .b(writesacc),
+        .q(nwaa)
+    );
+    nand00 gWA(
+        .a(nwam),
+        .b(nwaa),
+        .q(WA)
+    );
+    // FINALLY the end of WA.
+
     assign ALU = inst[3:0];
 
 endmodule
