@@ -30,13 +30,33 @@ module control(
         output [7:0] SIG
     );
 
-    wire ncycle, nMC;
-    nand00 invcycle(
-        .a(cycle),
-        .b(1'b1),
-        .q(ncycle)
+    wire [7:0] ninst;
+    invert invinst [7:4] (
+        .a(inst[7:4]),
+        .q(ninst[7:4])
     );
 
+    and3 gM(
+        .a(inst[7]),
+        .b(cycle),
+        .c(ninst[6]),
+        .q(M)
+    );
+
+    assign S = inst[4];
+
+    wire ncycle;
+    invert invcycle(
+        .a(cycle),
+        .q(ncycle)
+    );
+    andgate gMC(
+        .a(ncycle),
+        .b(inst[7]),
+        .q(MC)
+    );
+
+    assign Y = inst[5];
     assign RS = inst[1:0];
     assign ALU = inst[3:0];
 
