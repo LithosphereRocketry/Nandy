@@ -5,6 +5,7 @@ PY = python3
 SRCDIR = src/
 TESTDIR = tests/
 LOGDIR = logs/
+ERRDIR = error-logs/
 OBJDIR = obj/
 INCDIR = include/
 WAVEDIR = waveforms/
@@ -28,9 +29,10 @@ all: $(TEST_OUT)
 $(FUZZFILE): $(MAKEFUZZ)
 	$(PY) $(MAKEFUZZ) > $@
 
-$(TEST_OUT): $(LOGDIR)%.txt: $(OBJDIR)%.vvp $(FUZZFILE) | $(LOGDIR)
-	$(VVP) $< > $@
-	@if ((grep -Fxq "ERROR:" $@)); then cat $@; exit 1; fi
+$(TEST_OUT): $(LOGDIR)%.txt: $(OBJDIR)%.vvp $(FUZZFILE) | $(LOGDIR) $(ERRDIR)
+	$(VVP) $< > $(ERRDIR)$*.txt
+	@! grep -Fq "ERROR:" $(ERRDIR)$*.txt
+	@mv $(ERRDIR)$*.txt $@
 
 $(OBJDIR)%.vvp: $(TESTDIR)%.v $(SRC) $(INC) | $(OBJDIR) $(WAVEDIR)
 	$(VLG) -DWAVEPATH=\"$(WAVEDIR)$*.vcd\" -I$(INCDIR) -s $* -o $@ $< $(SRC)
@@ -39,6 +41,8 @@ $(OBJDIR)%.vvp: $(TESTDIR)%.v $(SRC) $(INC) | $(OBJDIR) $(WAVEDIR)
 $(WAVEDIR):
 	mkdir $@
 $(LOGDIR):
+	mkdir $@
+$(ERRDIR):
 	mkdir $@
 $(OBJDIR):
 	mkdir $@
