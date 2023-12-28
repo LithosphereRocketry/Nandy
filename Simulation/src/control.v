@@ -91,6 +91,12 @@ module control(
         .q(LJR)
     );
 
+    andgate gMW(
+        .a(M),
+        .b(inst[5]),
+        .q(MW)
+    );
+
     wire ncycle;
     invert invcycle(
         .a(cycle),
@@ -100,6 +106,20 @@ module control(
         .a(ncycle),
         .b(inst[7]),
         .q(MC)
+    );
+
+    and3 gRD(
+        .a(simple),
+        .b(ninst[4]),
+        .c(inst[2]),
+        .q(RD)
+    );
+
+    and3 gWR(
+        .a(simple),
+        .b(ninst[4]),
+        .c(inst[3]),
+        .q(WR)
     );
 
     assign Y = inst[5];

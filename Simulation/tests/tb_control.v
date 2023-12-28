@@ -60,7 +60,7 @@ module tb_control();
     assign realRD = ~inst[7] & ~inst[6] & ~inst[5] & ~inst[4] & inst[2];
 
     wire realWR;
-    assign realRD = ~inst[7] & ~inst[6] & ~inst[5] & ~inst[4] & inst[3];
+    assign realWR = ~inst[7] & ~inst[6] & ~inst[5] & ~inst[4] & inst[3];
 
     wire realY;
     assign realY = inst[5];
@@ -109,10 +109,10 @@ module tb_control();
         .SIG(SIG)
     );
 
-    combitest #("control", 10, 14, 1000) tester(
+    combitest #("control", 10, 16, 1000) tester(
         .comp_in({inst, cycle, carry}),
-        .verify({realM, realS, realJ, realLJ, realCLI, realLJR, realMC, realY, realRS, realALU}),
-        .comp_out({M, S, J, LJ, CLI, LJR, MC, Y, RS, ALU})
+        .verify({realM, realS, realJ, realLJ, realCLI, realLJR, realMC, realRD, realWR, realY, realRS, realALU}),
+        .comp_out({M, S, J, LJ, CLI, LJR, MC, RD, WR, Y, RS, ALU})
     );
 
     initial begin
