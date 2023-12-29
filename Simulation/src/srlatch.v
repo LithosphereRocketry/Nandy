@@ -2,37 +2,38 @@
 
 /*
 
-Active high D latch
+Active high SR latch
 
 */
 
-module dlatch(
+module srlatch(
         input en,
-        input d,
+        input s,
+        input r,
         input nclr,
         output q,
         output nq
     );
 
-    wire s, r;
+    wire se, re;
 
-    nand00 gd(
-        .a(d),
-        .b(en),
-        .q(s)
-    );
-    nand00 gen(
+    nand00 gse(
         .a(s),
         .b(en),
-        .q(r)
+        .q(se)
+    );
+    nand00 gre(
+        .a(r),
+        .b(en),
+        .q(re)
     );
     nand00 gh(
-        .a(s),
+        .a(se),
         .b(nq),
         .q(q)
     );
     nand10 gl(
-        .a(r),
+        .a(re),
         .b(q),
         .c(nclr),
         .q(nq)

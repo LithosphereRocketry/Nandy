@@ -11,7 +11,8 @@ module register #(parameter WIDTH = 8) (
         input clk,
         input en,
         input nclr, 
-        output [WIDTH-1:0] q
+        output [WIDTH-1:0] q,
+        output [WIDTH-1:0] nq
     );  
 
     wire tick, ntick;
@@ -31,7 +32,8 @@ module register #(parameter WIDTH = 8) (
         .en(tick),
         .d(d),
         .nclr(nclr),
-        .q(q)
+        .q(q),
+        .nq(nq)
     );
 
 endmodule
