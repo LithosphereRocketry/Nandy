@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 
-module #(parameter rompath = "memory.txt") memory(
+module memory #(parameter rompath = "memory.txt") (
         input [15:0] addr,
         input [7:0] din,
         input we,
@@ -10,7 +10,7 @@ module #(parameter rompath = "memory.txt") memory(
 
     wire [7:0] romout, ramout;
 
-    rom grom(
+    rom #(rompath) grom(
         .address(addr[14:0]),
         .data(romout)
     );
