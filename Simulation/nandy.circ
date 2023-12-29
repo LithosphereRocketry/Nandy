@@ -1848,6 +1848,7 @@ b0 7 b1 6 c0 0 a b
     <wire from="(160,100)" to="(160,490)"/>
     <wire from="(320,60)" to="(320,190)"/>
     <wire from="(90,1030)" to="(210,1030)"/>
+    <wire from="(240,800)" to="(240,810)"/>
     <wire from="(190,360)" to="(190,570)"/>
     <wire from="(360,280)" to="(460,280)"/>
     <wire from="(320,240)" to="(320,270)"/>
@@ -1887,13 +1888,12 @@ b0 7 b1 6 c0 0 a b
     <wire from="(370,820)" to="(370,860)"/>
     <wire from="(230,240)" to="(240,240)"/>
     <wire from="(380,130)" to="(460,130)"/>
-    <wire from="(450,900)" to="(450,950)"/>
     <wire from="(90,410)" to="(90,530)"/>
     <wire from="(350,560)" to="(350,620)"/>
+    <wire from="(450,900)" to="(450,960)"/>
     <wire from="(150,100)" to="(150,290)"/>
     <wire from="(140,830)" to="(140,890)"/>
     <wire from="(100,420)" to="(100,550)"/>
-    <wire from="(90,810)" to="(210,810)"/>
     <wire from="(90,410)" to="(210,410)"/>
     <wire from="(190,130)" to="(240,130)"/>
     <wire from="(280,540)" to="(280,550)"/>
@@ -1905,6 +1905,8 @@ b0 7 b1 6 c0 0 a b
     <wire from="(310,440)" to="(330,440)"/>
     <wire from="(120,210)" to="(330,210)"/>
     <wire from="(110,240)" to="(110,350)"/>
+    <wire from="(220,830)" to="(240,830)"/>
+    <wire from="(300,960)" to="(450,960)"/>
     <wire from="(320,300)" to="(330,300)"/>
     <wire from="(130,650)" to="(210,650)"/>
     <wire from="(350,730)" to="(360,730)"/>
@@ -1919,10 +1921,12 @@ b0 7 b1 6 c0 0 a b
     <wire from="(290,180)" to="(410,180)"/>
     <wire from="(400,550)" to="(400,560)"/>
     <wire from="(140,320)" to="(140,400)"/>
+    <wire from="(180,810)" to="(180,830)"/>
     <wire from="(250,960)" to="(250,990)"/>
     <wire from="(90,810)" to="(90,1030)"/>
     <wire from="(90,220)" to="(90,380)"/>
     <wire from="(130,100)" to="(130,260)"/>
+    <wire from="(90,810)" to="(180,810)"/>
     <wire from="(290,1030)" to="(310,1030)"/>
     <wire from="(310,330)" to="(330,330)"/>
     <wire from="(440,620)" to="(460,620)"/>
@@ -1965,8 +1969,8 @@ b0 7 b1 6 c0 0 a b
     <wire from="(100,550)" to="(240,550)"/>
     <wire from="(150,830)" to="(150,890)"/>
     <wire from="(190,200)" to="(240,200)"/>
-    <wire from="(460,950)" to="(460,960)"/>
     <wire from="(150,290)" to="(330,290)"/>
+    <wire from="(240,810)" to="(240,820)"/>
     <wire from="(100,420)" to="(210,420)"/>
     <wire from="(90,100)" to="(90,120)"/>
     <wire from="(360,450)" to="(460,450)"/>
@@ -2001,11 +2005,10 @@ b0 7 b1 6 c0 0 a b
     <wire from="(320,560)" to="(350,560)"/>
     <wire from="(340,750)" to="(360,750)"/>
     <wire from="(190,360)" to="(210,360)"/>
+    <wire from="(180,830)" to="(200,830)"/>
     <wire from="(100,860)" to="(370,860)"/>
-    <wire from="(450,950)" to="(460,950)"/>
     <wire from="(120,100)" to="(120,150)"/>
     <wire from="(100,170)" to="(240,170)"/>
-    <wire from="(230,810)" to="(240,810)"/>
     <wire from="(230,410)" to="(240,410)"/>
     <wire from="(230,650)" to="(240,650)"/>
     <wire from="(130,650)" to="(130,830)"/>
@@ -2020,7 +2023,6 @@ b0 7 b1 6 c0 0 a b
     <wire from="(320,270)" to="(320,300)"/>
     <wire from="(140,100)" to="(140,320)"/>
     <wire from="(190,200)" to="(190,360)"/>
-    <wire from="(300,960)" to="(460,960)"/>
     <wire from="(290,430)" to="(310,430)"/>
     <wire from="(90,120)" to="(90,160)"/>
     <wire from="(340,640)" to="(360,640)"/>
@@ -2109,9 +2111,6 @@ b0 7 b1 6 c0 0 a b
     <comp lib="1" loc="(230,530)" name="NOT Gate">
       <a name="size" val="20"/>
     </comp>
-    <comp lib="0" loc="(240,830)" name="Constant">
-      <a name="value" val="0x0"/>
-    </comp>
     <comp lib="0" loc="(460,680)" name="Pin">
       <a name="facing" val="west"/>
       <a name="output" val="true"/>
@@ -2161,9 +2160,6 @@ b0 7 b1 6 c0 0 a b
       <a name="size" val="30"/>
       <a name="inputs" val="2"/>
     </comp>
-    <comp lib="1" loc="(230,810)" name="NOT Gate">
-      <a name="size" val="20"/>
-    </comp>
     <comp lib="0" loc="(80,60)" name="Pin">
       <a name="facing" val="south"/>
       <a name="width" val="8"/>
@@ -2195,6 +2191,9 @@ b0 7 b1 6 c0 0 a b
       <a name="value" val="0x0"/>
     </comp>
     <comp lib="1" loc="(230,1030)" name="NOT Gate">
+      <a name="size" val="20"/>
+    </comp>
+    <comp lib="1" loc="(220,830)" name="NOT Gate">
       <a name="size" val="20"/>
     </comp>
     <comp lib="1" loc="(360,410)" name="AND Gate">
@@ -2343,9 +2342,6 @@ b0 7 b1 6 c0 0 a b
       <a name="facing" val="south"/>
       <a name="tristate" val="false"/>
       <a name="label" val="Cycle"/>
-    </comp>
-    <comp lib="0" loc="(240,820)" name="Constant">
-      <a name="value" val="0x0"/>
     </comp>
     <comp lib="0" loc="(460,150)" name="Pin">
       <a name="facing" val="west"/>
