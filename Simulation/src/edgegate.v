@@ -3,8 +3,8 @@
 /*
 Positive-edge detector
 
-Creates a (N*2+1)-gate-delay pulse when clk transitions from low to high if en is
-set high.
+Creates a (N*2+1)-gate-delay negative pulse when clk transitions from low to
+high if en is set high.
 */
 
 module edgegate #(parameter REPEATS = 1) (
@@ -14,7 +14,6 @@ module edgegate #(parameter REPEATS = 1) (
     );
 
     wire [REPEATS*2:0] delchain;
-    wire nout;
 
     invert delay [REPEATS*2:0] (
         .a({clk, delchain[REPEATS*2:1]}),
@@ -25,11 +24,6 @@ module edgegate #(parameter REPEATS = 1) (
         .a(clk),
         .b(delchain[0]),
         .c(en),
-        .q(nout)
-    );
-
-    invert inv(
-        .a(nout),
         .q(out)
     );
 

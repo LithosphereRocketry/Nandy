@@ -14,12 +14,17 @@ module register #(parameter WIDTH = 8) (
         output [WIDTH-1:0] q
     );  
 
-    wire tick;
+    wire tick, ntick;
 
     edgegate edgedet(
         .clk(clk),
         .en(en),
-        .out(tick)
+        .out(ntick)
+    );
+
+    invert inv(
+        .a(ntick),
+        .q(tick)
     );
 
     dlatch latches [WIDTH-1:0] (
