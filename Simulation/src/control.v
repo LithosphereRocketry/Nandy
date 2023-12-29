@@ -27,7 +27,7 @@ module control(
         output ISP,
         output WC,
         output [3:0] ALU,
-        output [7:0] SIG
+        output [7:0] nSIG
     );
 
     wire [7:0] ninst;
@@ -269,9 +269,9 @@ module control(
         .q(dec[7])
     );
 
-    andgate gSIG [7:0] (
+    nand00 gSIG [7:0] (
         .a(dec),
         .b(issig),
-        .q(SIG)
+        .q(nSIG)
     );
 endmodule

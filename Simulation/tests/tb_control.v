@@ -83,7 +83,7 @@ module tb_control();
     assign realALU = inst[6] ? inst[3:0] : {~inst[7], 3'b000};
 
     wire [7:0] realSIG;
-    assign realSIG = (1 << inst[2:0]) & {8{~inst[7] & ~inst[6] & ~inst[5] & inst[4] & inst[3]}};
+    assign realSIG = ~((1 << inst[2:0]) & {8{~inst[7] & ~inst[6] & ~inst[5] & inst[4] & inst[3]}});
 
     control testGate(
         .inst(inst),
@@ -106,7 +106,7 @@ module tb_control();
         .ISP(ISP),
         .WC(WC),
         .ALU(ALU),
-        .SIG(SIG)
+        .nSIG(SIG)
     );
 
     combitest #("control", 10, 27, 80) tester(
