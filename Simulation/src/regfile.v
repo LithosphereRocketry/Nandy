@@ -195,9 +195,75 @@ module regfile(
         .q(dx)
     );
 
+    // And the whole mess has to be repeated for DY
+    wire nmvdy;
+    nand10 gmvdy(
+        .a(RS[1]),
+        .b(RS[0]),
+        .c(wr),
+        .q(nmvdy)
+    );
+    wire wranyy;
+    nand00 ganyy(
+        .a(nmvdy),
+        .b(LJR),
+        .q(wranyy)
+    );
+    wire wrmainy;
+    andgate gmainy(
+        .a(wranyy),
+        .b(nistatus),
+        .q(wrmainy)
+    );
+    wire naltyfromreg;
+    nand00 galtyfromreg(
+        .a(wranyy),
+        .b(nistatus),
+        .q(naltyfromreg)
+    );
+    wire wralty;
+    nand00 galty(
+        .a(naltyfromreg),
+        .b(naltfromint),
+        .q(wralty)
+    );
+    wire [7:0] dyin;
+    mux #(8) mdy(
+        .a(RA[15:8]),
+        .b(acc),
+        .s(wr),
+        .q(dyin)
+    );
+    wire [7:0] altyin;
+    mux #(8) malty(
+        .a(dyin),
+        .b(intRA[15:8]),
+        .s(nistatus),
+        .q(altyin)
+    );
+    wire [7:0] normaldy, altdy;
+    register #(8) datay(
+        .d(dyin),
+        .clk(clk),
+        .en(wrmainy),
+        .nclr(1'b1), 
+        .q(normaldy)
+    );
+    register #(8) intrety(
+        .d(altyin),
+        .clk(clk),
+        .en(wralty),
+        .nclr(1'b1),
+        .q(altdy)
+    );
+    mux #(8) mdy(
+        .a(normaldy),
+        .b(altdy),
+        .s(istatus),
+        .q(dy)
+    );
 
-    register #(8) datay();
-    register #(8) intrety();
+    
     register #(8) ioreg();
     
 endmodule
