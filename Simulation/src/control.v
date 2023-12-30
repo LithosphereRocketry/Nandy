@@ -16,7 +16,7 @@ module control(
         output J,
         output LJ,
         output nCLI,
-        output LJR,
+        output nLJR,
         output MW,
         output MC,
         output RD,
@@ -24,7 +24,7 @@ module control(
         output Y,
         output [1:0] RS,
         output WA,
-        output ISP,
+        output nISP,
         output WC,
         output [3:0] ALU,
         output [7:0] nSIG,
@@ -86,10 +86,10 @@ module control(
         .q(nCLI)
     );
 
-    andgate gLJR(
+    nand00 gLJR(
         .a(LJ),
         .b(inst[2]),
-        .q(LJR)
+        .q(nLJR)
     );
 
     andgate gMW(
@@ -168,18 +168,11 @@ module control(
     );
     // FINALLY the end of WA.
 
-    // We break this signal up rather than using the perfectly good and3 module
-    // because the next signal can reuse nisp to save one gate
-    wire nisp;
     nand10 gnisp(
         .a(ninst[7]),
         .b(ninst[6]),
         .c(inst[5]),
-        .q(nisp)
-    );
-    invert gisp(
-        .a(nisp),
-        .q(ISP)
+        .q(nISP)
     );
 
     wire nisalu, carryable;
@@ -189,7 +182,7 @@ module control(
     );
     nand00 gncarryable(
         .a(nisalu),
-        .b(nisp),
+        .b(nISP),
         .q(carryable)
     );
     andgate gWC(

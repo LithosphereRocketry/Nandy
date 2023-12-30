@@ -48,7 +48,7 @@ module tb_control();
     assign realCLI = ~(realLJ & inst[1]);
 
     wire realLJR;
-    assign realLJR = realLJ & inst[2];
+    assign realLJR = ~(realLJ & inst[2]);
 
     wire realMW;
     assign realMW = realM & inst[5];
@@ -73,11 +73,11 @@ module tb_control();
         (((inst[6] & ~inst[7]) | (cycle & inst[6] & ~inst[5])) & ~(inst[4] & ~inst[3]));
 
     wire realISP;
-    assign realISP = ~inst[7] & ~inst[6] & inst[5];
+    assign realISP = ~(~inst[7] & ~inst[6] & inst[5]);
 
     wire realWC;
     assign realWC = (((inst[6] & ~inst[7]) | (cycle & inst[6] & ~inst[5]))
-                     | realISP) & inst[4];
+                     | ~realISP) & inst[4];
 
     wire [3:0] realALU;
     assign realALU = inst[6] ? inst[3:0] : {~inst[7], 3'b000};
@@ -95,7 +95,7 @@ module tb_control();
         .J(J),
         .LJ(LJ),
         .nCLI(CLI),
-        .LJR(LJR),
+        .nLJR(LJR),
         .MW(MW),
         .MC(MC),
         .RD(RD),
@@ -103,13 +103,13 @@ module tb_control();
         .Y(Y),
         .RS(RS),
         .WA(WA),
-        .ISP(ISP),
+        .nISP(ISP),
         .WC(WC),
         .ALU(ALU),
         .nSIG(SIG)
     );
 
-    combitest #("control", 10, 27, 80) tester(
+    combitest #("control", 10, 27, 2000) tester(
         .comp_in({inst, cycle, carry}),
         .verify({realM, realS, realJ, realLJ, realCLI, realLJR, realMC, realRD, realWR, realY, realRS, realWA, realISP, realWC, realALU, realSIG}),
         .comp_out({M, S, J, LJ, CLI, LJR, MC, RD, WR, Y, RS, WA, ISP, WC, ALU, SIG})
