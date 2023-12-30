@@ -35,5 +35,169 @@ module regfile(
         output [7:0] ioout
     );
 
+    // Make an inverted copy of register-select to be shared by the decoders
+    wire [1:0] nRS;
+    invert invrs [1:0] (.a(RS), .q(nRS));
+    // And one for interrupt status & interrupt enable
+    wire nistatus;
+    invert invis(.a(istatus), .q(nistatus));
+    wire nienabled;
+    invert invie(.a(ienabled), .q(nienabled));
+
+    // Accumulator write decision logic - this is just an or since the logic is
+    // pretty simple while being annoying to optimize
+    wire wracc;
+    orgate gwracc(
+        .a(rd),
+        .b(WA),
+        .q(wracc)
+    );
+
+    // Select accumulator input; normally gets the ALU, except on rd-mode
+    // instructions where it gets passed a different register's contents
+    wire [7:0] accin;
+    wire [7:0] regpass;
+    mux #(8) macc(
+        .a(aluout),
+        .b(regpass),
+        .s(rd),
+        .q(accin)
+    );
+    // The accumulator itself, after all that pain
+    register #(8) accumulator(
+        .d(accin),
+        .clk(clk),
+        .en(wracc),
+        .nclr(1'b1),
+        .q(acc)
+    );
+    
+    // Stack pointer write decision logic - gmvsp here acts as 1/4 of a decoder
+    // while also providing the AND input for write-mode instructions
+    wire nmvsp;
+    nand10 gmvsp(
+        .a(nRS[1]),
+        .b(nRS[0]),
+        .c(WR),
+        .q(nmvsp)
+    );
+    // Using the and-or trick here to save inverts
+    // i.e. (A & B) | C === (A NAND B) NAND ~C
+    wire wrsp;
+    nand00 gwrsp(
+        .a(nmvsp),
+        .b(nISP),
+        .q(wrsp)
+    );
+    // SP normally comes from ALU (as in isp), or ACC on wr-mode
+    wire [7:0] spin;
+    mux #(8) msp(
+        .a(accin),
+        .b(acc),
+        .s(wr),
+        .q(spin)
+    );
+    // And the register:
+    register #(8) stackpointer(
+        .d(spin),
+        .clk(clk),
+        .en(wrsp),
+        .nclr(1'b1),
+        .q(sp)
+    );
+
+    // Whether to update the interrupt-return address; shared across IRX/IRY
+    wire naltfromint;
+    nand00 galtfromint(
+        .a(nistatus),
+        .b(ienabled),
+        .q(naltfromint)
+    );
+
+    // DX write decision is a bit more complicated; we have to demux between
+    // the main and alternate versions of DX so that it works properly in
+    // interrupts
+    // First figure out if either DX is written:
+    wire nmvdx;
+    nand10 gmvdx(
+        .a(RS[1]),
+        .b(nRS[0]),
+        .c(wr),
+        .q(nmvdx)
+    );
+    wire wranyx;
+    nand00 ganyx(
+        .a(nmvdx),
+        .b(LJR),
+        .q(wranyx)
+    );
+    // Then enable only the register that's actually correct:
+    wire wrmainx;
+    andgate gmainx(
+        .a(wranyx),
+        .b(nistatus),
+        .q(wrmainx)
+    );
+    // Alt register write is a little more complicated, since they can also be
+    // written in the background by the interrupt system
+    wire naltxfromreg;
+    nand00 galtxfromreg(
+        .a(wranyx),
+        .b(nistatus),
+        .q(naltxfromreg)
+    );
+    // and/or trick here as usual
+    wire wraltx;
+    nand00 galtx(
+        .a(naltxfromreg),
+        .b(naltfromint),
+        .q(wraltx)
+    );
+
+    // Input selection - "normal" is jsr, "alternate" is wr-mode
+    wire [7:0] dxin;
+    mux #(8) mdx(
+        .a(RA[7:0]),
+        .b(acc),
+        .s(wr),
+        .q(dxin)
+    );
+    // Of course, IRX has an extra wrinkle here as well; when an interrupt is
+    // not active it has to pull data from the interrupt return address instead
+    wire [7:0] altxin;
+    mux #(8) maltx(
+        .a(dxin),
+        .b(intRA[7:0]),
+        .s(nistatus),
+        .q(altxin)
+    );
+    // Finally the registers:
+    wire [7:0] normaldx, altdx;
+    register #(8) datax(
+        .d(dxin),
+        .clk(clk),
+        .en(wrmainx),
+        .nclr(1'b1), 
+        .q(normaldx)
+    );
+    register #(8) intretx(
+        .d(altxin),
+        .clk(clk),
+        .en(wraltx),
+        .nclr(1'b1),
+        .q(altdx)
+    );
+    // And of course since nothing is easy, we also have to mux the outputs:
+    mux #(8) mdx(
+        .a(normaldx),
+        .b(altdx),
+        .s(istatus),
+        .q(dx)
+    );
+
+
+    register #(8) datay();
+    register #(8) intrety();
+    register #(8) ioreg();
     
 endmodule
