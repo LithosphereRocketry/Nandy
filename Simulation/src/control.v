@@ -15,7 +15,7 @@ module control(
         output S,
         output J,
         output LJ,
-        output CLI,
+        output nCLI,
         output LJR,
         output MW,
         output MC,
@@ -27,7 +27,8 @@ module control(
         output ISP,
         output WC,
         output [3:0] ALU,
-        output [7:0] nSIG
+        output [7:0] nSIG,
+        output ncycle // for intcontrol only
     );
 
     wire [7:0] ninst;
@@ -79,10 +80,10 @@ module control(
         .q(LJ)
     );
 
-    andgate gCLI(
+    nand00 gCLI(
         .a(LJ),
         .b(inst[1]),
-        .q(CLI)
+        .q(nCLI)
     );
 
     andgate gLJR(
@@ -97,7 +98,6 @@ module control(
         .q(MW)
     );
 
-    wire ncycle;
     invert invcycle(
         .a(cycle),
         .q(ncycle)

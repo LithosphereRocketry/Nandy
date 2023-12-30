@@ -2356,15 +2356,14 @@ b0 7 b1 6 c0 0 a b
       <circ-port height="8" pin="250,530" width="8" x="46" y="66"/>
       <circ-anchor facing="east" height="6" width="6" x="57" y="67"/>
     </appear>
-    <wire from="(110,350)" to="(110,480)"/>
-    <wire from="(50,480)" to="(110,480)"/>
+    <wire from="(300,410)" to="(550,410)"/>
     <wire from="(440,340)" to="(490,340)"/>
     <wire from="(390,390)" to="(390,530)"/>
-    <wire from="(300,300)" to="(300,310)"/>
-    <wire from="(550,340)" to="(550,410)"/>
+    <wire from="(210,330)" to="(330,330)"/>
+    <wire from="(530,340)" to="(590,340)"/>
     <wire from="(50,450)" to="(100,450)"/>
     <wire from="(550,260)" to="(590,260)"/>
-    <wire from="(550,340)" to="(590,340)"/>
+    <wire from="(300,300)" to="(300,320)"/>
     <wire from="(460,360)" to="(460,380)"/>
     <wire from="(80,370)" to="(190,370)"/>
     <wire from="(70,310)" to="(70,330)"/>
@@ -2374,47 +2373,48 @@ b0 7 b1 6 c0 0 a b
     <wire from="(80,340)" to="(80,370)"/>
     <wire from="(480,350)" to="(480,450)"/>
     <wire from="(530,260)" to="(550,260)"/>
-    <wire from="(530,340)" to="(550,340)"/>
+    <wire from="(530,360)" to="(550,360)"/>
     <wire from="(460,360)" to="(490,360)"/>
     <wire from="(100,350)" to="(100,450)"/>
     <wire from="(520,370)" to="(520,480)"/>
+    <wire from="(300,320)" to="(330,320)"/>
+    <wire from="(300,340)" to="(330,340)"/>
     <wire from="(350,180)" to="(370,180)"/>
     <wire from="(360,330)" to="(380,330)"/>
-    <wire from="(270,350)" to="(280,350)"/>
+    <wire from="(50,480)" to="(520,480)"/>
+    <wire from="(190,320)" to="(210,320)"/>
     <wire from="(150,330)" to="(160,330)"/>
     <wire from="(80,340)" to="(90,340)"/>
-    <wire from="(270,350)" to="(270,410)"/>
     <wire from="(250,510)" to="(380,510)"/>
+    <wire from="(510,370)" to="(510,430)"/>
     <wire from="(190,370)" to="(190,430)"/>
     <wire from="(300,300)" to="(550,300)"/>
+    <wire from="(300,340)" to="(300,410)"/>
+    <wire from="(190,430)" to="(510,430)"/>
     <wire from="(100,450)" to="(480,450)"/>
     <wire from="(380,190)" to="(380,330)"/>
+    <wire from="(210,320)" to="(210,330)"/>
     <wire from="(250,160)" to="(370,160)"/>
-    <wire from="(190,340)" to="(310,340)"/>
-    <wire from="(190,320)" to="(310,320)"/>
     <wire from="(250,260)" to="(490,260)"/>
     <wire from="(250,280)" to="(490,280)"/>
-    <wire from="(190,340)" to="(190,370)"/>
+    <wire from="(510,290)" to="(510,370)"/>
     <wire from="(550,260)" to="(550,300)"/>
     <wire from="(250,370)" to="(410,370)"/>
-    <wire from="(110,480)" to="(520,480)"/>
     <wire from="(380,350)" to="(380,510)"/>
     <wire from="(380,350)" to="(410,350)"/>
     <wire from="(380,330)" to="(410,330)"/>
     <wire from="(70,310)" to="(160,310)"/>
     <wire from="(440,380)" to="(460,380)"/>
     <wire from="(390,390)" to="(410,390)"/>
-    <wire from="(270,410)" to="(550,410)"/>
     <wire from="(50,310)" to="(70,310)"/>
     <wire from="(70,330)" to="(90,330)"/>
     <wire from="(170,430)" to="(190,430)"/>
     <wire from="(250,530)" to="(390,530)"/>
     <wire from="(480,270)" to="(490,270)"/>
     <wire from="(480,350)" to="(490,350)"/>
-    <wire from="(300,310)" to="(310,310)"/>
-    <wire from="(300,350)" to="(310,350)"/>
     <wire from="(120,330)" to="(130,330)"/>
     <wire from="(400,170)" to="(530,170)"/>
+    <wire from="(550,360)" to="(550,410)"/>
     <comp lib="0" loc="(50,450)" name="Pin">
       <a name="tristate" val="false"/>
       <a name="label" val="CLK"/>
@@ -2503,11 +2503,9 @@ b0 7 b1 6 c0 0 a b
       <a name="width" val="1"/>
       <a name="label" val="Last"/>
     </comp>
-    <comp lib="1" loc="(300,350)" name="NOT Gate">
-      <a name="size" val="20"/>
-    </comp>
     <comp lib="1" loc="(360,330)" name="AND Gate">
-      <a name="inputs" val="4"/>
+      <a name="size" val="30"/>
+      <a name="inputs" val="3"/>
     </comp>
     <comp lib="0" loc="(50,430)" name="Pin">
       <a name="tristate" val="false"/>

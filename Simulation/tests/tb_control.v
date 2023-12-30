@@ -45,7 +45,7 @@ module tb_control();
     assign realLJ = ~inst[7] & ~inst[6] & ~inst[5] & inst[4] & ~inst[3];
 
     wire realCLI;
-    assign realCLI = realLJ & inst[1];
+    assign realCLI = ~(realLJ & inst[1]);
 
     wire realLJR;
     assign realLJR = realLJ & inst[2];
@@ -94,7 +94,7 @@ module tb_control();
         .S(S),
         .J(J),
         .LJ(LJ),
-        .CLI(CLI),
+        .nCLI(CLI),
         .LJR(LJR),
         .MW(MW),
         .MC(MC),
