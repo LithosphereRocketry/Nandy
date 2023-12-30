@@ -263,7 +263,21 @@ module regfile(
         .q(dy)
     );
 
-    
-    register #(8) ioreg();
+    // The IO register is refreshingly less painful, just a 3 input and to
+    // determine writes and we only pul from accumulator
+    // Note that the write signal is connected externally to OnWrite
+    and3 gwrio(
+        .a(nRS[1]),
+        .b(RS[0]),
+        .c(wr),
+        .q(OnWrite)
+    );
+    register #(8) ioreg(
+        .d(acc),
+        .clk(clk),
+        .en(OnWrite),
+        .nclr(1'b1),
+        .q(ioout)
+    );
     
 endmodule
