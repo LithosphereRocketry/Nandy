@@ -21,6 +21,7 @@ module regfile(
         input [15:0] intRA,
         input [7:0] aluout,
         input [7:0] mem,
+        input [7:0] ioin,
         input [3:0] imm,
 
         output ior,
@@ -48,7 +49,7 @@ module regfile(
     // pretty simple while being annoying to optimize
     wire wracc;
     orgate gwracc(
-        .a(rd),
+        .a(RD),
         .b(WA),
         .q(wracc)
     );
@@ -60,7 +61,7 @@ module regfile(
     mux #(8) macc(
         .a(aluout),
         .b(regpass),
-        .s(rd),
+        .s(RD),
         .q(accin)
     );
     // The accumulator itself, after all that pain
@@ -94,7 +95,7 @@ module regfile(
     mux #(8) msp(
         .a(accin),
         .b(acc),
-        .s(wr),
+        .s(WR),
         .q(spin)
     );
     // And the register:
@@ -122,13 +123,13 @@ module regfile(
     nand10 gmvdx(
         .a(RS[1]),
         .b(nRS[0]),
-        .c(wr),
+        .c(WR),
         .q(nmvdx)
     );
     wire wranyx;
     nand00 ganyx(
         .a(nmvdx),
-        .b(LJR),
+        .b(nLJR),
         .q(wranyx)
     );
     // Then enable only the register that's actually correct:
@@ -156,10 +157,10 @@ module regfile(
 
     // Input selection - "normal" is jsr, "alternate" is wr-mode
     wire [7:0] dxin;
-    mux #(8) mdx(
+    mux #(8) minx(
         .a(RA[7:0]),
         .b(acc),
-        .s(wr),
+        .s(WR),
         .q(dxin)
     );
     // Of course, IRX has an extra wrinkle here as well; when an interrupt is
@@ -200,13 +201,13 @@ module regfile(
     nand10 gmvdy(
         .a(RS[1]),
         .b(RS[0]),
-        .c(wr),
+        .c(WR),
         .q(nmvdy)
     );
     wire wranyy;
     nand00 ganyy(
         .a(nmvdy),
-        .b(LJR),
+        .b(nLJR),
         .q(wranyy)
     );
     wire wrmainy;
@@ -228,10 +229,10 @@ module regfile(
         .q(wralty)
     );
     wire [7:0] dyin;
-    mux #(8) mdy(
+    mux #(8) miny(
         .a(RA[15:8]),
         .b(acc),
-        .s(wr),
+        .s(WR),
         .q(dyin)
     );
     wire [7:0] altyin;
@@ -269,7 +270,7 @@ module regfile(
     and3 gwrio(
         .a(nRS[1]),
         .b(RS[0]),
-        .c(wr),
+        .c(WR),
         .q(OnWrite)
     );
     register #(8) ioreg(
@@ -296,7 +297,7 @@ module regfile(
     mux #(1) mseldxdy(
         .a(Y),
         .b(RS[0]),
-        .s(WR),
+        .s(RD),
         .q(seldxdy)
     );
     wire [7:0] dxdy;
@@ -308,7 +309,7 @@ module regfile(
     );
     mux #(8) mregpass(
         .a(regpass_spio),
-        .b(regpass_dxdy),
+        .b(dxdy),
         .s(RS[1]),
         .q(regpass)
     );
@@ -327,7 +328,7 @@ module regfile(
         .a(sp),
         .b(acc),
         .s(nISP),
-        .q(ALUA)
+        .q(A)
     );
     wire [7:0] immext;
     signext #(4, 8) gimmext(
@@ -338,7 +339,7 @@ module regfile(
         .a(immext),
         .b(xymem),
         .s(nISP),
-        .q(ALUB)
+        .q(B)
     );
 
     // OnRead signal

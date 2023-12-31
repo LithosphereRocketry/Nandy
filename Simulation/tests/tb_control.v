@@ -88,6 +88,7 @@ module tb_control();
     control testGate(
         .inst(inst),
         .cycle(cycle),
+        .ncycle(~cycle),
         .carry(carry),
         
         .M(M),

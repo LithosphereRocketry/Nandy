@@ -18,7 +18,7 @@ module addresscalc(
     );
 
     wire [15:0] memaddr;
-    mux mmemaddr(
+    mux #(16) mmemaddr(
         .a({dy, dx}),
         .b({8'hFF, sp}),
         .s(stack),
@@ -26,7 +26,7 @@ module addresscalc(
     );
 
     wire [15:0] oldaddr;
-    mux moldaddr(
+    mux #(16) moldaddr(
         .a(pcin),
         .b(memaddr),
         .s(mem),
@@ -54,17 +54,17 @@ module addresscalc(
         .q(ioffs)
     );
 
-    wire [15:0] offs;
-    mux #(16) moffs(
+    wire [15:0] offset;
+    mux #(16) moffset(
         .a(ioffs),
-        .b(moffs),
+        .b(memoffs),
         .s(mem),
-        .q(offs)
+        .q(offset)
     );
 
     addern #(16) adder(
         .a(oldaddr),
-        .b(offs),
+        .b(offset),
         .cin(1'b0),
         .q(ret)
     );

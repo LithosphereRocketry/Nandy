@@ -249,11 +249,11 @@ void aluop(enum ALUMode mode, bool isCarry, bool isXY, word_t a, word_t b, word_
 			newcarry = (newresult >> 8) & 1;
 			break;
 		case ALU_SUB:
-			newresult = a - b;
+			newresult = a + 256 - b;
 			newcarry = (newresult >> 8) & 1;
 			break;
 		case ALU_SUBC:
-			newresult = a - b + (int) !carry;
+			newresult = a + 255 + ((int) carry) - b;
 			newcarry = (newresult >> 8) & 1;
 			break;
 		case ALU_SL:
@@ -362,6 +362,7 @@ bool step(bool debugint) {
 		}
 	} else { // multicycle operations
 		if(!(i & ALU_SEL_MASK)) { // memory 
+			cycles++; // These operations don't move PC but they do consume a cycle
 			addr_t memaddr;
 			if(!(i & MEM_STACK_MASK)) {
 				memaddr = (((int) (isInterrupt ? iy : y)) << 8 

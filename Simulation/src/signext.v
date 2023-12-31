@@ -5,5 +5,5 @@ module signext #(parameter widthIn = 1, parameter widthOut = 1) (
         output [widthOut-1:0] out
     );
 
-    assign out = {{widthOut-widthIn{in[widthIn-1]}}, widthIn};
+    assign out = {{(widthOut-widthIn){in[widthIn-1]}}, in};
 endmodule

@@ -18,5 +18,5 @@ module nand03(
 	parameter RISE_TIME = 113, // * includes 100ns delay from pullup RC circuit
 			  FALL_TIME = 10;
 	
-	assign #(RISE_TIME, FALL_TIME) q = ~(a & b);
+	assign #(RISE_TIME, FALL_TIME) q = ~(a & b) ? 1'bz : 1'b0;
 endmodule

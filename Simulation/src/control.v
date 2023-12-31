@@ -9,6 +9,7 @@ This module is big and ugly. Sorry.
 module control(
         input [7:0] inst,
         input cycle,
+        input ncycle,
         input carry,
 
         output M,
@@ -27,8 +28,7 @@ module control(
         output nISP,
         output WC,
         output [3:0] ALU,
-        output [7:0] nSIG,
-        output ncycle // for intcontrol only
+        output [7:0] nSIG
     );
 
     wire [7:0] ninst;
@@ -98,10 +98,6 @@ module control(
         .q(MW)
     );
 
-    invert invcycle(
-        .a(cycle),
-        .q(ncycle)
-    );
     andgate gMC(
         .a(ncycle),
         .b(inst[7]),
