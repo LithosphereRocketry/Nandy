@@ -279,5 +279,76 @@ module regfile(
         .nclr(1'b1),
         .q(ioout)
     );
-    
+
+    // Now the other fun part: the endless tangle of output muxes
+    // 4-way mux to generate the register passback:
+    wire [7:0] regpass_spio;
+    mux #(8) mregpass_spio(
+        .a(sp),
+        .b(ioin),
+        .s(RS[0]),
+        .q(regpass_spio)
+    );
+    // This mux serves both ALU output 2 and the passback mux, so we mux its
+    // control signal between the two - with some clever optimization a few
+    // gates can probably be saved here
+    wire seldxdy;
+    mux #(1) mseldxdy(
+        .a(Y),
+        .b(RS[0]),
+        .s(WR),
+        .q(seldxdy)
+    );
+    wire [7:0] dxdy;
+    mux #(8) mdxdy(
+        .a(dx),
+        .b(dy),
+        .s(seldxdy),
+        .q(dxdy)
+    );
+    mux #(8) mregpass(
+        .a(regpass_spio),
+        .b(regpass_dxdy),
+        .s(RS[1]),
+        .q(regpass)
+    );
+    // If we're on the second cycle, ALUB is always going to want the memory
+    // output:
+    wire [7:0] xymem;
+    mux #(8) mxymem(
+        .a(dxdy),
+        .b(mem),
+        .s(cycle),
+        .q(xymem)
+    );
+    // isp is weird because it has both a unique ALUA and ALUB, so it gets its
+    // own pair of muxes. Also, 
+    mux #(8) mouta(
+        .a(sp),
+        .b(acc),
+        .s(nISP),
+        .q(ALUA)
+    );
+    wire [7:0] immext;
+    signext #(4, 8) gimmext(
+        .in(imm),
+        .out(immext)
+    );
+    mux #(8) moutb(
+        .a(immext),
+        .b(xymem),
+        .s(nISP),
+        .q(ALUB)
+    );
+
+    // OnRead signal
+    // These are subject to change - they may want to be latched
+    // Note that OnWrite was generated incidentally by the IO register write
+    // logic
+    and3 gonread(
+        .a(nRS[1]),
+        .b(RS[0]),
+        .c(RD),
+        .q(OnRead)
+    );
 endmodule
