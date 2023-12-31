@@ -12,15 +12,10 @@ module shift(
         output cout
     );
 
-    wire nenc, encarry, ra, newbit;
-    nand00 g_encarry(
+    wire encarry, ra, newbit;
+    andgate g_encarry(
         .a(cin),
         .b(mode[0]),
-        .q(nenc)
-    );
-    nand00 g_nenc(
-        .a(nenc),
-        .b(1'b1),
         .q(encarry)
     );
     mux m_ra(
