@@ -32,25 +32,24 @@ module intcontrol(
     // An interrupt can only occur when on the last interrupt tick (aka 
     // non-two-cycle clock), the interrupt wasn't present. This means that
     // slower peripherals can interface with the CPU without fear that their
-    // interrupts will be double-registered. It's not entirely trivial to decide
-    // in which cases the last-value register should be updated - here I've
-    // decided on every clock cycle, regardless of if an interrupt is occuring
-    // or not, or whether interrupts are enabled.
-    wire notprev, new;
-    // Because this doesn't use the reset function, this can actually be
-    // implemented with four 74x00s and not 3 + a 74x10 to save a bit of money
-    // and PCB space, but it's not worth enumerating here becasue the difference
-    // in logic is so miniscule
-    dlatch gprev(
-        .d(int),
-        .en(tick),
-        .nclr(1'b1),
-        .nq(notprev)
+    // interrupts will be double-registered. 
+    wire ipossible, wrprev, notprev;
+    andgate gpossible(
+        .a(ienabled),
+        .b(nistatus),
+        .q(ipossible)
     );
-    andgate gnew(
-        .a(int),
-        .b(notprev),
-        .q(new)
+    and3 gwrprev(
+        .a(ncycle),
+        .b(ipossible),
+        .q(wrprev)
+    );
+    register #(1) gprev(
+        .d(int),
+        .clk(clk),
+        .en(wrprev),
+        .nclr(rst),
+        .nq(notprev)
     );
 
     // Interrupt handling logic
@@ -58,9 +57,9 @@ module intcontrol(
     // happens
     wire nready, nistatus;
     nand10 giready(
-        .a(ienabled),
-        .b(nistatus),
-        .c(new),
+        .a(ipossible),
+        .b(int),
+        .c(notprev),
         .q(nready)
     );
     // Manual set/reset
