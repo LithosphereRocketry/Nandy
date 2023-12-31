@@ -852,15 +852,6 @@
       <a name="bit14" val="0"/>
       <a name="bit15" val="1"/>
     </comp>
-    <comp lib="4" loc="(790,260)" name="ROM">
-      <a name="addrWidth" val="15"/>
-      <a name="contents">addr/data: 15 8
-c0 0 8 1d b c0 4 a
-c0 0 f 10 32500*0 2d b2 e
-b0 7 b1 6 c0 0 a b
-90 a 91 b 92 23 12 ff
-</a>
-    </comp>
     <comp lib="0" loc="(510,530)" name="Pin">
       <a name="tristate" val="false"/>
       <a name="label" val="CLK"/>
@@ -869,12 +860,23 @@ b0 7 b1 6 c0 0 a b
       <a name="tristate" val="false"/>
       <a name="label" val="WE"/>
     </comp>
-    <comp lib="0" loc="(700,400)" name="Constant"/>
     <comp lib="0" loc="(740,400)" name="Constant"/>
     <comp lib="4" loc="(790,360)" name="RAM">
       <a name="addrWidth" val="15"/>
       <a name="bus" val="separate"/>
     </comp>
+    <comp lib="2" loc="(860,310)" name="Multiplexer">
+      <a name="width" val="8"/>
+      <a name="enable" val="false"/>
+    </comp>
+    <comp lib="4" loc="(790,260)" name="ROM">
+      <a name="addrWidth" val="15"/>
+      <a name="contents">addr/data: 15 8
+1d 1c 1c a b 1d 1d ef
+f9 32503*0 5 9 12 ff
+</a>
+    </comp>
+    <comp lib="0" loc="(700,400)" name="Constant"/>
     <comp lib="0" loc="(510,470)" name="Pin">
       <a name="width" val="8"/>
       <a name="tristate" val="false"/>
@@ -887,10 +889,6 @@ b0 7 b1 6 c0 0 a b
     </comp>
     <comp lib="0" loc="(760,400)" name="Constant">
       <a name="value" val="0x0"/>
-    </comp>
-    <comp lib="2" loc="(860,310)" name="Multiplexer">
-      <a name="width" val="8"/>
-      <a name="enable" val="false"/>
     </comp>
   </circuit>
   <circuit name="AddrCalc">
@@ -1210,7 +1208,7 @@ b0 7 b1 6 c0 0 a b
       <circ-port height="10" pin="700,820" width="10" x="305" y="175"/>
       <circ-port height="10" pin="490,140" width="10" x="285" y="175"/>
       <circ-port height="8" pin="240,750" width="8" x="116" y="56"/>
-      <circ-port height="8" pin="810,440" width="8" x="46" y="176"/>
+      <circ-port height="8" pin="810,440" width="8" x="46" y="106"/>
       <circ-anchor facing="east" height="6" width="6" x="327" y="97"/>
     </appear>
     <wire from="(300,410)" to="(300,480)"/>
@@ -1256,6 +1254,7 @@ b0 7 b1 6 c0 0 a b
     <wire from="(430,600)" to="(620,600)"/>
     <wire from="(1000,330)" to="(1000,340)"/>
     <wire from="(440,610)" to="(630,610)"/>
+    <wire from="(850,270)" to="(850,470)"/>
     <wire from="(340,450)" to="(340,580)"/>
     <wire from="(900,390)" to="(900,400)"/>
     <wire from="(870,360)" to="(870,370)"/>
@@ -1327,6 +1326,7 @@ b0 7 b1 6 c0 0 a b
     <wire from="(240,750)" to="(530,750)"/>
     <wire from="(390,140)" to="(490,140)"/>
     <wire from="(390,140)" to="(390,170)"/>
+    <wire from="(580,250)" to="(580,270)"/>
     <wire from="(190,220)" to="(480,220)"/>
     <wire from="(1020,330)" to="(1020,630)"/>
     <wire from="(560,740)" to="(580,740)"/>
@@ -1361,7 +1361,6 @@ b0 7 b1 6 c0 0 a b
     <wire from="(780,230)" to="(780,240)"/>
     <wire from="(680,370)" to="(730,370)"/>
     <wire from="(190,70)" to="(440,70)"/>
-    <wire from="(670,250)" to="(850,250)"/>
     <wire from="(790,70)" to="(850,70)"/>
     <wire from="(920,600)" to="(980,600)"/>
     <wire from="(680,700)" to="(720,700)"/>
@@ -1398,7 +1397,6 @@ b0 7 b1 6 c0 0 a b
     <wire from="(430,600)" to="(430,690)"/>
     <wire from="(320,310)" to="(360,310)"/>
     <wire from="(1020,310)" to="(1040,310)"/>
-    <wire from="(510,250)" to="(660,250)"/>
     <wire from="(530,440)" to="(620,440)"/>
     <wire from="(950,190)" to="(950,380)"/>
     <wire from="(520,530)" to="(520,650)"/>
@@ -1419,7 +1417,6 @@ b0 7 b1 6 c0 0 a b
     <wire from="(590,450)" to="(650,450)"/>
     <wire from="(740,400)" to="(740,470)"/>
     <wire from="(640,820)" to="(700,820)"/>
-    <wire from="(850,250)" to="(850,470)"/>
     <wire from="(870,420)" to="(870,450)"/>
     <wire from="(770,410)" to="(810,410)"/>
     <wire from="(810,130)" to="(850,130)"/>
@@ -1446,8 +1443,10 @@ b0 7 b1 6 c0 0 a b
     <wire from="(890,400)" to="(900,400)"/>
     <wire from="(600,470)" to="(600,520)"/>
     <wire from="(860,450)" to="(870,450)"/>
+    <wire from="(580,270)" to="(850,270)"/>
     <wire from="(1070,250)" to="(1090,250)"/>
     <wire from="(660,250)" to="(670,250)"/>
+    <wire from="(510,250)" to="(580,250)"/>
     <wire from="(550,460)" to="(560,460)"/>
     <wire from="(580,730)" to="(590,730)"/>
     <comp lib="2" loc="(1070,250)" name="Multiplexer">
