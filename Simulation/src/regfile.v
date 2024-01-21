@@ -352,4 +352,20 @@ module regfile(
         .c(RD),
         .q(OnRead)
     );
+    
+    // Write and read latches
+    register #(1) rwrite(
+        .d(OnWrite),
+        .clk(clk),
+        .en(1'b1),
+        .nclr(1'b1),
+        .q(iow)
+    );
+    register #(1) rread(
+        .d(OnRead),
+        .clk(clk),
+        .en(1'b1),
+        .nclr(1'b1),
+        .q(ior)
+    );
 endmodule
