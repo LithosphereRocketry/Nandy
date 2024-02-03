@@ -1,0 +1,13 @@
+        rdi 0
+        nzero
+        j start
+
+        wr io
+        brk
+
+@loc 18
+start:  rdi 65 # 'A'
+label:  _subi -1
+        j weird
+
+@define weird label+1

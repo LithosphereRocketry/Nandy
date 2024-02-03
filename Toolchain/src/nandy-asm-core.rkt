@@ -5,6 +5,7 @@
 (define comment-token "#")
 (define label-token ":")
 (define bytesel-token "$")
+(define plus-token "+")
 
 ; == AST expressions here ==
 ; Abstract constructs
@@ -124,9 +125,14 @@
       [else (raise (string-append "Unrecognized register: " name))])))
 
 (struct bytenum (symbol index) #:transparent)
+(struct addnum (a b) #:transparent)
 (define parse-number
   (lambda (rep)
     (or (string->number rep)
+        ; crappy operation parsing because I just need + to work for a demo
+        (and (string-contains? rep plus-token)
+             (let ([rspl (string-split rep plus-token)])
+               (addnum (parse-number (car rspl)) (parse-number (cadr rspl)))))
         (and (string-contains? rep bytesel-token)
              (let* ([rspl (string-split rep bytesel-token)]
                     [bnum (string->number (cadr rspl))])
@@ -446,6 +452,7 @@
           [(string? rep) (hash-ref ltab rep)]
           [(bytenum? rep) (get-bnum (get-value (bytenum-symbol rep) ltab)
                                     (bytenum-index rep))]
+          [(addnum? rep) (+ (get-value (addnum-a rep) ltab) (get-value (addnum-b rep) ltab))]
           [else (raise "Invalid type for get_value")])))
   
 ; Converts a list-exp into a list of primitive expressions and a hash of label locations
@@ -467,8 +474,8 @@
                     [(list-exp? (car exps)) (raise "Can only resolve labels on a flattened program")]
                     [(@define-exp? (car exps)) (recurse (cdr exps)
                                                         (hash-set ltab
-                                                                  (@define-exp-sym exp)
-                                                                  (get-value (@define-exp-val exp) ltab))
+                                                                  (@define-exp-sym (car exps))
+                                                                  (get-value (@define-exp-val (car exps)) ltab))
                                                         clean-exps index static-index)]
                     [(@static-exp? (car exps)) (recurse (cdr exps)
                                                         (hash-set ltab
