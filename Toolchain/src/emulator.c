@@ -5,36 +5,14 @@
 #include <string.h>
 #include <time.h>
 
+#include "nandy_tools.h"
+
 #ifdef __unix__
 #include <unistd.h>
 #endif
 
-typedef int8_t word_t;
-typedef uint16_t addr_t;
-typedef uint8_t inst_t;
-
-bool parity(word_t w) {
-	for(int i = 0; i < 8; i++) {
-		w ^= w >> i;
-	}
-	return w & 1;
-}
-
-#define MULTICYCLE_MASK (1<<7)
-#define ALU_SEL_MASK (1<<6)
-#define ISP_MASK (1<<5)
-#define XY_MASK (1<<5)
-#define MEM_WRITE_MASK (1<<5)
-#define JUMP_MASK (1<<5)
-#define CARRY_SEL_MASK (1<<4)
-#define PROGFLOW_MASK (1<<4)
-#define MEM_STACK_MASK (1<<4)
-#define COND_MASK (1<<4)
-#define SIG_MASK (1<<3)
-#define WR_MASK (1<<3)
-#define RD_MASK (1<<2)
-#define RET_MASK (1<<2)
-#define CI_MASK (1<<1)
+// TODO: finish refactoring
+extern bool parity(word_t w);
 
 #define ALU_INST_MASK 0xF
 #define ALU_WRITESBOTH_MASK 0b1000 // any instruction with either of these bits can
@@ -92,7 +70,7 @@ unsigned long cycles = -1;
 word_t acc, x, y, sp, ix, iy;
 bool carry;
 addr_t pc = -1;
-inst_t mem[65536];
+word_t mem[65536];
 word_t ioin, ioout;
 bool intEnabled;
 bool isInterrupt;
@@ -191,7 +169,7 @@ bool pauseToDbg() {
 	}
 }
 
-inst_t fetch() {
+word_t fetch() {
 #ifdef __unix__
 	// We assume the actual emulator takes zero time at all
 	// we can probably get better timing precision by using a different timing
@@ -295,7 +273,7 @@ bool step(bool debugint) {
 		pc = 0x7EFF;
 	}
 
-	inst_t i = fetch();
+	word_t i = fetch();
 	if(!(i & MULTICYCLE_MASK)) { // single cycle operations
 		if(!(i & ALU_SEL_MASK)) { // basic instructions
 			if(!(i & ISP_MASK)) { // housekeeping/program logic
@@ -401,7 +379,7 @@ int main(int argc, char** argv) {
     char* path = argv[1];
 	printf("Loading file %s...\n", path);
 	FILE* binfile = fopen(path, "rb");
-	size_t loaded = fread(mem, sizeof(inst_t), 32768, binfile);
+	size_t loaded = fread(mem, sizeof(word_t), 32768, binfile);
 	printf("%lu bytes loaded\n", loaded);
 	// A bit of a hack to start in the debug menu but then continue running with
 	// no debug afterward
