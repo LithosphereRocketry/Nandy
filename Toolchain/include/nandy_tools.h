@@ -57,7 +57,6 @@ addr_t nbytes(word_t inst);
 size_t nclocks(word_t inst);
 
 addr_t nextinst(const cpu_state_t* cpu, addr_t addr);
-addr_t previnst(const cpu_state_t* cpu, addr_t addr);
 
 void disasm(const cpu_state_t* cpu, addr_t addr, char* buf, size_t len);
 

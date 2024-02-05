@@ -36,29 +36,3 @@ size_t nclocks(word_t inst) {
 addr_t nextinst(const cpu_state_t* cpu, addr_t addr) {
     return addr + nbytes(peek(cpu, addr));
 }
-
-addr_t previnst(const cpu_state_t* cpu, addr_t addr) {
-    /**
-     * This function is going to be really nasty without debug symbols but
-     * that's really useful functionality to have; because of some really nasty
-     * possible programming techniques, it may not be resolvable *at all*.
-     * Basically, instruction misalignment can create some really screwy
-     * bytecode geometry problems that mean working backwards from a given
-     * location 
-     * 
-     * Ex:
-     * 
-     * 0        rdi
-     * 1    l:  j 0x0..
-     * 2        wr sp
-     * 3        wr dx
-     * 4        rd sp
-     * 5        add dx
-     * 6        addi 65
-     * 7        ...
-     * 8        j l
-     * 9        ...
-     * 10       wr io
-     * 11       brk
-    */
-}
