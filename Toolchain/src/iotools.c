@@ -14,7 +14,7 @@ size_t fsize(FILE* stream) {
  * Helper function for read-until-character to heap
  * Reads until the given character, or EOF if until=-1
 */
-char* fread_dup_helper(FILE* stream, int until) {
+static char* fread_dup_helper(FILE* stream, int until) {
     char* str = malloc(1);
     size_t size = 0;
     size_t cap = 1;

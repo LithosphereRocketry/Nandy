@@ -4,7 +4,7 @@
 // can add initialized values here later if we want
 const cpu_state_t INIT_STATE = {};
 
-extern const char* const regnames[4] = { "sp", "io", "dx", "dy" };
+const char* const regnames[4] = { "sp", "io", "dx", "dy" };
 
 // Internal tools
 bool parity(word_t w) {
