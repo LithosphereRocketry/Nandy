@@ -1,7 +1,7 @@
 # Semi-automated C/C++ makefile
 
 # This should be all you need to change
-TARGETS = emulator binconvert #assembler
+TARGETS = nandy-emu binconvert nandy-asm
 RKT_TARGETS = nandy-asm-racket
 
 INCDIR = include/

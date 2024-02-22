@@ -8,8 +8,8 @@
  * step; e.g. line numbers & comments in debug mode
 */
 
-#ifndef TOOLS_H
-#define TOOLS_H
+#ifndef NANDY_TOOLS_H
+#define NANDY_TOOLS_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -40,8 +40,8 @@ typedef uint16_t addr_t;
 // CPU state
 typedef struct cpu_state {
     addr_t pc;
-    word_t acc, sp, dx, dy, irx, iry, ioout;
-    bool cycle, carry, int_en, int_active, int_prev;
+    word_t acc, sp, dx, dy, irx, iry, ioin, ioout;
+    bool cycle, carry, int_en, int_active, int_prev, int_in;
     word_t rom[1 << 15];
     word_t ram[1 << 15];
 } cpu_state_t;
@@ -58,6 +58,28 @@ size_t nclocks(word_t inst);
 
 addr_t nextinst(const cpu_state_t* cpu, addr_t addr);
 
-void disasm(const cpu_state_t* cpu, addr_t addr, char* buf, size_t len);
+// Some function pointer typedefs
+typedef void (*inst_disassemble_t)(const cpu_state_t*, addr_t, char*, size_t);
+typedef void (*inst_execute_t)(cpu_state_t*);
+
+// Instruction definitions
+typedef struct instruction {
+    // Assembly
+    const char* mnemonic;
+    
+    // Emulation / Disassembly
+    const word_t opcode_mask;
+    const word_t opcode;
+    inst_disassemble_t disassemble;
+    inst_execute_t execute;
+} instruction_t;
+
+typedef struct ilist {
+    const size_t size;
+    const instruction_t* list;
+} ilist_t;
+
+// Debugging tools
+extern const char* const regnames[4];
 
 #endif

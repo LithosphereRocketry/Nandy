@@ -1,10 +1,10 @@
 # NANDy specific
 *.nb
 *.logi
-assembler
-emulator
 parse-test
+nandy-emu
 nandy-asm
+nandy-asm-racket
 binconvert
 
 # Racket
