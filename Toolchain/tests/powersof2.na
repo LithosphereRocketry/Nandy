@@ -1,0 +1,48 @@
+
+# The challenge here is:
+# Given a positive 64-bit integer, return log2(n) if n is a power of 2;
+# otherwise return -1. Implement the main loop recursively, rather than
+# iteratively.
+
+# stack grab: 7 bytes
+# stack layout:
+# [retl reth arg[0] ... arg[7]]
+# register layout:
+poweroftwo:
+    # setup
+    isp -3
+    strs 2
+    rd dy
+    strs 1
+    rd dx
+    strs 0
+
+    # clear the carry bit and set dx to 0 (zero not present)
+    rdi 0
+    nzero
+    wr dx
+
+    # this is a little bit evil
+    # we load a 1 into the top bit of dy so we can shift it to the right until
+    # it gets to the bottom as a loop counter, but we also borrow the top bit
+    # of dy to store the carry-out of the shift at the same time
+    rdi -128
+    wr dy
+
+    # we use the stack pointer to iterate over the bytes, so we have to turn off
+    # interrupts so keyboard input doesn't screw up our real stack
+    # we do a little trick here by setting dx equal to the bitwise or of every
+    # byte, that way it will only be zero if all the bytes are zero
+    sw dx
+    or dx
+    sw dx
+    sl
+
+
+
+    lds 0
+    wr dx
+    lds 1
+    wr dy
+    isp 4
+    ja
