@@ -1,0 +1,143 @@
+rdi 0
+wr sp
+# eint
+
+isp -7
+rdi -64
+strs 6
+rdi 0
+strs 5
+strs 4
+strs 3
+strs 2
+strs 1
+strs 0
+call poweroftwo
+brk
+
+# The challenge here is:
+# Given a positive 64-bit integer, return log2(n) if n is a power of 2;
+# otherwise return -1. Implement the main loop recursively, rather than
+# iteratively.
+
+# stack grab: 7 bytes
+# stack layout:
+# [retl reth arg[0] ... arg[7]]
+# register layout:
+poweroftwo:
+    # setup
+    isp -3
+    strs 2
+    rd dy
+    strs 1
+    rd dx
+    strs 0
+
+    rdi 0
+    wr dx
+
+    # this is a little bit evil
+    # we load a 0 into the top bit of dy so we can shift it to the right until
+    # it gets to the bottom as a loop counter, but we also borrow the top bit
+    # of dy to store the carry-out of the shift at the same time
+    rdi 127
+    # this will eventually go in dy, but the swap to/from dy is optimized away
+    # because it occurs at the top and bottom of the shift loop already
+    
+    # we use the stack pointer to iterate over the bytes, so we have to turn off
+    # interrupts so keyboard input doesn't screw up our real stack
+    # dint
+    # Place the SP at arg[7]
+    _isp 7
+    _isp 2
+ptwo_loop:
+    # retrieve the old shift result, or the zero at the top if this is the
+    # first time through
+    sl
+    _src
+    sw dy
+
+    lds 0
+    src
+    # we do a little trick here by setting dx equal to the bitwise or of every
+    # byte, that way it will only be zero if all the bytes are zero
+    sw dx
+    or dx
+    sw dx
+    strs 0
+    _isp -1
+
+    sw dy
+    # simultaneously throw the old carry result in dy and read the loop counter
+    src
+    # if the carry is absent, exit the loop
+    ctog
+    jcz ptwo_loop
+
+    isp -1 # realign the stack pointer
+    # eint
+
+    wr dy
+    # step 1: are we zero?
+    rd dx
+    nzero
+    rdi 0
+    jcz return
+    # step 2: are we odd?
+    rd dy
+    sl
+    jcz reccall
+    # else: we must be -1
+    rdi -1
+return:
+    wr dy
+    lds 0
+    wr dx
+    lds 1
+    sw dy
+    isp 3
+    ja
+
+reccall:
+    # Calling this function recursively is a little nasty because of all the
+    # crap on the stack that we have to shift down
+    lds 0
+    wr dx
+    lds 1
+    wr dy
+    # I don't feel like writing a loop, sue me
+    lds 2
+    strs 0
+    lds 3
+    strs 1
+    lds 4
+    strs 2
+    lds 5
+    strs 3
+    lds 6
+    strs 4
+    lds 7
+    strs 5
+    lds 8
+    strs 6
+    lds 9
+    strs 7
+    rd dx
+    strs 8
+    rd dy
+    strs 9
+    lds 0
+    isp 1
+
+    call poweroftwo
+    addi 1
+    jcz keepone
+    subi 1
+keepone:
+    wr dy
+    lds 7
+    wr dx
+    lds 8
+    sw dy
+    isp 2
+    ja

@@ -163,6 +163,13 @@ bool pauseToDbg() {
 				printf("Warning: IO value %li will be truncated\n", newio);
 				ioin = newio;
 			}
+		} else if(!strcmp(cmd, "peek") || !strcmp(cmd, "p")) {
+			long peekaddr = 0;
+			if(sscanf(input, "%*s %lx", &peekaddr) < 1) {
+				printf("No I/O value given\n");
+			} else {
+				printf("mem[%hx] = 0x%hhx\n", (short) peekaddr, mem[peekaddr & 0xFFFF]);
+			}
 		} else {
 			printf("Unrecognized command \"%s\"\n", cmd);
 		}
@@ -174,8 +181,9 @@ word_t fetch() {
 	// We assume the actual emulator takes zero time at all
 	// we can probably get better timing precision by using a different timing
 	// method but this is pretty OK
-	static const struct timespec us = {0, 1000};
-	nanosleep(&us, NULL);
+	// update: this sucks
+	// static const struct timespec us = {0, 1000};
+	// nanosleep(&us, NULL);
 #endif
 	if(ioCooldown != 0) { ioCooldown--; }
 	cycles++;
@@ -219,19 +227,20 @@ void aluop(enum ALUMode mode, bool isCarry, bool isXY, word_t a, word_t b, word_
 			newcarry = !parity(a);
 			break;
 		case ALU_ADD:
-			newresult = a + b;
+			newresult = (((int) a) & 0xFF) + (((int) b) & 0xFF);
 			newcarry = (newresult >> 8) & 1;
 			break;
 		case ALU_ADDC:
-			newresult = a + b + (int) carry;
+			newresult = (((int) a) & 0xFF) + (((int) b) & 0xFF) + ((int) carry);
 			newcarry = (newresult >> 8) & 1;
 			break;
 		case ALU_SUB:
-			newresult = a + 256 - b;
+			newresult = (((int) a) & 0xFF) + 256 - (((int) b) & 0xFF);
 			newcarry = (newresult >> 8) & 1;
 			break;
 		case ALU_SUBC:
-			newresult = a + 255 + ((int) carry) - b;
+			newresult = (((int) a) & 0xFF) + 255 + ((int) carry)
+					- (((int) b) & 0xFF);
 			newcarry = (newresult >> 8) & 1;
 			break;
 		case ALU_SL:
@@ -239,7 +248,7 @@ void aluop(enum ALUMode mode, bool isCarry, bool isXY, word_t a, word_t b, word_
 				newresult = a << 1;
 				newcarry = (a >> 7) & 1;
 			} else {
-				newresult = a >> 1;
+				newresult = (a >> 1) & 0x7F;
 				newcarry = a & 1;
 			}
 			break;
@@ -248,7 +257,7 @@ void aluop(enum ALUMode mode, bool isCarry, bool isXY, word_t a, word_t b, word_
 				newresult = a << 1 | (carry ? 1 : 0);
 				newcarry = (a >> 7) & 1;
 			} else {
-				newresult = a >> 1 | (carry ? 0x80 : 0);
+				newresult = ((a >> 1) & 0x7F) | (carry ? 0x80 : 0);
 				newcarry = a & 1;
 			}
 			break;
@@ -258,10 +267,10 @@ void aluop(enum ALUMode mode, bool isCarry, bool isXY, word_t a, word_t b, word_
 	if(isCarry) {
 		carry = newcarry;
 		if(mode & ALU_WRITESBOTH_MASK) {
-			*result = newresult;
+			*result = newresult & 0xFF;
 		}
 	} else {
-		*result = newresult;
+		*result = newresult & 0xFF;
 	}
 }
 
@@ -344,9 +353,9 @@ bool step(bool debugint) {
 			addr_t memaddr;
 			if(!(i & MEM_STACK_MASK)) {
 				memaddr = (((int) (isInterrupt ? iy : y)) << 8 
-								| (isInterrupt ? ix : x)) + signExt(i, 4);
+								| (isInterrupt ? ix : x)) + (i & 0xF);
 			} else {
-				memaddr = ((unsigned) sp) + signExt(i, 4);
+				memaddr = 0xFF00 + (((int) sp) & 0xFF)  + (i & 0xF);
 			}
 			if(!(i & MEM_WRITE_MASK)) { // reads
 				acc = mem[memaddr];
