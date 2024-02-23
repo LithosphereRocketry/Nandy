@@ -169,10 +169,10 @@
          (cons "iset" (idesc dint-exp '()))
          (cons "_isp" (idesc _isp-exp (list parse-number)))
          (cons "isp" (idesc isp-exp (list parse-number)))
-         (cons "or" (idesc xor-exp (list parse-reg)))
-         (cons "and" (idesc xor-exp (list parse-reg)))
+         (cons "or" (idesc or-exp (list parse-reg)))
+         (cons "and" (idesc and-exp (list parse-reg)))
          (cons "xor" (idesc xor-exp (list parse-reg)))
-         (cons "inv" (idesc xor-exp (list parse-reg)))
+         (cons "inv" (idesc inv-exp (list parse-reg)))
          (cons "xnor" (idesc xnor-exp (list parse-reg)))
          (cons "nand" (idesc nand-exp (list parse-reg)))
          (cons "nor" (idesc nor-exp (list parse-reg)))
@@ -579,13 +579,13 @@
                      [(iset-exp? inst) (list #b00011111)]
                      [(_isp-exp? inst) (list (bitwise-ior #b00100000 (num->4bi (_isp-exp-num inst))))]
                      [(isp-exp? inst) (list (bitwise-ior #b00110000 (num->4bi (isp-exp-num inst))))]
-                     [(or-exp? inst) (list (bitwise-ior #b01000001 (regmath->bits (xor-exp-reg inst))))]
+                     [(or-exp? inst) (list (bitwise-ior #b01000001 (regmath->bits (or-exp-reg inst))))]
                      [(and-exp? inst) (list (bitwise-ior #b01000010 (regmath->bits (and-exp-reg inst))))]
-                     [(xor-exp? inst) (list (bitwise-ior #b01000011 (regmath->bits (or-exp-reg inst))))]
+                     [(xor-exp? inst) (list (bitwise-ior #b01000011 (regmath->bits (xor-exp-reg inst))))]
                      [(inv-exp? inst) (list (bitwise-ior #b01000100 (regmath->bits (inv-exp-reg inst))))]
-                     [(nor-exp? inst) (list (bitwise-ior #b01000101 (regmath->bits (xnor-exp-reg inst))))]
+                     [(nor-exp? inst) (list (bitwise-ior #b01000101 (regmath->bits (nor-exp-reg inst))))]
                      [(nand-exp? inst) (list (bitwise-ior #b01000110 (regmath->bits (nand-exp-reg inst))))]
-                     [(xnor-exp? inst) (list (bitwise-ior #b01000111 (regmath->bits (nor-exp-reg inst))))]
+                     [(xnor-exp? inst) (list (bitwise-ior #b01000111 (regmath->bits (xnor-exp-reg inst))))]
                      [(_add-exp? inst) (list (bitwise-ior #b01001000 (regmath->bits (_add-exp-reg inst))))]
                      [(_addc-exp? inst) (list (bitwise-ior #b01001001 (regmath->bits (_addc-exp-reg inst))))]
                      [(_sub-exp? inst) (list (bitwise-ior #b01001010 (regmath->bits (_sub-exp-reg inst))))]

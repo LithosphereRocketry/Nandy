@@ -261,7 +261,7 @@ void aluop(enum ALUMode mode, bool isCarry, bool isXY, word_t a, word_t b, word_
 				newresult = a << 1;
 				newcarry = (a >> 7) & 1;
 			} else {
-				newresult = a >> 1;
+				newresult = (a >> 1) & 0x7F;
 				newcarry = a & 1;
 			}
 			break;
@@ -270,7 +270,7 @@ void aluop(enum ALUMode mode, bool isCarry, bool isXY, word_t a, word_t b, word_
 				newresult = a << 1 | (carry ? 1 : 0);
 				newcarry = (a >> 7) & 1;
 			} else {
-				newresult = a >> 1 | (carry ? 0x80 : 0);
+				newresult = ((a >> 1) & 0x7F) | (carry ? 0x80 : 0);
 				newcarry = a & 1;
 			}
 			break;
