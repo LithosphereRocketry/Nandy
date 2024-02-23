@@ -3,15 +3,15 @@ wr sp
 # eint
 
 isp -7
-rdi 0
+rdi -64
 strs 6
+rdi 0
 strs 5
 strs 4
 strs 3
 strs 2
 strs 1
 strs 0
-rdi 4
 call poweroftwo
 brk
 
@@ -57,9 +57,6 @@ ptwo_loop:
     _src
     sw dy
 
-    rdi 65
-    wr io
-
     lds 0
     src
     # we do a little trick here by setting dx equal to the bitwise or of every
@@ -82,7 +79,6 @@ ptwo_loop:
 
     wr dy
     # step 1: are we zero?
-    brk
     rd dx
     nzero
     rdi 0
@@ -135,6 +131,9 @@ reccall:
 
     call poweroftwo
     addi 1
+    jcz keepone
+    subi 1
+keepone:
     wr dy
     lds 7
     wr dx
