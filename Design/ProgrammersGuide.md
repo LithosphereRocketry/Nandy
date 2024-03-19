@@ -112,6 +112,10 @@ instructions when assembled; it is generally fairly efficient, but if some
 registers contain "don't care" values better performance may sometimes be
 achieved by hand-writing the swap sequences.
 
+Another common action is to read an absolute address into the combined DX and DY
+registers. The assembler provites the macro `rda <label>`, which loads the given
+16-bit label value into DX and DY without disturbing the accumulator.
+
 ### Arithmetic
 NANDy provides a number of 8-bit arithmetic operations as primitive
 instructions. Most are two-operand; one input is always the accumulator,
@@ -509,3 +513,13 @@ plus the specified unsigned 4-bit offset.
 ##### `strs <offset>`
 Stores the value of the accumulator at the address formed by 0xFF00 + SP +
 offset.
+
+### Macros
+##### `move <ra> <rb>`
+Moves the contents of register A into register B.
+##### `rda <label>`
+Reads the specified label as a 16-bit value into DX and DY as an address.
+##### `call <label>`
+Calls the function at the specified label; stores return address in DX and DY.
+##### `goto <label>`
+Jumps to the specified label without a return address. Overwrites DX and DY.

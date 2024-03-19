@@ -1,0 +1,4 @@
+NANDy Assembly
+    filter remove_matches ^\s*#
+    extension na
+    3rd_gen_scale 0.1
