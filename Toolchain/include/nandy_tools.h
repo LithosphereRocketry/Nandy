@@ -12,43 +12,48 @@
 #define NANDY_TOOLS_H
 
 #include <stdbool.h>
-#include <stdint.h>
 #include <stdlib.h>
 
-// Instruction bitmasks
-#define ADDR_RAM_MASK (1<<15)
-#define MULTICYCLE_MASK (1<<7)
-#define ALU_SEL_MASK (1<<6)
-#define ISP_MASK (1<<5)
-#define XY_MASK (1<<5)
-#define MEM_WRITE_MASK (1<<5)
-#define JUMP_MASK (1<<5)
-#define CARRY_SEL_MASK (1<<4)
-#define PROGFLOW_MASK (1<<4)
-#define MEM_STACK_MASK (1<<4)
-#define COND_MASK (1<<4)
-#define SIG_MASK (1<<3)
-#define WR_MASK (1<<3)
-#define RD_MASK (1<<2)
-#define RET_MASK (1<<2)
-#define CI_MASK (1<<1)
-
-// Data sizes
-typedef int8_t word_t;
-typedef uint16_t addr_t;
+#include "nandy_definitions.h"
 
 // CPU state
 typedef struct cpu_state {
     addr_t pc;
     word_t acc, sp, dx, dy, irx, iry, ioin, ioout;
     bool cycle, carry, int_en, int_active, int_prev, int_in;
-    word_t rom[1 << 15];
-    word_t ram[1 << 15];
+    word_t rom[ROM_SIZE];
+    word_t ram[RAM_SIZE];
 } cpu_state_t;
 
 // For convenience in the high-level emulator; note that the CPU registers WILL
 // NOT be initialized with nice values like this most of the time
 extern const cpu_state_t INIT_STATE;
+
+typedef struct unresolved {
+    addr_t location;
+    char* str;
+} unresolved_t;
+
+typedef struct label {
+    char* name;
+    int64_t value;
+} label_t;
+
+typedef struct asm_state {
+    cpu_state_t cpu;
+    addr_t rom_loc;
+    addr_t ram_loc;
+    
+    size_t resolved_sz;
+    size_t resolved_cap;
+    label_t* resolved;
+
+    size_t unresolved_sz;
+    size_t unresolved_cap;
+    unresolved_t* unresolved;
+} asm_state_t;
+
+extern const asm_state_t INIT_ASM;
 
 word_t peek(const cpu_state_t* cpu, addr_t addr);
 void poke(cpu_state_t* cpu, addr_t addr, word_t value);
@@ -58,9 +63,13 @@ size_t nclocks(word_t inst);
 
 addr_t nextinst(const cpu_state_t* cpu, addr_t addr);
 
+// NOTE: takes ownership of label, which should be heap-allocated
+int addLabel(asm_state_t* state, const char* label, int64_t value);
+
 // Some function pointer typedefs
 typedef void (*inst_disassemble_t)(const cpu_state_t*, addr_t, char*, size_t);
 typedef void (*inst_execute_t)(cpu_state_t*);
+typedef char* (*inst_assemble_t)(const char*, asm_state_t*);
 
 // Instruction definitions
 typedef struct instruction {
@@ -70,6 +79,7 @@ typedef struct instruction {
     // Emulation / Disassembly
     const word_t opcode_mask;
     const word_t opcode;
+    inst_assemble_t assemble;
     inst_disassemble_t disassemble;
     inst_execute_t execute;
 } instruction_t;

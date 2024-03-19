@@ -1,6 +1,9 @@
 #include "nandy_instructions.h"
 #include "stdio.h"
 
+static char* asm_nop(const char* text, asm_state_t* state) {
+    return NULL;
+}
 static void exe_nop(cpu_state_t* cpu) {
     cpu->pc ++;
 }
@@ -29,23 +32,28 @@ static void exe__addi(cpu_state_t* cpu) {
 }
 
 static void dis__addi(const cpu_state_t* cpu, addr_t addr, char* buf, size_t len) {
-    
     snprintf(buf, len, "nop");
 }
 
 static const instruction_t default_instrs[] = {
     {
         .mnemonic = "nop",
-        .opcode_mask = 0b11111100,
-        .opcode = 0b00000000,
+        .opcode_mask = REGID_MASK,
+        .opcode = 0,
         .disassemble = dis_nop,
         .execute = exe_nop
     }, {
         .mnemonic = "rd",
-        .opcode_mask = 0b11111100,
-        .opcode = 0b00000100,
+        .opcode_mask = REGID_MASK,
+        .opcode = RD_MASK,
         .disassemble = dis_rd,
         .execute = exe_rd
+    }, {
+        .mnemonic = "_addi",
+        .opcode_mask = 0,
+        .opcode = MULTICYCLE_MASK | ALU_SEL_MASK | ALU_ADD,
+        .disassemble = dis__addi,
+        .execute = exe__addi
     }
 };
 

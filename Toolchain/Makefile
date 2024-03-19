@@ -10,6 +10,8 @@ SRCDIR = src/
 # Generated object files go here
 OBJDIR = obj/
 
+COPTS = -Wall
+
 # if you just type "make", this happens
 .DEFAULT_GOAL: all
 # these rules don't refer to real files, so they shouldn't get timestamp-checked

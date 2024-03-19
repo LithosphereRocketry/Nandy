@@ -17,31 +17,10 @@ extern bool parity(word_t w);
 #define ALU_INST_MASK 0xF
 #define ALU_WRITESBOTH_MASK 0b1000 // any instruction with either of these bits can
 								   // write ACC and CARRY simultaneously
-#define REGID_MASK 0b0011
-
 #define WRITABLE_REGION (1<<15)
 
 unsigned int cpufreq = 1000000;
 unsigned int baudrate = 1200;
-
-enum ALUMode {
-	ALU_B = 0x0,
-	ALU_OR = 0x1,
-	ALU_AND = 0x2,
-	ALU_XOR = 0x3,
-	ALU_NB = 0x4,
-	ALU_NOR = 0x5,
-	ALU_NAND = 0x6,
-	ALU_XNOR = 0x7,
-	ALU_ADD = 0x8,
-	ALU_ADDC = 0x9,
-	ALU_SUB = 0xA,
-	ALU_SUBC = 0xB,
-	ALU_SL = 0xC,
-	ALU_SLC = 0xD,
-	ALU_SLA = 0xE,
-	ALU_SLR = 0xF
-};
 
 #define SIGNAL_MASK 0x7
 enum Signal {

@@ -1,8 +1,23 @@
 #include "nandy_tools.h"
+#include <stdio.h>
 
 // By default all the variables initialize to 0 which is what we want
 // can add initialized values here later if we want
 const cpu_state_t INIT_STATE = {};
+
+const asm_state_t INIT_ASM = {
+    .cpu = INIT_STATE,
+    .rom_loc = 0,
+    .ram_loc = ADDR_RAM_MASK,
+
+    .resolved_sz = 0,
+    .resolved_cap = 0,
+    .resolved = NULL,
+
+    .unresolved_sz = 0,
+    .unresolved_cap = 0,
+    .unresolved = NULL
+};
 
 const char* const regnames[4] = { "sp", "io", "dx", "dy" };
 
@@ -37,4 +52,27 @@ size_t nclocks(word_t inst) {
 
 addr_t nextinst(const cpu_state_t* cpu, addr_t addr) {
     return addr + nbytes(peek(cpu, addr));
+}
+
+int addLabel(asm_state_t* state, const char* label, int64_t value) {
+    if(!state->resolved) {
+        state->resolved = malloc(sizeof(label_t));
+        state->resolved_sz = 0;
+        state->resolved_cap = 1;
+    } else {
+        if(state->resolved_sz >= state->resolved_cap) {
+            state->resolved_cap *= 2;
+            label_t* new_resolved = realloc(state->resolved,
+                    state->resolved_cap * sizeof(label_t));
+            if(new_resolved) {
+                state->resolved = new_resolved;
+            } else {
+                return -1;
+            }
+        }
+    }
+    state->resolved[state->resolved_sz].name = label;
+    state->resolved[state->resolved_sz].value = value;
+    state->resolved_sz ++;
+    return 0;
 }
