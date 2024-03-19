@@ -106,6 +106,7 @@
 ; Pseudoinstructions
 (struct move-exp (from to) #:transparent)
 (struct swap-exp (a b) #:transparent)
+(struct rda-exp (label) #:transparent)
 (struct call-exp (label) #:transparent)
 (struct goto-exp (label) #:transparent)
 
@@ -234,6 +235,7 @@
          (cons "j" (idesc j-exp (list parse-label)))
          (cons "jcz" (idesc jcz-exp (list parse-label)))
 
+         (cons "rda" (idesc rda-exp (list parse-label)))
          (cons "call" (idesc call-exp (list parse-label)))
          (cons "goto" (idesc goto-exp (list parse-label)))
          (cons "move" (idesc move-exp (list parse-reg parse-reg))))))
@@ -301,17 +303,14 @@
 (define macro-expand
   (lambda (exp)
     (cond [(@include-exp? exp) (expand-file (@include-exp-path exp))]
-          [(call-exp? exp) (list-exp (list (wr-exp 'dy)
-                                           (rdi-exp (bytenum (call-exp-label exp) 0))
-                                           (wr-exp 'dx)
-                                           (rdi-exp (bytenum (call-exp-label exp) 1))
-                                           (sw-exp 'dy)
+          [(rda-exp? exp) (list-exp (list (wr-exp 'dy)
+                                          (rdi-exp (bytenum (rda-exp-label exp) 0))
+                                          (wr-exp 'dx)
+                                          (rdi-exp (bytenum (rda-exp-label exp) 1))
+                                          (sw-exp 'dy)))]
+          [(call-exp? exp) (list-exp (list (macro-expand (rda-exp (call-exp-label exp)))
                                            (jar-exp)))]
-          [(goto-exp? exp) (list-exp (list (wr-exp 'dy)
-                                           (rdi-exp (bytenum (goto-exp-label exp) 0))
-                                           (wr-exp 'dx)
-                                           (rdi-exp (bytenum (goto-exp-label exp) 1))
-                                           (sw-exp 'dy)
+          [(goto-exp? exp) (list-exp (list (macro-expand (rda-exp (goto-exp-label exp)))
                                            (ja-exp)))]
           [(move-exp? exp) (cond [(eq? (move-exp-to exp) (move-exp-from exp)) (none-exp)]
                                  [(eq? (move-exp-to exp) 'acc) (rd-exp (move-exp-from exp))]
