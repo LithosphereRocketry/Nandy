@@ -1,4 +1,5 @@
 #include "nandy_tools.h"
+#include "nandy_instructions.h"
 #include <stdio.h>
 
 // By default all the variables initialize to 0 which is what we want
@@ -6,6 +7,8 @@
 const cpu_state_t INIT_STATE = {};
 
 const asm_state_t INIT_ASM = {
+    .instrs = &NANDY_ILIST,
+
     .cpu = INIT_STATE,
     .rom_loc = 0,
     .ram_loc = ADDR_RAM_MASK,

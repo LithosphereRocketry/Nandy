@@ -48,3 +48,11 @@ char* fgets_dup(FILE* stream) {
 char* fread_dup(FILE* stream) {
     return fread_dup_helper(stream, -1);
 }
+
+const char* eol(const char* str) {
+    const char* ptr = str;
+    while(*ptr != '\0' && *ptr != '\n') {
+        ptr++;
+    }
+    return ptr;
+}

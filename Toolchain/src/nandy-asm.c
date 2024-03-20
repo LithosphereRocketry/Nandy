@@ -10,7 +10,7 @@ bool isValidLabel(char c) {
     return isalpha(c) || c == '_';
 }
 
-char* asmLabel(const char* str, const char** startOfText) {
+char* parseLabel(const char* str, const char** startOfText) {
     const char* ptr = str;
     const char* endOfWord = NULL;
     while(1) {
@@ -37,23 +37,48 @@ char* asmLabel(const char* str, const char** startOfText) {
     }
 }
 
-instruction_t* asmInstr(const char* str, const char** startOfText) {
-    
+const instruction_t* parseInstr(const ilist_t* instrs, const char* str, const char** startOfText) {
+    for(int i = 0; i < instrs->size; i++) {
+        const instruction_t* instr = &instrs->list[i];
+        if(!strncmp(str, instr->mnemonic, strlen(instr->mnemonic))
+                && (isspace(str[strlen(instr->mnemonic)])
+                    || str[strlen(instr->mnemonic)] == '\0')) {
+            *startOfText = str + strlen(instr->mnemonic);
+            return instr;
+        }
+    }
+    return NULL;
 }
 
 int assemble(const char* str, asm_state_t* dest) {
-    if(!str) return -1;
+    if(!str) {
+        printf("No string provided, or previous parse failed to give status\n");
+        return -1;
+    }
     if(*str == '\0') return 0;
     if(isspace(*str)) return assemble(str+1, dest);
+    if(*str == '#') return assemble(eol(str), dest);
 
-    const char* endOfLabel = NULL;
     const char* nextToken = NULL;
+
     const char* lbl;
-    if(lbl = asmLabel(str, &nextToken)) {
+    const instruction_t* instr;
+    if((lbl = parseLabel(str, &nextToken))) {
         if(addLabel(dest, lbl, dest->rom_loc)) {
             printf("Failed to add symbol\n");
-            return -1;
+            return -3;
         }
+    } else if((instr = parseInstr(dest->instrs, str, &nextToken))) {
+        if(instr->assemble) {
+            nextToken = eol(instr->assemble(nextToken, dest));
+        } else {
+            printf("Instruction %s missing assembly\n", instr->mnemonic);
+            return -4;
+        }
+    } else {
+        const char* ptr = eol(str);
+        printf("Failed to parse line \"%.*s\"\n", (int) (ptr-str), str);
+        return -2;
     }
     return assemble(nextToken, dest);
 }

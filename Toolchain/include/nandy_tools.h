@@ -35,11 +35,19 @@ typedef struct unresolved {
 } unresolved_t;
 
 typedef struct label {
-    char* name;
+    const char* name;
     int64_t value;
 } label_t;
 
+typedef struct instruction instruction_t;
+typedef struct ilist {
+    const size_t size;
+    const instruction_t* list;
+} ilist_t;
+
 typedef struct asm_state {
+    const ilist_t* instrs;
+
     cpu_state_t cpu;
     addr_t rom_loc;
     addr_t ram_loc;
@@ -69,7 +77,7 @@ int addLabel(asm_state_t* state, const char* label, int64_t value);
 // Some function pointer typedefs
 typedef void (*inst_disassemble_t)(const cpu_state_t*, addr_t, char*, size_t);
 typedef void (*inst_execute_t)(cpu_state_t*);
-typedef char* (*inst_assemble_t)(const char*, asm_state_t*);
+typedef const char* (*inst_assemble_t)(const char*, asm_state_t*);
 
 // Instruction definitions
 typedef struct instruction {
@@ -83,11 +91,6 @@ typedef struct instruction {
     inst_disassemble_t disassemble;
     inst_execute_t execute;
 } instruction_t;
-
-typedef struct ilist {
-    const size_t size;
-    const instruction_t* list;
-} ilist_t;
 
 // Debugging tools
 extern const char* const regnames[4];
