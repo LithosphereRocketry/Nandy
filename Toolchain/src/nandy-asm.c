@@ -50,15 +50,20 @@ const instruction_t* parseInstr(const ilist_t* instrs, const char* str, const ch
     return NULL;
 }
 
-int assemble(const char* str, asm_state_t* dest) {
+int assemble_helper(const char* str, asm_state_t* dest, bool inst_line) {
     if(!str) {
         printf("No string provided, or previous parse failed to give status\n");
         return -1;
     }
     if(*str == '\0') return 0;
-    if(isspace(*str)) return assemble(str+1, dest);
-    if(*str == '#') return assemble(eol(str), dest);
-
+    if(*str == '\n') return assemble_helper(str+1, dest, true);
+    if(isspace(*str)) return assemble_helper(str+1, dest, inst_line);
+    if(*str == '#') return assemble_helper(eol(str), dest, inst_line);
+    if(!inst_line) {
+        const char* ptr = eol(str);
+        printf("Unexpected text at \"%.*s\"\n", (int) (ptr-str), str);
+        return -3;
+    }
     const char* nextToken = NULL;
 
     const char* lbl;
@@ -66,21 +71,25 @@ int assemble(const char* str, asm_state_t* dest) {
     if((lbl = parseLabel(str, &nextToken))) {
         if(addLabel(dest, lbl, dest->rom_loc)) {
             printf("Failed to add symbol\n");
-            return -3;
+            return -4;
         }
     } else if((instr = parseInstr(dest->instrs, str, &nextToken))) {
         if(instr->assemble) {
-            nextToken = eol(instr->assemble(nextToken, dest));
+            nextToken = instr->assemble(nextToken, dest);
+            inst_line = false;
         } else {
             printf("Instruction %s missing assembly\n", instr->mnemonic);
-            return -4;
+            return -5;
         }
     } else {
         const char* ptr = eol(str);
         printf("Failed to parse line \"%.*s\"\n", (int) (ptr-str), str);
         return -2;
     }
-    return assemble(nextToken, dest);
+    return assemble_helper(nextToken, dest, inst_line);
+}
+int assemble(const char* str, asm_state_t* dest) {
+    return assemble_helper(str, dest, true);
 }
 
 int main(int argc, char** argv) {
