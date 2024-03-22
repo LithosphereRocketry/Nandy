@@ -1,9 +1,12 @@
 test_a:
 test_b :
 nop
+rd
 nop
 # nop
 nop
+rd
+rd
 other: nop
         # this is a comment:
         nop            # this is a comment!

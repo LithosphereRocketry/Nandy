@@ -4,5 +4,6 @@
 #include "nandy_tools.h"
 
 extern const instruction_t i_nop;
+extern const instruction_t i_rd;
 
 #endif
