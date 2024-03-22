@@ -42,7 +42,7 @@ typedef struct label {
 typedef struct instruction instruction_t;
 typedef struct ilist {
     const size_t size;
-    const instruction_t* list;
+    const instruction_t** list;
 } ilist_t;
 
 typedef struct asm_state {
