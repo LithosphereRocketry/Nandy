@@ -1,6 +1,8 @@
 #include "nandy_tools.h"
 #include "nandy_instructions.h"
 #include <stdio.h>
+#include <string.h>
+#include <ctype.h>
 
 // By default all the variables initialize to 0 which is what we want
 // can add initialized values here later if we want
@@ -22,7 +24,7 @@ const asm_state_t INIT_ASM = {
     .unresolved = NULL
 };
 
-const char* const regnames[4] = { "sp", "io", "dx", "dy" };
+const char* const regnames[5] = { "sp", "io", "dx", "dy", "acc" };
 
 // Internal tools
 bool parity(word_t w) {
@@ -78,4 +80,20 @@ int addLabel(asm_state_t* state, const char* label, int64_t value) {
     state->resolved[state->resolved_sz].value = value;
     state->resolved_sz ++;
     return 0;
+}
+
+const char* parseFallback(const char* text) {
+    while(!isspace(*text)) text++;
+    return text;
+}
+
+const char* parseReg(const char* text, regid_t* dest) {
+    while(isspace(*text) && *text != '\n') text++;
+    for(int i = 0; i < sizeof(regnames)/sizeof(char*); i++) {
+        if(strncmp(text, regnames[i], strlen(regnames[i])) == 0) {
+            *dest = i;
+            return text + strlen(regnames[i]);
+        }
+    }
+    return NULL;
 }

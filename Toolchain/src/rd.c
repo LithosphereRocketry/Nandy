@@ -2,9 +2,24 @@
 #include "stdio.h"
 
 static const char* asm_rd(const char* text, asm_state_t* state) {
-    state->cpu.rom[state->rom_loc] = 0;
+    regid_t reg;
+    const char* after = parseReg(text, &reg);
+    if(!after) {
+        after = parseFallback(text);
+        if(after == text) {
+            printf("No register name provided\n");
+        } else {
+            printf("Unrecognized register name \"%.*s\"\n", (int) (after-text), text);
+        }
+        return NULL;
+    }
+    if(reg == REG_ACC) {
+        printf("Cannot move accumulator into itself\n");
+        return NULL;
+    }
+    state->cpu.rom[state->rom_loc] = WR_MASK | reg;
     state->rom_loc ++;
-    return text;
+    return after;
 }
 static void exe_rd(cpu_state_t* cpu) {
     word_t ibyte = peek(cpu, cpu->pc);

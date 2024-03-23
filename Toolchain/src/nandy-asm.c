@@ -76,10 +76,14 @@ int assemble_helper(const char* str, asm_state_t* dest, bool inst_line) {
     } else if((instr = parseInstr(dest->instrs, str, &nextToken))) {
         if(instr->assemble) {
             nextToken = instr->assemble(nextToken, dest);
+            if(!nextToken) {
+                printf("Failed parse of instruction %s\n", instr->mnemonic);
+                return -5;
+            }
             inst_line = false;
         } else {
             printf("Instruction %s missing assembly\n", instr->mnemonic);
-            return -5;
+            return -6;
         }
     } else {
         const char* ptr = eol(str);

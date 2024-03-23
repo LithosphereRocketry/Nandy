@@ -5,5 +5,6 @@
 
 extern const instruction_t i_nop;
 extern const instruction_t i_rd;
+extern const instruction_t i__addi;
 
 #endif

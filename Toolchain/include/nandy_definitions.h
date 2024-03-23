@@ -49,4 +49,12 @@ enum ALUMode {
 typedef int8_t word_t;
 typedef uint16_t addr_t;
 
+typedef enum regid {
+	REG_SP,
+	REG_IO,
+	REG_DX,
+	REG_DY,
+	REG_ACC
+} regid_t;
+
 #endif

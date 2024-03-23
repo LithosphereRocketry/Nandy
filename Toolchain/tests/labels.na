@@ -1,12 +1,12 @@
 test_a:
 test_b :
 nop
-rd
+rd dx
 nop
 # nop
 nop
-rd
-rd
+rd sp
+rd dy
 other: nop
         # this is a comment:
         nop            # this is a comment!
