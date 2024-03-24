@@ -5,6 +5,7 @@
 static const instruction_t* default_instrs[] = {
     &i_nop, 
     &i_rd,
+    &i_wr,
     &i__addi
 };
 

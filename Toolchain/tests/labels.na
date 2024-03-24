@@ -2,11 +2,13 @@ test_a:
 test_b :
 nop
 rd dx
+wr dy
 nop
 # nop
 nop
 rd sp
 rd dy
+wr io
 other: nop
         # this is a comment:
         nop            # this is a comment!

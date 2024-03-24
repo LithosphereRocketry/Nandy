@@ -97,3 +97,17 @@ const char* parseReg(const char* text, regid_t* dest) {
     }
     return NULL;
 }
+
+const char* parseRegRequired(const char* text, regid_t* dest) {
+    const char* after = parseReg(text, dest);
+    if(!after) {
+        after = parseFallback(text);
+        if(after == text) {
+            printf("No register name provided\n");
+        } else {
+            printf("Unrecognized register name \"%.*s\"\n", (int) (after-text), text);
+        }
+        return NULL;
+    }
+    return after;
+}

@@ -97,5 +97,6 @@ extern const char* const regnames[5];
 // Assembly & parsing tools
 const char* parseFallback(const char* text);
 const char* parseReg(const char* text, regid_t* dest);
+const char* parseRegRequired(const char* text, regid_t* dest);
 
 #endif

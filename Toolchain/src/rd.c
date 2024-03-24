@@ -3,31 +3,22 @@
 
 static const char* asm_rd(const char* text, asm_state_t* state) {
     regid_t reg;
-    const char* after = parseReg(text, &reg);
-    if(!after) {
-        after = parseFallback(text);
-        if(after == text) {
-            printf("No register name provided\n");
-        } else {
-            printf("Unrecognized register name \"%.*s\"\n", (int) (after-text), text);
-        }
-        return NULL;
-    }
+    const char* after = parseRegRequired(text, &reg);
     if(reg == REG_ACC) {
-        printf("Cannot move accumulator into itself\n");
+        printf("Cannot read accumulator from itself\n");
         return NULL;
     }
-    state->cpu.rom[state->rom_loc] = WR_MASK | reg;
+    state->cpu.rom[state->rom_loc] = RD_MASK | reg;
     state->rom_loc ++;
     return after;
 }
 static void exe_rd(cpu_state_t* cpu) {
     word_t ibyte = peek(cpu, cpu->pc);
-    switch(ibyte & 0x11) {
-        case 0: cpu->acc = cpu->sp; break;
-        case 1: cpu->acc = cpu->ioin; break; // todo: data ping
-        case 2: cpu->acc = cpu->dx; break;
-        case 3: cpu->acc = cpu->dy; break;
+    switch(ibyte & i_rd.opcode_mask) {
+        case REG_SP: cpu->acc = cpu->sp; break;
+        case REG_IO: cpu->acc = cpu->ioin; break; // todo: data ping
+        case REG_DX: cpu->acc = cpu->dx; break;
+        case REG_DY: cpu->acc = cpu->dy; break;
     }
     cpu->pc ++;
 }
