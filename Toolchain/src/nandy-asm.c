@@ -116,8 +116,9 @@ int main(int argc, char** argv) {
         return err;
     }
 
-    for(int i = 0; i < state.resolved_sz; i++) {
-        printf("%s : %li\n", state.resolved[i].name, state.resolved[i].value);
+    for(int i = 0; i < state.resolved.len; i++) {
+        printf("%s : %li\n", state.resolved.symbols[i].name,
+                             state.resolved.symbols[i].value);
     }
 
     FILE* fdest = fopen(argv[2], "w");

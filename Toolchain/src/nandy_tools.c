@@ -15,9 +15,7 @@ const asm_state_t INIT_ASM = {
     .rom_loc = 0,
     .ram_loc = ADDR_RAM_MASK,
 
-    .resolved_sz = 0,
-    .resolved_cap = 0,
-    .resolved = NULL,
+    .resolved = SYMTAB_INIT,
 
     .unresolved_sz = 0,
     .unresolved_cap = 0,
@@ -60,26 +58,12 @@ addr_t nextinst(const cpu_state_t* cpu, addr_t addr) {
 }
 
 int addLabel(asm_state_t* state, const char* label, int64_t value) {
-    if(!state->resolved) {
-        state->resolved = malloc(sizeof(label_t));
-        state->resolved_sz = 0;
-        state->resolved_cap = 1;
+    symtab_put(&state->resolved, label, value);
+    if(symtab_get(&state->resolved, label)) {
+        return 0;
     } else {
-        if(state->resolved_sz >= state->resolved_cap) {
-            state->resolved_cap *= 2;
-            label_t* new_resolved = realloc(state->resolved,
-                    state->resolved_cap * sizeof(label_t));
-            if(new_resolved) {
-                state->resolved = new_resolved;
-            } else {
-                return -1;
-            }
-        }
+        return -1;
     }
-    state->resolved[state->resolved_sz].name = label;
-    state->resolved[state->resolved_sz].value = value;
-    state->resolved_sz ++;
-    return 0;
 }
 
 const char* parseFallback(const char* text) {

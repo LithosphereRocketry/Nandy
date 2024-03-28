@@ -14,6 +14,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#include "symtab.h"
 #include "nandy_definitions.h"
 
 // CPU state
@@ -52,9 +53,7 @@ typedef struct asm_state {
     addr_t rom_loc;
     addr_t ram_loc;
     
-    size_t resolved_sz;
-    size_t resolved_cap;
-    label_t* resolved;
+    symtab_t resolved;
 
     size_t unresolved_sz;
     size_t unresolved_cap;
