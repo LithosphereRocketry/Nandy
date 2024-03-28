@@ -10,8 +10,7 @@ const cpu_state_t INIT_STATE = {};
 
 const asm_state_t INIT_ASM = {
     .instrs = &NANDY_ILIST,
-
-    .cpu = INIT_STATE,
+    
     .rom_loc = 0,
     .ram_loc = ADDR_RAM_MASK,
 

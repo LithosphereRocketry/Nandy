@@ -8,7 +8,7 @@ static const char* asm_rd(const char* text, asm_state_t* state) {
         printf("Cannot read accumulator from itself\n");
         return NULL;
     }
-    state->cpu.rom[state->rom_loc] = RD_MASK | reg;
+    state->rom[state->rom_loc] = RD_MASK | reg;
     state->rom_loc ++;
     return after;
 }

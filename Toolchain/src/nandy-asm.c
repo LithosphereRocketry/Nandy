@@ -122,7 +122,7 @@ int main(int argc, char** argv) {
     }
 
     FILE* fdest = fopen(argv[2], "w");
-    fwrite(state.cpu.rom, sizeof(word_t), ROM_SIZE, fdest);
+    fwrite(state.rom, sizeof(word_t), ROM_SIZE, fdest);
 
     free(text);
 }

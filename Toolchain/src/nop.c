@@ -2,7 +2,7 @@
 #include "stdio.h"
 
 static const char* asm_nop(const char* text, asm_state_t* state) {
-    state->cpu.rom[state->rom_loc] = 0;
+    state->rom[state->rom_loc] = 0;
     state->rom_loc ++;
     return text;
 }

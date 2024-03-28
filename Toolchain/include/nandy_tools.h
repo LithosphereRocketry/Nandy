@@ -49,7 +49,7 @@ typedef struct ilist {
 typedef struct asm_state {
     const ilist_t* instrs;
 
-    cpu_state_t cpu;
+    word_t rom[ROM_SIZE];
     addr_t rom_loc;
     addr_t ram_loc;
     

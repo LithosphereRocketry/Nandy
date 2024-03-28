@@ -8,7 +8,7 @@ static const char* asm_wr(const char* text, asm_state_t* state) {
         printf("Cannot write accumulator to itself\n");
         return NULL;
     }
-    state->cpu.rom[state->rom_loc] = WR_MASK | reg;
+    state->rom[state->rom_loc] = WR_MASK | reg;
     state->rom_loc ++;
     return after;
 }
