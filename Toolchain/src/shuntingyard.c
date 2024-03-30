@@ -6,6 +6,38 @@
 #include <string.h>
 #include <stdio.h>
 
+// non-discriminated union because tokens will always be in one place and
+// numbers will always be in another
+typedef struct operator_token operator_token_t;
+typedef union stack_element {
+    const operator_token_t* token;
+    int64_t value;
+} stack_element_t;
+
+typedef struct op_stack {
+    stack_element_t* stack;
+    size_t cap;
+    size_t level;
+} op_stack_t;
+
+static void op_push(op_stack_t* stack, stack_element_t element) {
+    if(stack->level >= stack->cap) {
+        if(stack->cap == 0) {
+            stack->cap = 1;
+        } else {
+            stack->cap *= 2;
+        }
+        stack->stack = realloc(stack->stack, stack->cap * sizeof(stack_element_t));
+    }
+    stack->stack[stack->level] = element;
+    stack->level ++;
+}
+
+static stack_element_t op_pop(op_stack_t* stack) {
+    stack->level --;
+    return stack->stack[stack->level];
+}
+
 static const struct {
     const char* const prefix;
     const int64_t base;
@@ -66,13 +98,27 @@ const char* parseInt(const char* expstr, stack_element_t* out) {
 
 const char* parseOperator(const char* expstr, stack_element_t* out, bool unary) {
     for(size_t i = 0; i < n_operators; i++) {
-        if(unary == operators[i].isUnary 
+        if(unary == (operators[i].args == 1)
                 && !strncmp(expstr, operators[i].str, strlen(operators[i].str))) {
             out->token = &operators[i];
             return expstr + strlen(operators[i].str);
         }
     }
     return NULL;
+}
+
+int evalOperator(op_stack_t* stack, const operator_token_t* op) {
+    if(op->func == NULL) { return -1; }
+    if(stack->level < op->args) { return -2; }
+    stack_element_t element;
+    int64_t* values = malloc(op->args * sizeof(int64_t));
+    for(size_t i = 0; i < op->args; i++) {
+        values[i] = op_pop(stack).value;
+    }
+    element.value = op->func(values);
+    op_push(stack, element);
+    free(values);
+    return 0;
 }
 
 // Based on: https://en.wikipedia.org/wiki/Shunting_yard_algorithm
@@ -86,7 +132,6 @@ shunting_status_t parseExp(const symtab_t* symbols, const char* expstr, int64_t*
     while(*ptr != '\0' && exitcode == SHUNT_DONE) {
         stack_element_t element;
         const char* next;
-        
         if(isspace(*ptr)) {
             ptr++;
         } else if(!lastNumber && (next = parseInt(ptr, &element))) {
@@ -98,23 +143,31 @@ shunting_status_t parseExp(const symtab_t* symbols, const char* expstr, int64_t*
                 op_push(&operator_stack, element);
                 lastNumber = false;
             } else if(element.token == &operators[CLOSEDPAREN]) {
-                stack_element_t op = op_pop(&operator_stack);
                 lastNumber = true;
-                do {
-                    op.token->func(&value_stack);
-                    op = op_pop(&operator_stack);
-                } while(op.token != &operators[OPENPAREN]);
+                while(1) {
+                    if(operator_stack.level <= 0) {
+                        printf("No matching left parenthesis\n");
+                        exitcode = SHUNT_MISMATCHED_CLOSE;
+                        break;
+                    }
+                    stack_element_t op = op_pop(&operator_stack);
+                    if(op.token == &operators[OPENPAREN]) break;
+                    if(evalOperator(&value_stack, op.token)) {
+                        exitcode = SHUNT_TOO_MANY_POP_PAREN;
+                        break;
+                    }
+                }
             } else {
+                lastNumber = false;
                 while(operator_stack.level > 0) {
                     stack_element_t op = op_pop(&operator_stack);
                     if(op.token->priority < element.token->priority) {
                         op_push(&operator_stack, op);
                         break;
-                    } else {
-                        if(op.token->func(&value_stack)) {
-                            exitcode = SHUNT_TOO_FEW_VALUES;
-                            break;
-                        }
+                    }
+                    if(evalOperator(&value_stack, op.token)) {
+                        exitcode = SHUNT_TOO_MANY_POP;
+                        break;
                     }
                 }
                 op_push(&operator_stack, element);
@@ -122,21 +175,24 @@ shunting_status_t parseExp(const symtab_t* symbols, const char* expstr, int64_t*
             }
             ptr = next;
         } else {
-            printf("Failed at %s\n", ptr);
+            printf("Could not recognize symbol \"%s\"\n", ptr);
             exitcode = SHUNT_UNRECOGNIZED;
         }
     }
-
     while(exitcode == SHUNT_DONE && operator_stack.level > 0) {
         stack_element_t op = op_pop(&operator_stack);
-        if(op.token->func(&value_stack)) {
-            exitcode = SHUNT_TOO_FEW_VALUES;
+        if(evalOperator(&value_stack, op.token)) {
+            printf("Missing values on stack, probably missing operand\n");
+            exitcode = SHUNT_MISSING_VALUE;
         }
     }
-    if(value_stack.level == 1) {
-        *result = op_pop(&value_stack).value;
-    } else {
-        exitcode = SHUNT_TOO_MANY_VALUES;
+    if(exitcode == SHUNT_DONE) {
+        if(value_stack.level == 1) {
+            *result = op_pop(&value_stack).value;
+        } else {
+            printf("Values left on stack, probably missing right parenthesis\n");
+            exitcode = SHUNT_MISMATCHED_OPEN;
+        }
     }
     if(operator_stack.stack != NULL) free(operator_stack.stack);
     if(value_stack.stack != NULL) free(value_stack.stack);
