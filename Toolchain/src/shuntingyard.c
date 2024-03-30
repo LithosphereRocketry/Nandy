@@ -189,6 +189,9 @@ shunting_status_t parseExp(const symtab_t* symbols, const char* expstr, int64_t*
     if(exitcode == SHUNT_DONE) {
         if(value_stack.level == 1) {
             *result = op_pop(&value_stack).value;
+        } else if(value_stack.level == 0) {
+            printf("No input provided\n");
+            exitcode = SHUNT_NO_VALUES;
         } else {
             printf("Values left on stack, probably missing right parenthesis\n");
             exitcode = SHUNT_MISMATCHED_OPEN;
