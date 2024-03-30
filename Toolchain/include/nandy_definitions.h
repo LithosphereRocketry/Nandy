@@ -3,6 +3,9 @@
 
 #include <stdint.h>
 
+// Assembly
+#define COMMENT_TOK "#"
+
 // Instruction bitmasks
 #define ADDR_RAM_MASK (1<<15)
 #define MULTICYCLE_MASK (1<<7)

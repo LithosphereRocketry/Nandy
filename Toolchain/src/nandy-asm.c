@@ -58,7 +58,9 @@ int assemble_helper(const char* str, asm_state_t* dest, bool inst_line) {
     if(*str == '\0') return 0;
     if(*str == '\n') return assemble_helper(str+1, dest, true);
     if(isspace(*str)) return assemble_helper(str+1, dest, inst_line);
-    if(*str == '#') return assemble_helper(eol(str), dest, inst_line);
+    if(!strncmp(str, COMMENT_TOK, strlen(COMMENT_TOK))) {
+        return assemble_helper(eol(str), dest, inst_line);
+    }
     if(!inst_line) {
         const char* ptr = eol(str);
         printf("Unexpected text at \"%.*s\"\n", (int) (ptr-str), str);
@@ -93,7 +95,15 @@ int assemble_helper(const char* str, asm_state_t* dest, bool inst_line) {
     return assemble_helper(nextToken, dest, inst_line);
 }
 int assemble(const char* str, asm_state_t* dest) {
-    return assemble_helper(str, dest, true);
+    int asmstatus = assemble_helper(str, dest, true);
+    if(asmstatus != 0) { return asmstatus; }; // TODO: memory leak
+    for(size_t i = 0; i < dest->unresolved_sz; i++) {
+        dest->unresolved[i].func(dest, 
+            dest->unresolved[i].str,
+            dest->unresolved[i].location
+        );
+    }
+    return 0;
 }
 
 int main(int argc, char** argv) {

@@ -1,11 +1,14 @@
 #include "nandy_instr_defs.h"
 #include <stdio.h>
 
-
+static void res__addi(asm_state_t* state, const char* text, addr_t pos) {
+    printf("Unresolved _addi with string %s at pos %hi\n", text, pos);
+}
 static const char* asm__addi(const char* text, asm_state_t* state) {
-    state->rom[state->rom_loc] = 0;
-    state->rom_loc ++;
-    return text;
+    state->rom[state->rom_loc] = i__addi.opcode;
+    const char* endptr = addUnresolved(state, text, res__addi);
+    state->rom_loc += 2;
+    return endptr;
 }
 static void exe__addi(cpu_state_t* cpu) {
     cpu->acc += peek(cpu, cpu->pc + 1);

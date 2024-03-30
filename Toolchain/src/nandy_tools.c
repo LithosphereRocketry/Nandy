@@ -1,6 +1,7 @@
 #include "nandy_tools.h"
 #include "nandy_instructions.h"
 #include <stdio.h>
+#define __STDC_WANT_LIB_EXT2__ 1
 #include <string.h>
 #include <ctype.h>
 
@@ -10,7 +11,7 @@ const cpu_state_t INIT_STATE = {};
 
 const asm_state_t INIT_ASM = {
     .instrs = &NANDY_ILIST,
-    
+
     .rom_loc = 0,
     .ram_loc = ADDR_RAM_MASK,
 
@@ -56,6 +57,14 @@ addr_t nextinst(const cpu_state_t* cpu, addr_t addr) {
     return addr + nbytes(peek(cpu, addr));
 }
 
+const char* endOfInput(const char* str) {
+    const char* ptr = str;
+    while(*ptr != '\0' && *ptr != '\n' && strncmp(ptr, COMMENT_TOK, strlen(COMMENT_TOK))) {
+        ptr++;
+    }
+    return ptr;
+}
+
 int addLabel(asm_state_t* state, const char* label, int64_t value) {
     symtab_put(&state->resolved, label, value);
     if(symtab_get(&state->resolved, label)) {
@@ -63,6 +72,24 @@ int addLabel(asm_state_t* state, const char* label, int64_t value) {
     } else {
         return -1;
     }
+}
+
+const char* addUnresolved(asm_state_t* state, const char* arg, inst_resolve_t func) {
+    if(state->unresolved_sz >= state->unresolved_cap) {
+        if(state->unresolved_cap == 0) {
+            state->unresolved_cap = 1;
+        } else {
+            state->unresolved_cap *= 2;
+        }
+        state->unresolved = realloc(state->unresolved, 
+                state->unresolved_cap*sizeof(unresolved_t));
+    }
+    const char* endloc = endOfInput(arg);
+    state->unresolved[state->unresolved_sz].func = func;
+    state->unresolved[state->unresolved_sz].location = state->rom_loc;
+    state->unresolved[state->unresolved_sz].str = strndup(arg, endloc-arg);
+    state->unresolved_sz ++;
+    return endloc;
 }
 
 const char* parseFallback(const char* text) {

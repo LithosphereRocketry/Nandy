@@ -8,6 +8,10 @@ nop
 nop
 rd sp
 rd dy
+_addi 123
+_addi "WORDSWORDSWORDS"
+_addi Something # in a comment
+
 wr io
 other: nop
         # this is a comment:

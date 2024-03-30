@@ -30,11 +30,6 @@ typedef struct cpu_state {
 // NOT be initialized with nice values like this most of the time
 extern const cpu_state_t INIT_STATE;
 
-typedef struct unresolved {
-    addr_t location;
-    char* str;
-} unresolved_t;
-
 typedef struct label {
     const char* name;
     int64_t value;
@@ -46,6 +41,7 @@ typedef struct ilist {
     const instruction_t** list;
 } ilist_t;
 
+typedef struct unresolved unresolved_t;
 typedef struct asm_state {
     const ilist_t* instrs;
 
@@ -77,6 +73,7 @@ int addLabel(asm_state_t* state, const char* label, int64_t value);
 typedef void (*inst_disassemble_t)(const cpu_state_t*, addr_t, char*, size_t);
 typedef void (*inst_execute_t)(cpu_state_t*);
 typedef const char* (*inst_assemble_t)(const char*, asm_state_t*);
+typedef void (*inst_resolve_t)(asm_state_t*, const char*, addr_t);
 
 // Instruction definitions
 typedef struct instruction {
@@ -91,6 +88,15 @@ typedef struct instruction {
     inst_execute_t execute;
 } instruction_t;
 
+typedef struct unresolved {
+    addr_t location;
+    char* str;
+    inst_resolve_t func;
+} unresolved_t;
+
+const char* addUnresolved(asm_state_t* state, const char* arg, inst_resolve_t func);
+
+const char* endOfInput(const char* str);
 // Debugging tools
 extern const char* const regnames[5];
 // Assembly & parsing tools

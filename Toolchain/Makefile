@@ -1,7 +1,7 @@
 # Semi-automated C/C++ makefile
 
 # This should be all you need to change
-TARGETS = nandy-emu binconvert nandy-asm
+TARGETS = nandy-emu binconvert nandy-asm shuntingyard_test
 RKT_TARGETS = nandy-asm-racket
 
 INCDIR = include/
