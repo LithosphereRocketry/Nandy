@@ -38,7 +38,7 @@ char* parseLabel(const char* str, const char** startOfText) {
 }
 
 const instruction_t* parseInstr(const ilist_t* instrs, const char* str, const char** startOfText) {
-    for(int i = 0; i < instrs->size; i++) {
+    for(size_t i = 0; i < instrs->size; i++) {
         const instruction_t* instr = instrs->list[i];
         if(!strncmp(str, instr->mnemonic, strlen(instr->mnemonic))
                 && (isspace(str[strlen(instr->mnemonic)])
@@ -126,7 +126,7 @@ int main(int argc, char** argv) {
         return err;
     }
 
-    for(int i = 0; i < state.resolved.len; i++) {
+    for(size_t i = 0; i < state.resolved.len; i++) {
         printf("%s : %li\n", state.resolved.symbols[i].name,
                              state.resolved.symbols[i].value);
     }

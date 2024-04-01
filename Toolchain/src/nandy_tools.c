@@ -99,7 +99,7 @@ const char* parseFallback(const char* text) {
 
 const char* parseReg(const char* text, regid_t* dest) {
     while(isspace(*text) && *text != '\n') text++;
-    for(int i = 0; i < sizeof(regnames)/sizeof(char*); i++) {
+    for(size_t i = 0; i < sizeof(regnames)/sizeof(char*); i++) {
         if(strncmp(text, regnames[i], strlen(regnames[i])) == 0) {
             *dest = i;
             return text + strlen(regnames[i]);
