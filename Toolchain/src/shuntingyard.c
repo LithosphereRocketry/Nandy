@@ -107,6 +107,57 @@ const char* parseOperator(const char* expstr, stack_element_t* out, bool unary) 
     return NULL;
 }
 
+const char* parseChar(const char* expstr, stack_element_t* out) {
+    const char* ptr = expstr;
+    int64_t value;
+    int count;
+    if(*ptr == '\'') {
+        ptr++;
+        if(*ptr == '\\') {
+            ptr++;
+            switch(*ptr) {
+                case 'a': value = '\a'; ptr++; break;
+                case 'b': value = '\b'; ptr++; break;
+                case 'f': value = '\f'; ptr++; break;
+                case 'n': value = '\n'; ptr++; break;
+                case 'r': value = '\r'; ptr++; break;
+                case 't': value = '\t'; ptr++; break;
+                case 'v': value = '\v'; ptr++; break;
+                case '\\':
+                case '\'': value = *ptr; ptr++; break;
+                case 'x':
+                    ptr++;
+                    if(sscanf(ptr, "%lx%n", &value, &count) == 1) {
+                        ptr += count;
+                    } else {
+                        printf("Unrecognized hexadecimal literal\n");
+                        return NULL;
+                    }
+                    break;
+                default:
+                    if(sscanf(ptr, "%lo%n", &value, &count) == 1) {
+                        ptr += count;
+                    } else {
+                        printf("Unrecognized escape sequence\n");
+                        return NULL;
+                    }
+            }
+        } else {
+            value = *ptr;
+            ptr ++;
+        }
+        if(*ptr != '\'') {
+            printf("Missing terminator or incorrect length\n");
+            return NULL;
+        }
+        ptr++;
+        out->value = value;
+        return ptr;
+    } else {
+        return NULL;
+    }
+}
+
 int evalOperator(op_stack_t* stack, const operator_token_t* op) {
     if(op->func == NULL) { return -1; }
     if(stack->level < op->args) { return -2; }
@@ -134,7 +185,9 @@ shunting_status_t parseExp(const symtab_t* symbols, const char* expstr, int64_t*
         const char* next;
         if(isspace(*ptr)) {
             ptr++;
-        } else if(!lastNumber && (next = parseInt(ptr, &element))) {
+        } else if(!lastNumber && (
+                       (next = parseInt(ptr, &element))
+                    || (next = parseChar(ptr, &element)))) {
             op_push(&value_stack, element);
             ptr = next;
             lastNumber = true;
