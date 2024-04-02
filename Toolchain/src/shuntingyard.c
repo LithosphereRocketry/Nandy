@@ -96,17 +96,6 @@ const char* parseInt(const char* expstr, stack_element_t* out) {
     return parseNumeric(expstr, 10, &out->value);
 }
 
-const char* parseOperator(const char* expstr, stack_element_t* out, bool unary) {
-    for(size_t i = 0; i < n_operators; i++) {
-        if(unary == (operators[i].args == 1)
-                && !strncmp(expstr, operators[i].str, strlen(operators[i].str))) {
-            out->token = &operators[i];
-            return expstr + strlen(operators[i].str);
-        }
-    }
-    return NULL;
-}
-
 const char* parseChar(const char* expstr, stack_element_t* out) {
     const char* ptr = expstr;
     int64_t value;
@@ -158,6 +147,27 @@ const char* parseChar(const char* expstr, stack_element_t* out) {
     }
 }
 
+const char* parseSymbol(const char* expstr, const symtab_t* table, stack_element_t* out) {
+    for(size_t i = 0; i < table->len; i++) {
+        if(!strncmp(expstr, table->symbols[i].name, strlen(table->symbols[i].name))) {
+            out->value = table->symbols[i].value;
+            return expstr + strlen(table->symbols[i].name);
+        }
+    }
+    return NULL;
+}
+
+const char* parseOperator(const char* expstr, stack_element_t* out, bool unary) {
+    for(size_t i = 0; i < n_operators; i++) {
+        if(unary == (operators[i].args == 1)
+                && !strncmp(expstr, operators[i].str, strlen(operators[i].str))) {
+            out->token = &operators[i];
+            return expstr + strlen(operators[i].str);
+        }
+    }
+    return NULL;
+}
+
 int evalOperator(op_stack_t* stack, const operator_token_t* op) {
     if(op->func == NULL) { return -1; }
     if(stack->level < op->args) { return -2; }
@@ -186,8 +196,9 @@ shunting_status_t parseExp(const symtab_t* symbols, const char* expstr, int64_t*
         if(isspace(*ptr)) {
             ptr++;
         } else if(!lastNumber && (
-                       (next = parseInt(ptr, &element))
-                    || (next = parseChar(ptr, &element)))) {
+                   (next = parseInt(ptr, &element))
+                || (next = parseChar(ptr, &element))
+                || (symbols && (next = parseSymbol(ptr, symbols, &element))))) {
             op_push(&value_stack, element);
             ptr = next;
             lastNumber = true;
