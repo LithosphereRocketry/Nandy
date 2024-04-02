@@ -1,5 +1,6 @@
 #include "nandy_tools.h"
 #include "nandy_instructions.h"
+#include "nandy_parse_tools.h"
 #include <stdio.h>
 #define __STDC_WANT_LIB_EXT2__ 1
 #include <string.h>
@@ -27,7 +28,7 @@ const char* const regnames[5] = { "sp", "io", "dx", "dy", "acc" };
 // Internal tools
 bool parity(word_t w) {
 	// there's faster ways to do this but who cares it's 8 bits
-    for(int i = 0; i < 8*sizeof(word_t); i++) {
+    for(size_t i = 0; i < 8*sizeof(word_t); i++) {
 		w ^= w >> i;
 	}
 	return w & 1;
@@ -57,14 +58,6 @@ addr_t nextinst(const cpu_state_t* cpu, addr_t addr) {
     return addr + nbytes(peek(cpu, addr));
 }
 
-const char* endOfInput(const char* str) {
-    const char* ptr = str;
-    while(*ptr != '\0' && *ptr != '\n' && strncmp(ptr, COMMENT_TOK, strlen(COMMENT_TOK))) {
-        ptr++;
-    }
-    return ptr;
-}
-
 int addLabel(asm_state_t* state, const char* label, int64_t value) {
     symtab_put(&state->resolved, label, value);
     if(symtab_get(&state->resolved, label)) {
@@ -90,34 +83,4 @@ const char* addUnresolved(asm_state_t* state, const char* arg, inst_resolve_t fu
     state->unresolved[state->unresolved_sz].str = strndup(arg, endloc-arg);
     state->unresolved_sz ++;
     return endloc;
-}
-
-const char* parseFallback(const char* text) {
-    while(!isspace(*text)) text++;
-    return text;
-}
-
-const char* parseReg(const char* text, regid_t* dest) {
-    while(isspace(*text) && *text != '\n') text++;
-    for(size_t i = 0; i < sizeof(regnames)/sizeof(char*); i++) {
-        if(strncmp(text, regnames[i], strlen(regnames[i])) == 0) {
-            *dest = i;
-            return text + strlen(regnames[i]);
-        }
-    }
-    return NULL;
-}
-
-const char* parseRegRequired(const char* text, regid_t* dest) {
-    const char* after = parseReg(text, dest);
-    if(!after) {
-        after = parseFallback(text);
-        if(after == text) {
-            printf("No register name provided\n");
-        } else {
-            printf("Unrecognized register name \"%.*s\"\n", (int) (after-text), text);
-        }
-        return NULL;
-    }
-    return after;
 }

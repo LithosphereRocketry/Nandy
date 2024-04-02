@@ -1,5 +1,6 @@
 #include "nandy_instr_defs.h"
-#include "stdio.h"
+#include "nandy_parse_tools.h"
+#include <stdio.h>
 
 static const char* asm_rd(const char* text, asm_state_t* state) {
     regid_t reg;

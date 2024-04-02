@@ -10,7 +10,7 @@ SRCDIR = src/
 # Generated object files go here
 OBJDIR = obj/
 
-COPTS = -Wall -Wextra -O2 -Wno-unused-result -Wno-unused-parameter
+COPTS = -Wall -Wextra -O2 -Wno-unused-result -Wno-unused-parameter -Werror=implicit-function-declaration -Werror=int-conversion
 
 # if you just type "make", this happens
 .DEFAULT_GOAL: all
