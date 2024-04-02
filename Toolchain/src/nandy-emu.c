@@ -57,7 +57,7 @@ bool isInterrupt;
 unsigned long ioCooldown;
 
 word_t signExt(word_t value, int bits) {
-	word_t mask = (-1) << bits;
+	word_t mask = ~(1 << bits);
 	if(value & (1 << (bits-1))) {
 		return value | mask;
 	} else {

@@ -98,10 +98,12 @@ int assemble(const char* str, asm_state_t* dest) {
     int asmstatus = assemble_helper(str, dest, true);
     if(asmstatus != 0) { return asmstatus; }; // TODO: memory leak
     for(size_t i = 0; i < dest->unresolved_sz; i++) {
-        dest->unresolved[i].func(dest, 
+        if(!dest->unresolved[i].func(dest, 
             dest->unresolved[i].str,
             dest->unresolved[i].location
-        );
+        )) {
+            return -7;
+        }
     }
     return 0;
 }

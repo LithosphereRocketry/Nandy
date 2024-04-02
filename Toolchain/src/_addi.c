@@ -1,12 +1,10 @@
 #include "nandy_instr_defs.h"
+#include "nandy_parse_tools.h"
 #include <stdio.h>
 
-static void res__addi(asm_state_t* state, const char* text, addr_t pos) {
-    printf("Unresolved _addi with string %s at pos %hi\n", text, pos);
-}
 static const char* asm__addi(const char* text, asm_state_t* state) {
     state->rom[state->rom_loc] = i__addi.opcode;
-    const char* endptr = addUnresolved(state, text, res__addi);
+    const char* endptr = addUnresolved(state, text, resolveImm8);
     state->rom_loc += 2;
     return endptr;
 }
