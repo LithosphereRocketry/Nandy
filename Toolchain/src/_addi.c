@@ -13,7 +13,7 @@ static void exe__addi(cpu_state_t* cpu) {
     cpu->pc += 2;
 }
 static void dis__addi(const cpu_state_t* cpu, addr_t addr, char* buf, size_t len) {
-    snprintf(buf, len, "nop");
+    snprintf(buf, len, "_addi %hhi", peek(cpu, addr+1));
 }
 
 const instruction_t i__addi = {
