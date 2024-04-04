@@ -4,6 +4,8 @@ nop
 rd dx
 wr dy
 nop
+ja
+
 # nop
 Something: nop
 rd sp
@@ -11,6 +13,9 @@ rd dy
 _addi 123
 _addi 'f'
 _addi Something # in a comment
+
+jri
+jar
 
 wr io
 other: nop

@@ -3,9 +3,11 @@
 
 #include "nandy_tools.h"
 
-extern const instruction_t i_nop;
-extern const instruction_t i_rd;
-extern const instruction_t i_wr;
+// register
+extern const instruction_t i_nop, i_rd, i_wr, i_sw;
+// jump
+extern const instruction_t i_ja, i_jar, i_jri;
+// immadd
 extern const instruction_t i__addi;
 
 #endif

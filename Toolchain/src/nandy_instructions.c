@@ -6,6 +6,10 @@ static const instruction_t* default_instrs[] = {
     &i_nop, 
     &i_rd,
     &i_wr,
+    &i_sw,
+    &i_ja,
+    &i_jar,
+    &i_jri,
     &i__addi
 };
 
