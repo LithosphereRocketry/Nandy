@@ -60,4 +60,13 @@ typedef enum regid {
 	REG_ACC
 } regid_t;
 
+typedef enum sigid {
+	SIG_BRK = 0,
+	SIG_BELL = 1,
+	SIG_DINT = 4,
+	SIG_EINT = 5,
+	SIG_ICLR = 6,
+	SIG_ISET = 7
+} sigid_t;
+
 #endif

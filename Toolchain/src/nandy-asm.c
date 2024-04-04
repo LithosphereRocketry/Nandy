@@ -114,6 +114,10 @@ int main(int argc, char** argv) {
         return -1;
     }
     FILE* f = fopen(argv[1], "r");
+    if(!f) {
+        printf("File %s not found\n", argv[1]);
+        return -1;
+    }
     char* text = fread_dup(f);
     fclose(f);
     if(text == NULL) {

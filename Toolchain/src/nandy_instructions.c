@@ -10,6 +10,12 @@ static const instruction_t* default_instrs[] = {
     &i_ja,
     &i_jar,
     &i_jri,
+    &i_brk,
+    &i_bell,
+    &i_dint,
+    &i_eint,
+    &i_iclr,
+    &i_iset,
     &i__addi
 };
 
