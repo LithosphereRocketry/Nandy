@@ -26,7 +26,7 @@
 
 #define REGID_MASK 0b0011
 
-enum ALUMode {
+typedef enum alu_mode {
 	ALU_B = 0x0,
 	ALU_OR = 0x1,
 	ALU_AND = 0x2,
@@ -43,7 +43,7 @@ enum ALUMode {
 	ALU_SLC = 0xD,
 	ALU_SLA = 0xE,
 	ALU_SLR = 0xF
-};
+} alu_mode_t;
 
 #define RAM_SIZE (1<<15)
 #define ROM_SIZE (1<<15)

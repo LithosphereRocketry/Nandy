@@ -16,6 +16,13 @@ static const instruction_t* default_instrs[] = {
     &i_eint,
     &i_iclr,
     &i_iset,
+    &i_or,
+    &i_and,
+    &i_xor,
+    &i_inv,
+    &i_nor,
+    &i_nand,
+    &i_xnor,
     &i__addi
 };
 

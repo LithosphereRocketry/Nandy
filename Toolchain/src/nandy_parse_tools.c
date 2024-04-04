@@ -43,6 +43,24 @@ const char* parseRegRequired(const char* text, regid_t* dest) {
     return after;
 }
 
+
+const char* asm_alu_reg(const char* text, asm_state_t* state, alu_mode_t m) {
+    regid_t reg;
+    const char* after = parseRegRequired(text, &reg);
+    if(!after) { return NULL; }
+    if(reg == REG_DX) {
+        state->rom[state->rom_loc] = ALU_SEL_MASK | m;
+    } else if(reg == REG_DY) {
+        state->rom[state->rom_loc] = ALU_SEL_MASK | XY_MASK | m;
+    } else {
+        printf("Register %s not valid for ALU instruction\n", regnames[reg]);
+        return NULL;
+    }
+    state->rom_loc ++;
+    return after;
+}
+
+
 bool isBounded(int64_t value, int64_t bitwidth) {
     return value < (1 << bitwidth) && value >= -(1 << (bitwidth-1));
 }

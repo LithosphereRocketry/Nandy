@@ -15,6 +15,9 @@ const char* parseFallback(const char* text);
 const char* parseReg(const char* text, regid_t* dest);
 const char* parseRegRequired(const char* text, regid_t* dest);
 
+// Genericized assembly formats
+const char* asm_alu_reg(const char* text, asm_state_t* state, alu_mode_t m);
+
 // Verification
 bool isBounded(int64_t value, int64_t bitwidth);
 

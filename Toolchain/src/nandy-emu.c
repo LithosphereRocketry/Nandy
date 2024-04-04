@@ -169,7 +169,7 @@ word_t fetch() {
 	return mem[++pc];
 }
 
-void aluop(enum ALUMode mode, bool isCarry, bool isXY, word_t a, word_t b, word_t* result) {
+void aluop(enum alu_mode mode, bool isCarry, bool isXY, word_t a, word_t b, word_t* result) {
 	bool newcarry = false;
 	int newresult = 0;
 	switch(mode) {
