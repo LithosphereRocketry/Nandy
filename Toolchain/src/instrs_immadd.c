@@ -1,26 +1,56 @@
 #include "nandy_instr_defs.h"
 #include "nandy_parse_tools.h"
+#include "nandy_alufuncs.h"
 #include <stdio.h>
 
-static const char* asm__addi(const char* text, asm_state_t* state) {
-    state->rom[state->rom_loc] = i__addi.opcode;
-    const char* endptr = addUnresolved(state, text, resolveImm8);
-    state->rom_loc += 2;
-    return endptr;
-}
 static void exe__addi(cpu_state_t* cpu) {
-    cpu->acc += peek(cpu, cpu->pc + 1);
+    cpu->acc = alu_add(cpu->acc, peek(cpu, cpu->pc + 1), true, NULL);
     cpu->pc += 2;
 }
-static void dis__addi(const cpu_state_t* cpu, addr_t addr, char* buf, size_t len) {
-    snprintf(buf, len, "_addi %hhi", peek(cpu, addr+1));
-}
-
 const instruction_t i__addi = {
     .mnemonic = "_addi",
     .opcode_mask = 0,
     .opcode = MULTICYCLE_MASK | ALU_SEL_MASK | ALU_ADD,
-    .assemble = asm__addi,
-    .disassemble = dis__addi,
+    .assemble = asm_alu_imm,
+    .disassemble = dis_alu_imm,
     .execute = exe__addi
+};
+
+static void exe__addci(cpu_state_t* cpu) {
+    cpu->acc = alu_add(cpu->acc, peek(cpu, cpu->pc + 1), cpu->carry, NULL);
+    cpu->pc += 2;
+}
+const instruction_t i__addci = {
+    .mnemonic = "_addci",
+    .opcode_mask = 0,
+    .opcode = MULTICYCLE_MASK | ALU_SEL_MASK | ALU_ADDC,
+    .assemble = asm_alu_imm,
+    .disassemble = dis_alu_imm,
+    .execute = exe__addci
+};
+
+static void exe__subi(cpu_state_t* cpu) {
+    cpu->acc = alu_sub(cpu->acc, peek(cpu, cpu->pc + 1), true, NULL);
+    cpu->pc += 2;
+}
+const instruction_t i__subi = {
+    .mnemonic = "_subi",
+    .opcode_mask = 0,
+    .opcode = MULTICYCLE_MASK | ALU_SEL_MASK | ALU_SUB,
+    .assemble = asm_alu_imm,
+    .disassemble = dis_alu_imm,
+    .execute = exe__subi
+};
+
+static void exe__subci(cpu_state_t* cpu) {
+    cpu->acc = alu_sub(cpu->acc, peek(cpu, cpu->pc + 1), true, NULL);
+    cpu->pc += 2;
+}
+const instruction_t i__subci = {
+    .mnemonic = "_subci",
+    .opcode_mask = 0,
+    .opcode = MULTICYCLE_MASK | ALU_SEL_MASK | ALU_SUBC,
+    .assemble = asm_alu_imm,
+    .disassemble = dis_alu_imm,
+    .execute = exe__subci
 };

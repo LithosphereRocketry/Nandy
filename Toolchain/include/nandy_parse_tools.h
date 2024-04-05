@@ -16,7 +16,19 @@ const char* parseReg(const char* text, regid_t* dest);
 const char* parseRegRequired(const char* text, regid_t* dest);
 
 // Genericized assembly formats
-const char* asm_alu_reg(const char* text, asm_state_t* state, alu_mode_t m);
+const char* asm_basic(const instruction_t* instr, const char* text, asm_state_t* state);
+const char* asm_register(const instruction_t* instr, const char* text, asm_state_t* state);
+const char* asm_alu_reg(const instruction_t* instr, const char* text, asm_state_t* state);
+const char* asm_alu_imm(const instruction_t* instr, const char* text, asm_state_t* state);
+
+// Execution tools
+word_t getALUReg(cpu_state_t* cpu);
+
+// Disassembly tools
+void dis_basic(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* buf, size_t len);
+void dis_register(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* buf, size_t len);
+void dis_alu_reg(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* buf, size_t len);
+void dis_alu_imm(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* buf, size_t len);
 
 // Verification
 bool isBounded(int64_t value, int64_t bitwidth);

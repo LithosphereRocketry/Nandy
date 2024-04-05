@@ -23,7 +23,10 @@ static const instruction_t* default_instrs[] = {
     &i_nor,
     &i_nand,
     &i_xnor,
-    &i__addi
+    &i__addi,
+    &i__addci,
+    &i__subi,
+    &i__subci
 };
 
 const ilist_t NANDY_ILIST = {

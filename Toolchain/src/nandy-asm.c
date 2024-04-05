@@ -77,7 +77,7 @@ int assemble_helper(const char* str, asm_state_t* dest, bool inst_line) {
         }
     } else if((instr = parseInstr(dest->instrs, str, &nextToken))) {
         if(instr->assemble) {
-            nextToken = instr->assemble(nextToken, dest);
+            nextToken = instr->assemble(instr, nextToken, dest);
             if(!nextToken) {
                 printf("Failed parse of instruction %s\n", instr->mnemonic);
                 return -5;
