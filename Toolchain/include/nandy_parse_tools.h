@@ -32,6 +32,7 @@ void dis_alu_imm(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char
 
 // Verification
 bool isBounded(int64_t value, int64_t bitwidth);
+int64_t signExtend(int64_t value, int64_t bitwidth);
 
 // Label resolution
 bool resolveImm8(asm_state_t* state, const char* text, addr_t pos);

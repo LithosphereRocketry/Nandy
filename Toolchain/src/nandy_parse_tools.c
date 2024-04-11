@@ -106,6 +106,15 @@ bool isBounded(int64_t value, int64_t bitwidth) {
     return value < (1 << bitwidth) && value >= -(1 << (bitwidth-1));
 }
 
+int64_t signExtend(int64_t value, int64_t bits) {
+	int64_t mask = ~((1 << bits) - 1);
+	if(value & (1 << (bits-1))) {
+		return value | mask;
+	} else {
+		return value & ~mask;
+	}
+}
+
 bool resolveImm8(asm_state_t* state, const char* text, addr_t pos) {
     int64_t value;
     shunting_status_t status = parseExp(&state->resolved, text, &value);
