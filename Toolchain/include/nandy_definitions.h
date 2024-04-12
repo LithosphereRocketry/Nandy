@@ -12,6 +12,7 @@
 #define ALU_SEL_MASK (1<<6)
 #define ISP_MASK (1<<5)
 #define XY_MASK (1<<5)
+#define SR_MASK (1<<5)
 #define MEM_WRITE_MASK (1<<5)
 #define JUMP_MASK (1<<5)
 #define CARRY_SEL_MASK (1<<4)

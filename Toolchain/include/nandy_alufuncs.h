@@ -6,5 +6,7 @@
 
 word_t alu_add(word_t a, word_t b, bool cin, bool* cout);
 word_t alu_sub(word_t a, word_t b, bool cin, bool* cout);
+word_t alu_sl(word_t a, word_t b, bool cin, bool* cout);
+word_t alu_sr(word_t a, word_t b, bool cin, bool* cout);
 
 #endif
