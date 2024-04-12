@@ -86,7 +86,7 @@ const char* asm_alu_imm(const instruction_t* instr, const char* text, asm_state_
 
 const char *asm_imm4s(const instruction_t *instr, const char *text, asm_state_t *state) {
     state->rom[state->rom_loc] = instr->opcode;
-    const char* endptr = addUnresolved(state, text, resolveImm4s);
+    return addUnresolved(state, text, resolveImm4s);
 }
 
 word_t getALUReg(cpu_state_t* cpu) {
@@ -107,7 +107,7 @@ void dis_alu_imm(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char
     snprintf(buf, len, "%s %hhi", instr->mnemonic, peek(cpu, addr+1));
 }
 void dis_imm4s(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* buf, size_t len) {
-    snprintf(buf, len, "%s %hhi", instr->mnemonic, signExtend(peek(cpu, addr), 4));
+    snprintf(buf, len, "%s %li", instr->mnemonic, signExtend(peek(cpu, addr), 4));
 }
 
 
@@ -119,6 +119,8 @@ bool isBounded(int64_t value, int64_t bitwidth, bound_mode_t bound) {
             return value < (1 << bitwidth) && value >= 0;
         case BOUND_EITHER:
             return value < (1 << bitwidth) && value >= -(1 << (bitwidth-1));
+        default:
+            return false;
     }
 }
 

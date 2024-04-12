@@ -1,7 +1,6 @@
 #include "nandy_instr_defs.h"
 #include "nandy_parse_tools.h"
 #include "nandy_alufuncs.h"
-#include <stdio.h>
 
 static void exe__isp(cpu_state_t* cpu) {
     cpu->sp = alu_add(cpu->sp, signExtend(peek(cpu, cpu->pc), 4), false, NULL);

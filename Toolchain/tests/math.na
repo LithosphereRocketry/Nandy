@@ -1,0 +1,10 @@
+@define my_label a*b
+@echo my_label + 4
+
+nop
+nop
+nop
+a:
+nop
+nop
+b:
