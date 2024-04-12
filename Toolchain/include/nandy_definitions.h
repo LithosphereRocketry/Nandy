@@ -25,6 +25,7 @@
 #define CI_MASK (1<<1)
 
 #define REGID_MASK 0b0011
+#define IMM4_MASK 0b1111
 
 typedef enum alu_mode {
 	ALU_B = 0x0,

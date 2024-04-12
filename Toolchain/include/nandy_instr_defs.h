@@ -15,5 +15,7 @@ extern const instruction_t i_or, i_and, i_xor, i_inv, i_nor, i_nand, i_xnor;
 extern const instruction_t i__add, i__addc, i__sub, i__subc;
 // immadd
 extern const instruction_t i__addi, i__addci, i__subi, i__subci;
+// memory
+extern const instruction_t i__isp, i_isp;
 
 #endif

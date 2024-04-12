@@ -20,6 +20,7 @@ const char* asm_basic(const instruction_t* instr, const char* text, asm_state_t*
 const char* asm_register(const instruction_t* instr, const char* text, asm_state_t* state);
 const char* asm_alu_reg(const instruction_t* instr, const char* text, asm_state_t* state);
 const char* asm_alu_imm(const instruction_t* instr, const char* text, asm_state_t* state);
+const char *asm_imm4s(const instruction_t *instr, const char *text, asm_state_t *state);
 
 // Execution tools
 word_t getALUReg(cpu_state_t* cpu);
@@ -29,12 +30,19 @@ void dis_basic(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* 
 void dis_register(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* buf, size_t len);
 void dis_alu_reg(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* buf, size_t len);
 void dis_alu_imm(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* buf, size_t len);
+void dis_imm4s(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* buf, size_t len);
 
 // Verification
-bool isBounded(int64_t value, int64_t bitwidth);
+typedef enum {
+    BOUND_UNSIGNED,
+    BOUND_SIGNED,
+    BOUND_EITHER
+} bound_mode_t;
+bool isBounded(int64_t value, int64_t bitwidth, bound_mode_t bound);
 int64_t signExtend(int64_t value, int64_t bitwidth);
 
 // Label resolution
+bool resolveImm4s(asm_state_t* state, const char* text, addr_t pos);
 bool resolveImm8(asm_state_t* state, const char* text, addr_t pos);
 
 #endif
