@@ -25,16 +25,6 @@ const asm_state_t INIT_ASM = {
 
 const char* const regnames[5] = { "sp", "io", "dx", "dy", "acc" };
 
-// Internal tools
-bool parity(word_t w) {
-	// there's faster ways to do this but who cares it's 8 bits
-    for(size_t i = 0; i < 8*sizeof(word_t); i++) {
-		w ^= w >> i;
-	}
-	return w & 1;
-}
-
-
 word_t peek(const cpu_state_t* cpu, addr_t addr) {
     return addr & ADDR_RAM_MASK ?
         cpu->ram[addr & ~ADDR_RAM_MASK]

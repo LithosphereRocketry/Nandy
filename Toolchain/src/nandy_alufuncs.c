@@ -1,5 +1,13 @@
 #include "nandy_alufuncs.h"
 
+bool parity(word_t w) {
+	// there's faster ways to do this but who cares it's 8 bits
+    for(size_t i = 0; i < 8*sizeof(word_t); i++) {
+		w ^= w >> i;
+	}
+	return w & 1;
+}
+
 word_t alu_add(word_t a, word_t b, bool cin, bool* cout) {
     int result = (((int) a) & 0xFF) + (((int) b) & 0xFF) + ((int) cin);
 	if(cout) {

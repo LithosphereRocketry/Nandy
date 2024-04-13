@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include <nandy_tools.h>
 
+bool parity(word_t w);
+
 word_t alu_add(word_t a, word_t b, bool cin, bool* cout);
 word_t alu_sub(word_t a, word_t b, bool cin, bool* cout);
 word_t alu_sl(word_t a, word_t b, bool cin, bool* cout);
