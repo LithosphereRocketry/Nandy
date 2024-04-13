@@ -24,6 +24,6 @@ extern const instruction_t i_sgn, i_nzero, i_par, i_nsgn, i_ctog, i_zero, i_npar
 // immadd
 extern const instruction_t i__addi, i__addci, i__subi, i__subci;
 // memory
-extern const instruction_t i__isp, i_isp;
+extern const instruction_t i__isp, i_isp, i_lda, i_lds, i_stra, i_strs;
 
 #endif
