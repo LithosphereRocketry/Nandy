@@ -17,6 +17,7 @@ extern const instruction_t i_or, i_and, i_xor, i_inv, i_nor, i_nand, i_xnor;
 extern const instruction_t i__add, i__addc, i__sub, i__subc;
 // regshift
 extern const instruction_t i__sl, i__slc, i__sla, i__slr, i__sr, i__src, i__srr, i__sra;
+extern const instruction_t i_sl, i_slc, i_sla, i_slr, i_sr, i_src, i_srr, i_sra;
 // immadd
 extern const instruction_t i__addi, i__addci, i__subi, i__subci;
 // memory
