@@ -21,6 +21,8 @@ extern const instruction_t i__sl, i__slc, i__sla, i__slr, i__sr, i__src, i__srr,
 extern const instruction_t i_sl, i_slc, i_sla, i_slr, i_sr, i_src, i_srr, i_sra;
 // regcomp
 extern const instruction_t i_sgn, i_nzero, i_par, i_nsgn, i_ctog, i_zero, i_npar;
+// immbit
+extern const instruction_t i_rdi, i_ori, i_andi, i_xori, i_nori, i_nandi, i_xnori;
 // immadd
 extern const instruction_t i__addi, i__addci, i__subi, i__subci;
 // memory

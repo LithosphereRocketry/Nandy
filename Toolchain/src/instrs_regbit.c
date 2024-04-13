@@ -69,7 +69,7 @@ const instruction_t i_nor = {
 
 static void exe_nand(cpu_state_t* cpu) {
     cpu->acc = ~(cpu->acc & getALUReg(cpu));
-    cpu->pc += 2;
+    cpu->pc ++;
 }
 const instruction_t i_nand = {
     .mnemonic = "nand",
@@ -82,7 +82,7 @@ const instruction_t i_nand = {
 
 static void exe_xnor(cpu_state_t* cpu) {
     cpu->acc = ~(cpu->acc ^ getALUReg(cpu));
-    cpu->pc += 2;
+    cpu->pc ++;
 }
 const instruction_t i_xnor = {
     .mnemonic = "xnor",
