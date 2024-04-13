@@ -5,6 +5,7 @@
 static const instruction_t* default_instrs[] = {
     &i_macro_echo,
     &i_macro_define,
+    &i_macro_assert,
 
     &i_nop, 
     &i_rd,

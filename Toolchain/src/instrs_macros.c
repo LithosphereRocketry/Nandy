@@ -38,12 +38,33 @@ static bool resolveDefine(asm_state_t* state, const char* text, addr_t) {
         return false;
     }
 }
-
 static const char* asm_macro_define(const instruction_t* instr, const char* text, asm_state_t* state) {
     return addUnresolved(state, text, resolveDefine);
 }
-
 const instruction_t i_macro_define = {
     .mnemonic = "@define",
     .assemble = asm_macro_define
+};
+
+static bool resolveAssert(asm_state_t* state, const char* text, addr_t) {
+    int64_t value;
+    shunting_status_t status = parseExp(&state->resolved, text, &value);
+    if(status == SHUNT_DONE) {
+        if(value) {
+            return true;
+        } else {
+            printf("Assertion failed (%s)\n", text);
+            return false;
+        }
+    } else {
+        printf("Parse failed: %i\n", status);
+        return false;
+    }
+}
+static const char* asm_macro_assert(const instruction_t* instr, const char* text, asm_state_t* state) {
+    return addUnresolved(state, text, resolveAssert);
+}
+const instruction_t i_macro_assert = {
+    .mnemonic = "@assert",
+    .assemble = asm_macro_assert
 };
