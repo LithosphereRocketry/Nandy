@@ -8,7 +8,7 @@ extern const instruction_t i_macro_echo, i_macro_define, i_macro_assert;
 // register
 extern const instruction_t i_nop, i_rd, i_wr, i_sw;
 // jump
-extern const instruction_t i_ja, i_jar, i_jri;
+extern const instruction_t i_ja, i_jar, i_jri, i_j, i_jcz;
 // flags
 extern const instruction_t i_brk, i_bell, i_dint, i_eint, i_iclr, i_iset;
 // regbit
