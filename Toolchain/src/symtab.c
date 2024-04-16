@@ -28,5 +28,9 @@ int64_t* symtab_get(const symtab_t* table, const char* name) {
             return &(table->symbols[i].value);
         }
     }
-    return NULL;
+    if(table->parent) {
+        return symtab_get(table->parent, name);
+    } else {
+        return NULL;
+    }
 }
