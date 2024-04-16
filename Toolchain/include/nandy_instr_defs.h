@@ -5,6 +5,8 @@
 
 // macros
 extern const instruction_t i_macro_echo, i_macro_define, i_macro_assert;
+// temp macros
+extern const instruction_t i_rda, i_call;
 // register
 extern const instruction_t i_nop, i_rd, i_wr, i_sw;
 // jump

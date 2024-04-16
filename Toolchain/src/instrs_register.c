@@ -46,7 +46,7 @@ static void exe_wr(cpu_state_t* cpu) {
 const instruction_t i_wr = {
     .mnemonic = "wr",
     .opcode_mask = REGID_MASK,
-    .opcode = RD_MASK,
+    .opcode = WR_MASK,
     .assemble = asm_register,
     .disassemble = dis_register,
     .execute = exe_wr

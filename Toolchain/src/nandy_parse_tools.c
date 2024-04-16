@@ -5,6 +5,21 @@
 #include "nandy_parse_tools.h"
 #include "shuntingyard.h"
 
+
+static const char* regname_sp[] = {"sp", NULL};
+static const char* regname_io[] = {"io", NULL};
+static const char* regname_dx[] = {"dx", "x", "dl", NULL};
+static const char* regname_dy[] = {"dy", "y", "dh", NULL};
+static const char* regname_acc[] = {"acc", NULL};
+const char** regnames[] = {
+    [REG_SP] = regname_sp,
+    [REG_IO] = regname_io,
+    [REG_DX] = regname_dx,
+    [REG_DY] = regname_dy,
+    [REG_ACC] = regname_acc
+};
+const size_t n_regnames = sizeof(regnames) / sizeof(const char**);
+
 const char* endOfInput(const char* str) {
     const char* ptr = str;
     while(*ptr != '\0' && *ptr != '\n' && strncmp(ptr, COMMENT_TOK, strlen(COMMENT_TOK))) {
@@ -20,10 +35,14 @@ const char* parseFallback(const char* text) {
 
 const char* parseReg(const char* text, regid_t* dest) {
     while(isspace(*text) && *text != '\n') text++;
-    for(size_t i = 0; i < sizeof(regnames)/sizeof(char*); i++) {
-        if(strncmp(text, regnames[i], strlen(regnames[i])) == 0) {
-            *dest = i;
-            return text + strlen(regnames[i]);
+    for(size_t i = 0; i < n_regnames; i++) {
+        const char** reg = regnames[i];
+        while(*reg) {
+            if(strncmp(text, *reg, strlen(*reg)) == 0) {
+                *dest = i;
+                return text + strlen(*reg);
+            }
+            reg++;
         }
     }
     return NULL;
@@ -115,7 +134,7 @@ const char* asm_alu_reg(const instruction_t* instr, const char* text, asm_state_
     } else if(reg == REG_DY) {
         state->rom[state->rom_loc] = instr->opcode | XY_MASK;
     } else {
-        printf("Register %s not valid for ALU instruction\n", regnames[reg]);
+        printf("Register %s not valid for ALU instruction\n", regnames[reg][0]);
         return NULL;
     }
     state->rom_loc ++;
@@ -167,11 +186,11 @@ void dis_basic(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* 
     snprintf(buf, len, "%s", instr->mnemonic);
 }
 void dis_register(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* buf, size_t len) {
-    snprintf(buf, len, "%s %s", instr->mnemonic, regnames[peek(cpu, addr) & 0b11]);
+    snprintf(buf, len, "%s %s", instr->mnemonic, regnames[peek(cpu, addr) & 0b11][0]);
 }
 void dis_alu_reg(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* buf, size_t len) {
     snprintf(buf, len, "%s %s", instr->mnemonic,
-            regnames[(peek(cpu, addr) & XY_MASK) ? REG_DY : REG_DX]);
+            regnames[(peek(cpu, addr) & XY_MASK) ? REG_DY : REG_DX][0]);
 }
 void dis_alu_imm(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* buf, size_t len) {
     snprintf(buf, len, "%s %hhi", instr->mnemonic, peek(cpu, addr+1));

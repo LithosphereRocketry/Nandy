@@ -62,7 +62,7 @@ static void exe_add(cpu_state_t* cpu) {
 const instruction_t i_add = {
     .mnemonic = "add",
     .opcode_mask = XY_MASK,
-    .opcode = ALU_SEL_MASK | ALU_ADD,
+    .opcode = ALU_SEL_MASK | CARRY_SEL_MASK | ALU_ADD,
     .assemble = asm_alu_reg,
     .disassemble = dis_alu_reg,
     .execute = exe_add
@@ -75,7 +75,7 @@ static void exe_addc(cpu_state_t* cpu) {
 const instruction_t i_addc = {
     .mnemonic = "addc",
     .opcode_mask = XY_MASK,
-    .opcode = ALU_SEL_MASK | ALU_ADDC,
+    .opcode = ALU_SEL_MASK | CARRY_SEL_MASK | ALU_ADDC,
     .assemble = asm_alu_reg,
     .disassemble = dis_alu_reg,
     .execute = exe_addc
@@ -88,7 +88,7 @@ static void exe_sub(cpu_state_t* cpu) {
 const instruction_t i_sub = {
     .mnemonic = "sub",
     .opcode_mask = XY_MASK,
-    .opcode = ALU_SEL_MASK | ALU_SUB,
+    .opcode = ALU_SEL_MASK | CARRY_SEL_MASK | ALU_SUB,
     .assemble = asm_alu_reg,
     .disassemble = dis_alu_reg,
     .execute = exe_sub
@@ -101,7 +101,7 @@ static void exe_subc(cpu_state_t* cpu) {
 const instruction_t i_subc = {
     .mnemonic = "subc",
     .opcode_mask = XY_MASK,
-    .opcode = ALU_SEL_MASK | ALU_SUBC,
+    .opcode = ALU_SEL_MASK | CARRY_SEL_MASK | ALU_SUBC,
     .assemble = asm_alu_reg,
     .disassemble = dis_alu_reg,
     .execute = exe_subc

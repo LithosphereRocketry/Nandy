@@ -148,13 +148,17 @@ const char* parseChar(const char* expstr, stack_element_t* out) {
 }
 
 const char* parseSymbol(const char* expstr, const symtab_t* table, stack_element_t* out) {
+    const char* end = NULL;
     for(size_t i = 0; i < table->len; i++) {
         if(!strncmp(expstr, table->symbols[i].name, strlen(table->symbols[i].name))) {
-            out->value = table->symbols[i].value;
-            return expstr + strlen(table->symbols[i].name);
+            const char* local_end = expstr + strlen(table->symbols[i].name);
+            if(local_end > end) {
+                end = local_end;
+                out->value = table->symbols[i].value;
+            }
         }
     }
-    return NULL;
+    return end;
 }
 
 const char* parseOperator(const char* expstr, stack_element_t* out, bool unary) {

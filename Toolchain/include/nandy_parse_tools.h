@@ -9,7 +9,8 @@
 // Instruction parsing
 const char* endOfInput(const char* str);
 // Debugging tools
-extern const char* const regnames[5];
+extern const char** regnames[];
+extern const size_t n_regnames;
 // Assembly & parsing tools
 const char* parseFallback(const char* text);
 const char* parseReg(const char* text, regid_t* dest);

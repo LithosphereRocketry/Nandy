@@ -23,8 +23,6 @@ const asm_state_t INIT_ASM = {
     .unresolved = NULL
 };
 
-const char* const regnames[5] = { "sp", "io", "dx", "dy", "acc" };
-
 word_t peek(const cpu_state_t* cpu, addr_t addr) {
     return addr & ADDR_RAM_MASK ?
         cpu->ram[addr & ~ADDR_RAM_MASK]
@@ -58,19 +56,23 @@ int addLabel(asm_state_t* state, const char* label, int64_t value) {
 }
 
 const char* addUnresolved(asm_state_t* state, const char* arg, inst_resolve_t func) {
-    if(state->unresolved_sz >= state->unresolved_cap) {
-        if(state->unresolved_cap == 0) {
-            state->unresolved_cap = 1;
-        } else {
-            state->unresolved_cap *= 2;
+    if(arg) {
+        if(state->unresolved_sz >= state->unresolved_cap) {
+            if(state->unresolved_cap == 0) {
+                state->unresolved_cap = 1;
+            } else {
+                state->unresolved_cap *= 2;
+            }
+            state->unresolved = realloc(state->unresolved, 
+                    state->unresolved_cap*sizeof(unresolved_t));
         }
-        state->unresolved = realloc(state->unresolved, 
-                state->unresolved_cap*sizeof(unresolved_t));
+        const char* endloc = endOfInput(arg);
+        state->unresolved[state->unresolved_sz].func = func;
+        state->unresolved[state->unresolved_sz].location = state->rom_loc;
+        state->unresolved[state->unresolved_sz].str = strndup(arg, endloc-arg);
+        state->unresolved_sz ++;
+        return endloc;
+    } else {
+        return NULL;
     }
-    const char* endloc = endOfInput(arg);
-    state->unresolved[state->unresolved_sz].func = func;
-    state->unresolved[state->unresolved_sz].location = state->rom_loc;
-    state->unresolved[state->unresolved_sz].str = strndup(arg, endloc-arg);
-    state->unresolved_sz ++;
-    return endloc;
 }
