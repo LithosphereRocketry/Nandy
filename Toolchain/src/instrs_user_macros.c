@@ -3,6 +3,8 @@
 
 // This is the big scary one
 static const char* asm_macro_macro(const instruction_t* instr, const char* text, asm_state_t* state) {
+    char* end = endOfInput(text);
+    printf("Macros not implemented!\n");
     return NULL;
 }
 const instruction_t i_macro_macro = {
