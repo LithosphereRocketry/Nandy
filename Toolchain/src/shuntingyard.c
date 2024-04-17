@@ -4,7 +4,6 @@
 #include <stdbool.h>
 #include <ctype.h>
 #include <string.h>
-#include <stdio.h>
 
 // non-discriminated union because tokens will always be in one place and
 // numbers will always be in another
@@ -96,7 +95,7 @@ const char* parseInt(const char* expstr, stack_element_t* out) {
     return parseNumeric(expstr, 10, &out->value);
 }
 
-const char* parseChar(const char* expstr, stack_element_t* out) {
+const char* parseChar(const char* expstr, stack_element_t* out, FILE* debug) {
     const char* ptr = expstr;
     int64_t value;
     int count;
@@ -119,7 +118,7 @@ const char* parseChar(const char* expstr, stack_element_t* out) {
                     if(sscanf(ptr, "%lx%n", &value, &count) == 1) {
                         ptr += count;
                     } else {
-                        printf("Unrecognized hexadecimal literal\n");
+                        if(debug) fprintf(debug, "Unrecognized hexadecimal literal\n");
                         return NULL;
                     }
                     break;
@@ -127,7 +126,7 @@ const char* parseChar(const char* expstr, stack_element_t* out) {
                     if(sscanf(ptr, "%lo%n", &value, &count) == 1) {
                         ptr += count;
                     } else {
-                        printf("Unrecognized escape sequence\n");
+                        if(debug) fprintf(debug, "Unrecognized escape sequence\n");
                         return NULL;
                     }
             }
@@ -136,7 +135,7 @@ const char* parseChar(const char* expstr, stack_element_t* out) {
             ptr ++;
         }
         if(*ptr != '\'') {
-            printf("Missing terminator or incorrect length\n");
+            if(debug) fprintf(debug, "Missing terminator or incorrect length\n");
             return NULL;
         }
         ptr++;
@@ -188,7 +187,7 @@ int evalOperator(op_stack_t* stack, const operator_token_t* op) {
 
 // Based on: https://en.wikipedia.org/wiki/Shunting_yard_algorithm
 // and: https://web.archive.org/web/20110718214204/http://en.literateprograms.org/Shunting_yard_algorithm_(C)
-shunting_status_t parseExp(const symtab_t* symbols, const char* expstr, int64_t* result) {
+shunting_status_t parseExp(const symtab_t* symbols, const char* expstr, int64_t* result, FILE* debug) {
     op_stack_t operator_stack = {NULL, 0, 0};
     op_stack_t value_stack = {NULL, 0, 0};
     const char* ptr = expstr;
@@ -201,7 +200,7 @@ shunting_status_t parseExp(const symtab_t* symbols, const char* expstr, int64_t*
             ptr++;
         } else if(!lastNumber && (
                    (next = parseInt(ptr, &element))
-                || (next = parseChar(ptr, &element))
+                || (next = parseChar(ptr, &element, debug))
                 || (symbols && (next = parseSymbol(ptr, symbols, &element))))) {
             op_push(&value_stack, element);
             ptr = next;
@@ -214,7 +213,7 @@ shunting_status_t parseExp(const symtab_t* symbols, const char* expstr, int64_t*
                 lastNumber = true;
                 while(1) {
                     if(operator_stack.level <= 0) {
-                        printf("No matching left parenthesis\n");
+                        if(debug) fprintf(debug, "No matching left parenthesis\n");
                         exitcode = SHUNT_MISMATCHED_CLOSE;
                         break;
                     }
@@ -243,14 +242,14 @@ shunting_status_t parseExp(const symtab_t* symbols, const char* expstr, int64_t*
             }
             ptr = next;
         } else {
-            printf("Could not recognize symbol \"%s\"\n", ptr);
+            if(debug) fprintf(debug, "Could not recognize symbol \"%s\"\n", ptr);
             exitcode = SHUNT_UNRECOGNIZED;
         }
     }
     while(exitcode == SHUNT_DONE && operator_stack.level > 0) {
         stack_element_t op = op_pop(&operator_stack);
         if(evalOperator(&value_stack, op.token)) {
-            printf("Missing values on stack, probably missing operand\n");
+            if(debug) fprintf(debug, "Missing values on stack, probably missing operand\n");
             exitcode = SHUNT_MISSING_VALUE;
         }
     }
@@ -258,10 +257,10 @@ shunting_status_t parseExp(const symtab_t* symbols, const char* expstr, int64_t*
         if(value_stack.level == 1) {
             *result = op_pop(&value_stack).value;
         } else if(value_stack.level == 0) {
-            printf("No input provided\n");
+            if(debug) fprintf(debug, "No input provided\n");
             exitcode = SHUNT_NO_VALUES;
         } else {
-            printf("Values left on stack, probably missing right parenthesis\n");
+            if(debug) fprintf(debug, "Values left on stack, probably missing right parenthesis\n");
             exitcode = SHUNT_MISMATCHED_OPEN;
         }
     }

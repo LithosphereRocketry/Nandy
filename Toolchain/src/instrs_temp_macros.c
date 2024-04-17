@@ -3,19 +3,19 @@
 #include "shuntingyard.h"
 #include <stdio.h>
 
-static bool resolveRda(asm_state_t* state, const char* text, addr_t pos) {
+static bool resolveRda(asm_state_t* state, const char* text, addr_t pos, FILE* debug) {
     int64_t value;
-    shunting_status_t status = parseExp(&state->resolved, text, &value);
+    shunting_status_t status = parseExp(&state->resolved, text, &value, debug);
     if(status == SHUNT_DONE) {
         if(!isBounded(value, 16, BOUND_UNSIGNED)) {
-            printf("Error: address %s is out of range! (%li)\n", text, value);
+            if(debug) fprintf(debug, "Error: address %s is out of range! (%li)\n", text, value);
             return false;
         }
         state->rom[pos+5] = (value >> 8) & 0xFF;
         state->rom[pos+2] = value & 0xFF;
         return true;
     } else {
-        printf("Parse failed: %i\n", status);
+        if(debug) fprintf(debug, "Parse failed: %i\n", status);
         return false;
     }
 }

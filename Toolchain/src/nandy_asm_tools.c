@@ -101,7 +101,8 @@ int assemble(const char* str, asm_state_t* dest) {
     for(size_t i = 0; i < dest->unresolved_sz; i++) {
         if(!dest->unresolved[i].func(dest, 
             dest->unresolved[i].str,
-            dest->unresolved[i].location
+            dest->unresolved[i].location,
+            stdout
         )) {
             return -7;
         }

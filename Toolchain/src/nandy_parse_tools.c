@@ -62,47 +62,47 @@ const char* parseRegRequired(const char* text, regid_t* dest) {
     return after;
 }
 
-static bool resolveImm4s(asm_state_t* state, const char* text, addr_t pos) {
+static bool resolveImm4s(asm_state_t* state, const char* text, addr_t pos, FILE* debug) {
     int64_t value;
-    shunting_status_t status = parseExp(&state->resolved, text, &value);
+    shunting_status_t status = parseExp(&state->resolved, text, &value, debug);
     if(status == SHUNT_DONE) {
         if(!isBounded(value, 4, BOUND_SIGNED)) {
-            printf("Warning: value of %s ( == %li) will be truncated\n", text, value);
+            if(debug) fprintf(debug, "Warning: value of %s ( == %li) will be truncated\n", text, value);
         }
         state->rom[pos] |= value & IMM4_MASK;
         return true;
     } else {
-        printf("Parse failed: %i\n", status);
+        if(debug) fprintf(debug, "Parse failed: %i\n", status);
         return false;
     }
 }
 
-static bool resolveImm4u(asm_state_t* state, const char* text, addr_t pos) {
+static bool resolveImm4u(asm_state_t* state, const char* text, addr_t pos, FILE* debug) {
     int64_t value;
-    shunting_status_t status = parseExp(&state->resolved, text, &value);
+    shunting_status_t status = parseExp(&state->resolved, text, &value, debug);
     if(status == SHUNT_DONE) {
         if(!isBounded(value, 4, BOUND_UNSIGNED)) {
-            printf("Warning: value of %s ( == %li) will be truncated\n", text, value);
+            if(debug) fprintf(debug, "Warning: value of %s ( == %li) will be truncated\n", text, value);
         }
         state->rom[pos] |= value & IMM4_MASK;
         return true;
     } else {
-        printf("Parse failed: %i\n", status);
+        if(debug) fprintf(debug, "Parse failed: %i\n", status);
         return false;
     }
 }
 
-static bool resolveImm8(asm_state_t* state, const char* text, addr_t pos) {
+static bool resolveImm8(asm_state_t* state, const char* text, addr_t pos, FILE* debug) {
     int64_t value;
-    shunting_status_t status = parseExp(&state->resolved, text, &value);
+    shunting_status_t status = parseExp(&state->resolved, text, &value, debug);
     if(status == SHUNT_DONE) {
         if(!isBounded(value, 8, BOUND_EITHER)) {
-            printf("Warning: value of %s ( == %li) will be truncated\n", text, value);
+            if(debug) fprintf(debug, "Warning: value of %s ( == %li) will be truncated\n", text, value);
         }
         state->rom[pos+1] = value;
         return true;
     } else {
-        printf("Parse failed: %i\n", status);
+        if(debug) fprintf(debug, "Parse failed: %i\n", status);
         return false;
     }
 }
@@ -144,7 +144,7 @@ const char* asm_alu_reg(const instruction_t* instr, const char* text, asm_state_
 const char* asm_alu_imm(const instruction_t* instr, const char* text, asm_state_t* state) {
     state->rom[state->rom_loc] = instr->opcode;
     const char* endptr = addUnresolved(state, text, resolveImm8);
-    state->rom_loc += 2;
+    state->rom_loc += 2;    
     return endptr;
 }
 

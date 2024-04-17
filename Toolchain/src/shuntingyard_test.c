@@ -18,7 +18,7 @@ int main(int argc, char** argv) {
     while(1) {
         char* str = fgets_dup(stdin);
         int64_t val;
-        shunting_status_t status = parseExp(&table, str, &val);
+        shunting_status_t status = parseExp(&table, str, &val, stdout);
         free(str);
         if(status != SHUNT_DONE) {
             printf("Parse failed: %i\n", status);

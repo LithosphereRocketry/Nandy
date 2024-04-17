@@ -47,8 +47,4 @@ typedef enum {
 bool isBounded(int64_t value, int64_t bitwidth, bound_mode_t bound);
 int64_t signExtend(int64_t value, int64_t bitwidth);
 
-// Label resolution
-// bool resolveImm4s(asm_state_t* state, const char* text, addr_t pos);
-// bool resolveImm8(asm_state_t* state, const char* text, addr_t pos);
-
 #endif

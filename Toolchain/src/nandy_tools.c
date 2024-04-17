@@ -57,20 +57,26 @@ int addLabel(asm_state_t* state, const char* label, int64_t value) {
 
 const char* addUnresolved(asm_state_t* state, const char* arg, inst_resolve_t func) {
     if(arg) {
-        if(state->unresolved_sz >= state->unresolved_cap) {
-            if(state->unresolved_cap == 0) {
-                state->unresolved_cap = 1;
-            } else {
-                state->unresolved_cap *= 2;
-            }
-            state->unresolved = realloc(state->unresolved, 
-                    state->unresolved_cap*sizeof(unresolved_t));
-        }
         const char* endloc = endOfInput(arg);
-        state->unresolved[state->unresolved_sz].func = func;
-        state->unresolved[state->unresolved_sz].location = state->rom_loc;
-        state->unresolved[state->unresolved_sz].str = strndup(arg, endloc-arg);
-        state->unresolved_sz ++;
+        char* str = strndup(arg, endloc-arg);
+        addr_t loc = state->rom_loc;
+        if(func(state, arg, loc, NULL)) {
+            free(str);
+        } else {
+            if(state->unresolved_sz >= state->unresolved_cap) {
+                if(state->unresolved_cap == 0) {
+                    state->unresolved_cap = 1;
+                } else {
+                    state->unresolved_cap *= 2;
+                }
+                state->unresolved = realloc(state->unresolved, 
+                        state->unresolved_cap*sizeof(unresolved_t));
+            }
+            state->unresolved[state->unresolved_sz].func = func;
+            state->unresolved[state->unresolved_sz].location = state->rom_loc;
+            state->unresolved[state->unresolved_sz].str = str;
+            state->unresolved_sz ++;
+        }
         return endloc;
     } else {
         return NULL;

@@ -43,9 +43,9 @@ const instruction_t i_jar = {
     .execute = exe_jar
 };
 
-static bool resolveReljump(asm_state_t* state, const char* text, addr_t pos) {
+static bool resolveReljump(asm_state_t* state, const char* text, addr_t pos, FILE* debug) {
     int64_t value;
-    shunting_status_t status = parseExp(&state->resolved, text, &value);
+    shunting_status_t status = parseExp(&state->resolved, text, &value, debug);
     if(status == SHUNT_DONE) {
         int64_t offset = value - pos - 1;
         if(!isBounded(value, 12, BOUND_SIGNED)) {
@@ -56,7 +56,7 @@ static bool resolveReljump(asm_state_t* state, const char* text, addr_t pos) {
         state->rom[pos+1] = offset & 0xFF;
         return true;
     } else {
-        printf("Parse failed: %i\n", status);
+        if(debug) fprintf(debug, "Parse failed: %i\n", status);
         return false;
     }
 }

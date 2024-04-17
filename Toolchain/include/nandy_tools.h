@@ -13,6 +13,7 @@
 
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "symtab.h"
 #include "nandy_definitions.h"
@@ -73,7 +74,7 @@ int addLabel(asm_state_t* state, const char* label, int64_t value);
 typedef void (*inst_disassemble_t)(const instruction_t*, cpu_state_t*, addr_t, char*, size_t);
 typedef void (*inst_execute_t)(cpu_state_t*);
 typedef const char* (*inst_assemble_t)(const instruction_t*, const char*, asm_state_t*);
-typedef bool (*inst_resolve_t)(asm_state_t*, const char*, addr_t);
+typedef bool (*inst_resolve_t)(asm_state_t*, const char*, addr_t, FILE*);
 
 // Instruction definitions
 typedef struct instruction {
