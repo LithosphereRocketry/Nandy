@@ -68,3 +68,32 @@ const instruction_t i_macro_assert = {
     .mnemonic = "@assert",
     .assemble = asm_macro_assert
 };
+
+static const char* asm_macro_loc(const instruction_t* instr, const char* text, asm_state_t* state) {
+    FILE* debug = stdout;
+    int64_t value;
+    char* arg = strndup(text, endOfInput(text)-text);
+    shunting_status_t status = parseExp(&state->resolved, arg, &value, debug);
+    if(status == SHUNT_DONE) {
+        if(isBounded(value, 16, BOUND_UNSIGNED)) {
+            if(value > state->rom_loc) {
+                state->rom_loc = value;
+                free(arg);
+                return endOfInput(text);
+            } else {
+                if(debug) fprintf(debug, "Location %li (%s) is before current address %i\n",
+                        value, text, state->rom_loc);
+            }
+        } else {
+            if(debug) fprintf(debug, "Assertion failed (%s)\n", text);
+        }
+    } else {
+        if(debug) fprintf(debug, "Parse failed: %i\n", status);
+    }
+    free(arg);
+    return NULL;
+}
+const instruction_t i_macro_loc = {
+    .mnemonic = "@loc",
+    .assemble = asm_macro_loc
+};

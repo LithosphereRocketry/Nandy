@@ -28,6 +28,8 @@
 #define REGID_MASK 0b0011
 #define IMM4_MASK 0b1111
 
+#define ISR_ADDR 0x7F00
+
 typedef enum alu_mode {
 	ALU_B = 0x0,
 	ALU_OR = 0x1,

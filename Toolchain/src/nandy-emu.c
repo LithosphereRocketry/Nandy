@@ -258,7 +258,7 @@ bool step(bool debugint) {
 		isInterrupt = true;
 		ix = (pc+1) & 0xFF;
 		iy = (pc+1) >> 8;
-		pc = 0x7EFF;
+		pc = ISR_ADDR-1;
 	}
 
 	word_t i = fetch();
