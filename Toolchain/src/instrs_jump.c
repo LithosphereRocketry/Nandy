@@ -48,7 +48,7 @@ static bool resolveReljump(asm_state_t* state, const char* text, addr_t pos, FIL
     shunting_status_t status = parseExp(&state->resolved, text, &value, debug);
     if(status == SHUNT_DONE) {
         int64_t offset = value - pos - 1;
-        if(!isBounded(value, 12, BOUND_SIGNED)) {
+        if(!isBounded(offset, 12, BOUND_SIGNED)) {
             printf("Error: jump to %s is too long! (%li)\n", text, offset);
             return false;
         }

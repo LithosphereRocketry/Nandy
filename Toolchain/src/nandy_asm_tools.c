@@ -7,8 +7,8 @@
 #include "nandy_parse_tools.h"
 #include "iotools.h"
 
-bool isValidLabel(char c) {
-    return isalpha(c) || c == '_';
+bool isValidLabel(char c, bool isfirst) {
+    return isalpha(c) || c == '_' || (!isfirst && isalnum(c));
 }
 
 char* parseLabel(const char* str, const char** startOfText) {
@@ -30,7 +30,7 @@ char* parseLabel(const char* str, const char** startOfText) {
             ptr++;
         } else if(endOfWord) { // not a space, not :, and past an existing space
             return NULL;
-        } else if(!isValidLabel(*ptr)) {
+        } else if(!isValidLabel(*ptr, ptr == str)) {
             return NULL;
         } else {
             ptr++;

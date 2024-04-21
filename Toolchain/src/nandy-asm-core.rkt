@@ -166,8 +166,8 @@
          (cons "bell" (idesc bell-exp '()))
          (cons "dint" (idesc dint-exp '()))
          (cons "eint" (idesc eint-exp '()))
-         (cons "iclr" (idesc eint-exp '()))
-         (cons "iset" (idesc dint-exp '()))
+         (cons "iclr" (idesc iclr-exp '()))
+         (cons "iset" (idesc iset-exp '()))
          (cons "_isp" (idesc _isp-exp (list parse-number)))
          (cons "isp" (idesc isp-exp (list parse-number)))
          (cons "or" (idesc or-exp (list parse-reg)))
@@ -465,7 +465,8 @@
                       [index 0]
                       [static-index #x8000])
           (if (null? exps)
-              (cond [(> index #x8000) (raise "Program is too large for 32KB ROM, reduce size")]
+              (cond [(< index #x8000) (recurse exps ltab (cons (nop-exp) clean-exps) (+ index (exp-length (nop-exp))) static-index)]
+                    [(> index #x8000) (raise "Program is too large for 32KB ROM, reduce size")]
                     [(> static-index #xFF00) (raise "Static memory collides with stack, reduce static allocations")]
                     [else (labeled-program (hash-set ltab "FREE_MEM" static-index)
                                            (reverse clean-exps))])

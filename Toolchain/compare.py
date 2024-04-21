@@ -10,7 +10,7 @@ for fname in os.listdir(directory):
             print("C assembly failed on ", f)
             exit(-1)
         elif subprocess.run(["./nandy-asm-racket", f, progname+"_rkt.nb"]).returncode != 0:
-            print("C assembly failed on ", f)
+            print("Racket assembly failed on ", f)
             exit(-1)
         cbin = open(progname+".nb", "rb").read()
         rbin = open(progname+"_rkt.nb", "rb").read()

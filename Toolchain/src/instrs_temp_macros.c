@@ -44,3 +44,13 @@ const instruction_t i_call = {
     .mnemonic = "call",
     .assemble = asm_call
 };
+
+static const char* asm_goto(const instruction_t* instr, const char* text, asm_state_t* state) {
+    const char* end = i_rda.assemble(&i_rda, text, state);
+    i_ja.assemble(&i_ja, "", state);
+    return end;
+}
+const instruction_t i_goto = {
+    .mnemonic = "goto",
+    .assemble = asm_goto
+};
