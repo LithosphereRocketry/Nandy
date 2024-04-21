@@ -1,11 +1,11 @@
 rdi 0
 wr sp
-cclr
 rdi 10
 start:
 _addi 48
 wr io
 _subi 48
 subi 1
+ctog
 jcz start
 brk
