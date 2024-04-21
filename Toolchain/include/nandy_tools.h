@@ -58,6 +58,7 @@ typedef struct asm_state {
 } asm_state_t;
 
 extern const asm_state_t INIT_ASM;
+void asm_state_destroy(asm_state_t* state);
 
 word_t peek(const cpu_state_t* cpu, addr_t addr);
 void poke(cpu_state_t* cpu, addr_t addr, word_t value);

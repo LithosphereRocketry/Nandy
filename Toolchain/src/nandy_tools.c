@@ -23,6 +23,16 @@ const asm_state_t INIT_ASM = {
     .unresolved = NULL
 };
 
+void asm_state_destroy(asm_state_t* state) {
+    symtab_destroy(&state->resolved);
+    if(state->unresolved) {
+        for(size_t i = 0; i < state->unresolved_sz; i++) {
+            free(state->unresolved[i].str);
+        }
+        free(state->unresolved);
+    }
+}
+
 word_t peek(const cpu_state_t* cpu, addr_t addr) {
     return addr & ADDR_RAM_MASK ?
         cpu->ram[addr & ~ADDR_RAM_MASK]

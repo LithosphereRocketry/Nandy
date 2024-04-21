@@ -37,6 +37,8 @@ int main(int argc, char** argv) {
 
     FILE* fdest = fopen(argv[2], "w");
     fwrite(state.rom, sizeof(word_t), ROM_SIZE, fdest);
+    fclose(fdest);
+    asm_state_destroy(&state);
 
     free(text);
 }

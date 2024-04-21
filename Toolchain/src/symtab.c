@@ -2,6 +2,16 @@
 
 #include "symtab.h"
 
+void symtab_destroy(symtab_t* table) {
+    if(table->symbols) {
+        for(size_t i = 0; i < table->len; i++) {
+            free((char*) table->symbols[i].name);
+        }
+        free(table->symbols);
+        table->symbols = NULL;
+    }
+}
+
 // Claims ownership of name
 void symtab_put(symtab_t* table, const char* name, int64_t value) {
     int64_t* prevval = symtab_get(table, name);
