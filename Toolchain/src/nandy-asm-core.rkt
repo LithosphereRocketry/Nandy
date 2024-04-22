@@ -17,7 +17,7 @@
 ; Macros
 (struct @include-exp (path) #:transparent)
 (struct @define-exp (sym val) #:transparent)
-(struct @static-exp (len sym) #:transparent)
+(struct @static-exp (sym len) #:transparent)
 (struct @loc-exp (addr) #:transparent)
 (struct @memloc-exp (addr) #:transparent)
 
@@ -152,7 +152,7 @@
   (make-immutable-hash
    (list (cons "@define" (idesc @define-exp (list parse-label parse-number)))
          (cons "@include" (idesc @include-exp (list parse-fpath)))
-         (cons "@static" (idesc @static-exp (list parse-number parse-label)))
+         (cons "@static" (idesc @static-exp (list parse-label parse-number)))
          (cons "@loc" (idesc @loc-exp (list parse-number)))
          (cons "@memloc" (idesc @memloc-exp (list parse-number)))
          (cons "nop" (idesc nop-exp '()))
