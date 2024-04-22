@@ -8,6 +8,7 @@ static const instruction_t* default_instrs[] = {
     &i_macro_assert,
     &i_macro_loc,
     &i_macro_memloc,
+    &i_macro_static,
 
     &i_rda,
     &i_call,

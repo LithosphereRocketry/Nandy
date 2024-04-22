@@ -98,61 +98,60 @@ const instruction_t i_macro_loc = {
     .assemble = asm_macro_loc
 };
 
-static bool resolveMemloc(asm_state_t* state, const char* text, addr_t, FILE* debug) {
+static const char* asm_macro_memloc(const instruction_t* instr, const char* text, asm_state_t* state) {
+    FILE* debug = stdout;
     int64_t value;
-    shunting_status_t status = parseExp(&state->resolved, text, &value, debug);
+    const char* end = endOfInput(text);
+    char* arg = strndup(text, end-text);
+    shunting_status_t status = parseExp(&state->resolved, arg, &value, debug);
     if(status == SHUNT_DONE) {
         if(isBounded(value, 16, BOUND_UNSIGNED)) {
             if(value > state->ram_loc) {
                 state->ram_loc = value;
-                return true;
+                return end;
             } else {
                 if(debug) fprintf(debug, "Memory location 0x%lx (%s) is before current address %i\n",
-                        value, text, state->ram_loc);
-                return false;
+                        value, arg, state->ram_loc);
+                return NULL;
             }
         } else {
             if(debug) fprintf(debug, "Assertion failed (%s)\n", text);
-            return false;
+            return NULL;
         }
     } else {
         if(debug) fprintf(debug, "Parse failed: %i\n", status);
-        return false;
+        return NULL;
     }
-}
-static const char* asm_macro_memloc(const instruction_t* instr, const char* text, asm_state_t* state) {
-    return addUnresolved(state, text, resolveMemloc);
 }
 const instruction_t i_macro_memloc = {
     .mnemonic = "@memloc",
     .assemble = asm_macro_memloc
 };
 
-static bool resolveStatic(asm_state_t* state, const char* text, addr_t, FILE* debug) {
+static const char* asm_macro_static(const instruction_t* instr, const char* text, asm_state_t* state) {
+    FILE* debug = stdout;
     while(isspace(*text) && *text != '\n') text++;
+    const char* end = endOfInput(text);
+    char* arg = strndup(text, end-text);
     int64_t value;
-    const char* division = parseFallback(text);
+    const char* division = parseFallback(arg);
     shunting_status_t status = parseExp(&state->resolved, division, &value, debug);
     if(status == SHUNT_DONE) {
         if(value < 0) {
-            if(debug) fprintf(debug, "Static size %li (%s) cannot be negative\n", text, value);
-            return false;
+            if(debug) fprintf(debug, "Static size %li (%s) cannot be negative\n", value, division);
         } else if(state->ram_loc + value > 0xFF00) {
             if(debug) fprintf(debug, "Static allocation collides with stack\n");
-            return false;
         } else {
-            const char* lblName = strndup(text, division-text);
+            const char* lblName = strndup(arg, division-arg);
             addLabel(state, lblName, state->ram_loc);
             state->ram_loc += value;
-            return true;
+            return end;
         }
     } else {
         if(debug) fprintf(debug, "Parse failed: %i\n", status);
-        return false;
     }
-}
-static const char* asm_macro_static(const instruction_t* instr, const char* text, asm_state_t* state) {
-    return addUnresolved(state, text, resolveStatic);
+    free(arg);
+    return NULL;
 }
 const instruction_t i_macro_static = {
     .mnemonic = "@static",

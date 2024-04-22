@@ -96,7 +96,9 @@ int assemble_helper(const char* str, asm_state_t* dest, bool inst_line) {
     return assemble_helper(nextToken, dest, inst_line);
 }
 int assemble(const char* str, asm_state_t* dest) {
+    addLabel(dest, strdup("ISR"), ISR_ADDR);
     int asmstatus = assemble_helper(str, dest, true);
+    addLabel(dest, strdup("FREE_MEM"), dest->ram_loc);
     if(asmstatus != 0) { return asmstatus; }; // TODO: memory leak
     for(size_t i = 0; i < dest->unresolved_sz; i++) {
         if(!dest->unresolved[i].func(dest, 

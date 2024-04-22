@@ -23,7 +23,6 @@ int main(int argc, char** argv) {
     }
 
     asm_state_t state = INIT_ASM;
-    addLabel(&state, strdup("ISR"), ISR_ADDR);
     int err = assemble(text, &state);
     if(err) {
         printf("Failed to assemble: error %i\n", err);
