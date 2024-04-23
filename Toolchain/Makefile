@@ -2,7 +2,7 @@
 
 # This should be all you need to change
 TARGETS = nandy-emu binconvert nandy-asm shuntingyard_test
-RKT_TARGETS = nandy-asm-racket
+# RKT_TARGETS = nandy-asm-racket
 
 INCDIR = include/
 # C/C++ files go here
