@@ -25,6 +25,7 @@ All formats are case-insensitive.
 | `'\x12'` | Hexadecimal number         |
 ### Supported Operations
 | Symbol | Operation                |
+| ------ | ------------------------ |
 | `+`    | Addition, unary identity |
 | `-`    | Subtraction, negation    |
 | `*`    | Multiplication           |
@@ -67,7 +68,6 @@ Skips current assembly forward to a specified memory address. Contents of the
 skipped region are undefined.
 ##### `@memloc <value>`
 Skips static memory reservation forward to a specified memory address.
-##### `@
 #### Code Macros
 These macros generate finite chunks of code in the final executable, and as such
 can be treated as conventional instructions; they do not follow the "@"
