@@ -1,5 +1,6 @@
 #include "shuntingyard.h"
 #include "shuntingyard_funcs.h"
+#include "charparse.h"
 
 #include <stdbool.h>
 #include <ctype.h>
@@ -95,45 +96,13 @@ const char* parseInt(const char* expstr, stack_element_t* out) {
     return parseNumeric(expstr, 10, &out->value);
 }
 
-const char* parseChar(const char* expstr, stack_element_t* out, FILE* debug) {
+const char* parseCharLiteral(const char* expstr, stack_element_t* out, FILE* debug) {
     const char* ptr = expstr;
-    int64_t value;
-    int count;
+    char value;
     if(*ptr == '\'') {
         ptr++;
-        if(*ptr == '\\') {
-            ptr++;
-            switch(*ptr) {
-                case 'a': value = '\a'; ptr++; break;
-                case 'b': value = '\b'; ptr++; break;
-                case 'f': value = '\f'; ptr++; break;
-                case 'n': value = '\n'; ptr++; break;
-                case 'r': value = '\r'; ptr++; break;
-                case 't': value = '\t'; ptr++; break;
-                case 'v': value = '\v'; ptr++; break;
-                case '\\':
-                case '\'': value = *ptr; ptr++; break;
-                case 'x':
-                    ptr++;
-                    if(sscanf(ptr, "%lx%n", &value, &count) == 1) {
-                        ptr += count;
-                    } else {
-                        if(debug) fprintf(debug, "Unrecognized hexadecimal literal\n");
-                        return NULL;
-                    }
-                    break;
-                default:
-                    if(sscanf(ptr, "%lo%n", &value, &count) == 1) {
-                        ptr += count;
-                    } else {
-                        if(debug) fprintf(debug, "Unrecognized escape sequence\n");
-                        return NULL;
-                    }
-            }
-        } else {
-            value = *ptr;
-            ptr ++;
-        }
+        ptr = parseChar(ptr, &value, debug);
+        if(!ptr) return NULL;
         if(*ptr != '\'') {
             if(debug) fprintf(debug, "Missing terminator or incorrect length\n");
             return NULL;
@@ -200,7 +169,7 @@ shunting_status_t parseExp(const symtab_t* symbols, const char* expstr, int64_t*
             ptr++;
         } else if(!lastNumber && (
                    (next = parseInt(ptr, &element))
-                || (next = parseChar(ptr, &element, debug))
+                || (next = parseCharLiteral(ptr, &element, debug))
                 || (symbols && (next = parseSymbol(ptr, symbols, &element))))) {
             op_push(&value_stack, element);
             ptr = next;

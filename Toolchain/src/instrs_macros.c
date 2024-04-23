@@ -1,6 +1,7 @@
 #include "nandy_instr_defs.h"
 #include "nandy_parse_tools.h"
 #include "shuntingyard.h"
+#include "charparse.h"
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -156,4 +157,32 @@ static const char* asm_macro_static(const instruction_t* instr, const char* text
 const instruction_t i_macro_static = {
     .mnemonic = "@static",
     .assemble = asm_macro_static
+};
+
+static const char* asm_macro_string(const instruction_t* instr, const char* text, asm_state_t* state) {
+    while(isspace(*text) && *text != '\n') text++;
+    if(*text != '\"') {
+        printf("String literal missing quote\n");
+        return NULL;
+    }
+    text++;
+    while(*text != '\"') {
+        text = parseChar(text, (char*) state->rom + state->rom_loc, stdout);
+        if(!text) {
+            printf("Character parse failed\n");
+            return NULL;
+        }
+        state->rom_loc ++;
+        if(state->rom_loc >= ADDR_RAM_MASK-1) {
+            printf("String does not fit in ROM!\n");
+            return NULL;
+        }
+    }
+    state->rom[state->rom_loc + 1] = '\0';
+    state->rom_loc += 2;
+    return text+1;
+}
+const instruction_t i_macro_string = {
+    .mnemonic = "@string",
+    .assemble = asm_macro_string
 };
