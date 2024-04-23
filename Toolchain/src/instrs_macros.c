@@ -9,7 +9,7 @@ static bool resolveEcho(asm_state_t* state, const char* text, addr_t, FILE* debu
     int64_t value;
     shunting_status_t status = parseExp(&state->resolved, text, &value, debug);
     if(status == SHUNT_DONE) {
-        if(debug) fprintf(debug, "%li\n", value);
+        if(debug) fprintf(debug, "%s : %li\n", text, value);
         return true;
     } else {
         if(debug) fprintf(debug, "Parse failed: %i\n", status);
