@@ -7,7 +7,35 @@ itself; for information on the architecture itself, consult the Programmer's
 Guide and Instruction Reference documents.
 
 ## Theory of Operation
+The NANDy reference assembler operates in two main passes: a layout phase and a
+resolution phase.
 
+### Layout Phase
+Before parsing, the label `ISR` is set at the fixed location `0xFF00`.
+
+During the layout phase, instructions are parsed from top to bottom and opcodes
+placed in memory. Static and literal allocations are also determined at this
+time, and in-program labels are determined as parsing reaches them.
+
+During this phase, value expressions -- for example, labels and mathematical
+expressions -- are evaluated opportunistically; they will only be evaluated if
+all of their prerequisites are already evaluated, and otherwise they will be
+deferred to the next phase.
+
+By the end of this phase, the memory layout of the program must be fully
+determined. In practice, this means that layout macros such as `@loc` or
+`@static` can only depend on labels that occur before them in the program;
+otherwise, it would be possible to make a layout which is impossible to resolve.
+
+At the end of this phase, the label `FREE_MEM` is set at the first non-allocated
+location in RAM.
+
+### Resolution Phase
+During the resolution phase, all instructions that were deferred in the layout
+phase are re-parsed in top-to-bottom order. No further recursive processing is 
+performed; if an expression is missing dependencies at this stage, assembly will
+fail with an error. In general, this means it is most safe to have expressions
+depend only on expressions defined above them in the code.
 
 ## Reference
 ### Supported Numeric Formats
