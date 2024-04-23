@@ -7,7 +7,7 @@
 extern const instruction_t i_macro_echo, i_macro_define, i_macro_assert;
 extern const instruction_t i_macro_loc, i_macro_memloc, i_macro_static; // align, memalign, include
 // temp macros
-extern const instruction_t i_rda, i_call, i_goto; // i_move
+extern const instruction_t i_rda, i_call, i_goto, i_move; 
 // register
 extern const instruction_t i_nop, i_rd, i_wr, i_sw;
 // jump

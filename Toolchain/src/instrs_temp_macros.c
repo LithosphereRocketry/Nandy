@@ -54,3 +54,31 @@ const instruction_t i_goto = {
     .mnemonic = "goto",
     .assemble = asm_goto
 };
+
+static const char* asm_move(const instruction_t* instr, const char* text, asm_state_t* state) {
+    regid_t a, b;
+    text = parseReg(text, &a);
+    if(!text) return NULL;
+    text = parseReg(text, &b);
+    if(!text) return NULL;
+    if(a != b) {
+        if(b == REG_ACC) {
+            i_rd.assemble(&i_rd, regnames[a][0], state);
+        } else if(a == REG_ACC) {
+            i_wr.assemble(&i_wr, regnames[b][0], state);
+        } else if(a == REG_IO) {
+            i_sw.assemble(&i_sw, regnames[b][0], state);
+            i_rd.assemble(&i_rd, regnames[a][0], state);
+            i_sw.assemble(&i_sw, regnames[b][0], state);
+        } else {
+            i_sw.assemble(&i_sw, regnames[a][0], state);
+            i_wr.assemble(&i_wr, regnames[b][0], state);
+            i_sw.assemble(&i_sw, regnames[a][0], state);
+        }
+    }
+    return text;
+}
+const instruction_t i_move = {
+    .mnemonic = "move",
+    .assemble = asm_move
+};

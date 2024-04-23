@@ -13,6 +13,7 @@ static const instruction_t* default_instrs[] = {
     &i_rda,
     &i_call,
     &i_goto,
+    &i_move,
 
     &i_nop, 
     &i_rd,
