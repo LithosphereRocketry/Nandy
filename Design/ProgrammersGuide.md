@@ -1,7 +1,5 @@
 # NANDy Programmer's Manual
 
-NOTE: implementation of these features not yet complete
-
 ## About This Guide
 This guide is intended to detail all of the explicit rules, as well as some best
 practices and implementation hints, for writing programs in NANDy assembly.
@@ -36,20 +34,16 @@ very strongly discouraged (but not prohibited) from using the `@` character in
 any other context.
 
 ### Literals and Symbols
-Several instructions take a literal value as an argument; this can be a decimal
-number *(more radices coming soon) or a combination of operations on another
-literal. Currently only the byte selection operator is supported, denoted `$`.
-The expression `N$M` is equal to the Mth byte of N, with 0 representing the
-least-significant byte; in this operation M must be a decimal number and cannot
-contain other symbols.
+Several instructions take a literal value as an argument; this can be any
+mathematical expression of numeric literals and symbols. Generally speaking,
+assignment of symbols is not recursive; more detail may be found in Appendix B.
 
 Symbols may be defined in one of three ways:
 * Placing a label `name:` in the program sets the value of the symbol "name" to
 the address of the first instruction following the label.
 * The macro `@define name <value>` sets the value of the symbol "name" to the
-given value. This assignment is not recursive; it may depend on any label or any
-`@define` before it in the program, but not itself or any `@define` after it.
-* The macro `@static <amount> name` reserves `amount` bytes at the bottom of RAM
+given value. This assignment is not recursive.
+* The macro `@static name <amount>` reserves `amount` bytes at the bottom of RAM
 for static variables, and creates a symbol `name` containing the address of the
 first byte of the reserved region.
 
@@ -370,156 +364,3 @@ while `iclr` disables it, causing the primary and alternate DX and DY registers
 to flip without affecting program flow. This effectively increases the number of
 available registers from 4 to 6. These instructions should not be used while
 interrupts are enabled, as undefined behavior will result in most cases.
-
-## Instruction Reference
-
-### General-purpose
-
-#### Control
-##### `nop`
-Does nothing.
-##### `brk`
-Stops program execution. In emulation, exits to the debugger interface.
-##### `bell`
-Plays an audible alert tone.
-##### `eint`, `dint`
-Enables or disables interrupts, respectively.
-##### `iset`, `iclr`
-Sets or clears interrupt status, respectively. Does not trigger an interrupt;
-behavior is undefined while external interrupts are enabled.
-##### `j <label>`
-Jumps to the specified label.
-##### `jcz <label>`
-Jumps to the specified label if the carry bit is 0.
-##### `ja`
-Jumps to the address formed by the combination of DY and DX.
-##### `jar`
-Identical to `ja`, but replaces the contents of DY and DX with the address of
-the following instruction.
-##### `jri`
-Identical to `ja`, but also clears interrupt status if it is present.
-
-#### Registers
-##### `rd <register>`
-Moves the contents of the specified register into the accumulator.
-##### `wr <register>`
-Moves the contents of the accumulator into the specified register.
-##### `sw <register>`
-Exchanges the contents of the accumulator with the specified register.
-##### `rdi <value>`
-Loads the specified 8-bit value into the accumulator.
-##### `ctog`
-Toggles the value of the carry bit.
-
-### Arithmetic and Logic
-
-#### Addition & subtraction
-For all of the following, the carry bit is set to the carry-out value of the
-operation.
-##### `add <dx/dy>`
-Adds the contents of the specified register to the accumulator.
-##### `addc <dx/dy>`
-Identical to `add` but treats the carry bit as a carry-in bit from a less
-significant byte.
-##### `sub <dx/dy>`
-Subtracts the contents of the specified register from the accumulator.
-##### `subc <dx/dy>`
-Identical to `sub` but treats the carry bit as a carry-in bit from a less
-significant byte.
-##### `_add`, `_sub`, `_addc`, `_subc`
-Identical to their respective non-underscore variants, but do not modify the
-carry bit.
-##### `addi`, `addci`, `subi`, `subci`, `_addi`, `_addci`, `_subi`, `_subci`
-Identical to their respective non-`i` variants, but use the provided immediate
-value in place of the DX or DY register.
-
-#### Comparison
-##### `zero`
-Sets the carry bit to 1 if the accumulator holds the value 0, and sets it to 0
-otherwise.
-##### `nzero`
-Sets the carry bit to 0 if the accumulator holds the value 0, and sets it to 1 
-otherwise.
-##### `par`, `npar`
-Sets the carry bit to 1 if the accumulator contains an odd or even number of
-high bits, respecitvely.
-##### `sgn`, `nsgn`
-Sets the carry bit to 1 if the accumulator contains a negative or positive
-two's-complement value, respectively.
-
-#### Bitwise logic
-##### `inv <dx/dy>`
-Sets the contents of the accumulator to the bitwise inverse of the specified
-register.
-##### `and <dx/dy>`
-Bitwise-ands the contents of the accumulator with the specified register and
-stores the results in the accumulator.
-##### `nand <dx/dy>`
-Bitwise-nands the contents of the accumulator with the specified register and
-stores the results in the accumulator.
-##### `or <dx/dy>`
-Bitwise-ors the contents of the accumulator with the specified register and
-stores the results in the accumulator.
-##### `nor <dx/dy>`
-Bitwise-nors the contents of the accumulator with the specified register and
-stores the results in the accumulator.
-##### `xor <dx/dy>`
-Bitwise-xors the contents of the accumulator with the specified register and
-stores the results in the accumulator.
-##### `xnor <dx/dy>`
-Bitwise-xnors the contents of the accumulator with the specified register and
-stores the results in the accumulator.
-##### `andi`, `nandi`, `ori`, `nori`, `xori`, `xnori`
-Identical to their respective non-`i` variants, but use the provided immediate
-value in place of the DX or DY register.
-
-#### Shifts
-For all of the following, the carry bit is set to the value shifted off the end
-of the accumulator.
-##### `sl`, `sr`
-Shifts the accumulator left or right, respectively, by one bit, inserting a 0 at
-the vacated place.
-##### `slc`, `src`
-Shifts the accumulator left or right, respectively, by one bit, inserting the
-previous value of the carry bit at the vacated place.
-##### `sla`, `sra`
-Shifts the accumulator left or right, respectively, by one bit, copying the
-value of the vacated place from the bit adjacent to it.
-##### `slr`, `srr`
-Shifts the accumulator left or right, respectively, by one bit, copying the
-value of the vacated place from the bit shifted off the end.
-##### `_sl`, `_sr`, `_slc`, `_src`, `_sla`, `_sra`, `_slr`, `_srr`
-Identical to their respective non-underscore variants, but do not modify the
-carry bit.
-
-### Memory
-#### Stack pointer
-##### `isp`
-Increments the stack pointer by the provided signed 4-bit value, and sets the
-carry bit to the carry-out value of the addition or subtraction.
-##### `_isp`
-Identical to `isp` but does not set the carry bit.
-#### Loads
-##### `lda <offset>`
-Loads the value at the combined address stored in DY and DX plus the specified
-unsigned 4-bit offset into the accumulator.
-##### `lds <offset>`
-Loads the value at the address formed by 0xFF00 + SP + offset into the
-accumulator.
-#### Stores
-##### `stra <offset>`
-Stores the value of the accumulator at the combined address stored in DY and DX
-plus the specified unsigned 4-bit offset.
-##### `strs <offset>`
-Stores the value of the accumulator at the address formed by 0xFF00 + SP +
-offset.
-
-### Macros
-##### `move <ra> <rb>`
-Moves the contents of register A into register B.
-##### `rda <label>`
-Reads the specified label as a 16-bit value into DX and DY as an address.
-##### `call <label>`
-Calls the function at the specified label; stores return address in DX and DY.
-##### `goto <label>`
-Jumps to the specified label without a return address. Overwrites DX and DY.
