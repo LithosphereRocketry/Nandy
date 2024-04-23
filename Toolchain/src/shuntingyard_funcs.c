@@ -2,6 +2,8 @@
 
 static int64_t f_uplus(int64_t* stack) { return stack[0]; }
 static int64_t f_negate(int64_t* stack) { return -stack[0]; }
+static int64_t f_not(int64_t* stack) { return !stack[0] ? 1 : 0; }
+static int64_t f_bitnot(int64_t* stack) { return ~stack[0]; }
 
 static int64_t f_mul(int64_t* stack) { return stack[1] * stack[0]; }
 static int64_t f_div(int64_t* stack) { return stack[1] / stack[0]; }
@@ -54,6 +56,8 @@ const operator_token_t operators[] = {
     {"<", 7, 2, f_lt},
     {"==", 6, 2, f_eq},
     {"!=", 6, 2, f_ne},
+    {"!", 11, 1, f_not},
+    {"~", 11, 1, f_bitnot},
     {"^", 4, 2, f_bitxor},
     {"||", 1, 2, f_or},
     {"|", 3, 2, f_bitor},
