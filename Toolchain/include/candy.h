@@ -21,4 +21,9 @@
     #define assert(condition, ...) ((void)0)
 #endif
 
+typedef struct string {
+    char *text;
+    long count;
+} string_t;
+
 #endif

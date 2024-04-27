@@ -5,8 +5,14 @@ parse-test
 nandy-emu
 nandy-asm
 nandy-asm-racket
+candy
+candy-preprocessor
+candy-compiler
 binconvert
 shuntingyard_test
+
+# Intermediate Files
+*.i
 
 # Racket
 *.bak
