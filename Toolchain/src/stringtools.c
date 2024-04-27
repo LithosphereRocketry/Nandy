@@ -1,7 +1,10 @@
 #include "stringtools.h"
 
-inline int is_newline(char *c) {
-    return c && (c[0] == '\n' || (c[0] == '\r' && c[1] == '\n'));
+inline int linebreak_length(char *c) {
+    if (!c) return 0;
+    if (c[0] == '\n') return 1;
+    if (c[0] == '\r' && c[1] == '\n') return 2;
+    return 0;
 }
 
 inline int is_whitespace(char c) {

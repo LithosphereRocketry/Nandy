@@ -4,6 +4,9 @@
 #include "stdio.h"
 #include "stdlib.h"
 
+#define TRUE  1
+#define FALSE 0
+
 // All of the following forms are valid for this:
 // assert(condition)
 // assert(condition, message)

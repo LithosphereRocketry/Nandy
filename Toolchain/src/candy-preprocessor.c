@@ -28,16 +28,19 @@ int read_into_buffer(int start) {
     return size;
 }
 
-int read_more(int *index) {
+int read_more(int *index, int should_write) {
     // Write what we have to the output
-    fwrite(buffer, 1, *index, file_out);
+    if (should_write)
+        fwrite(buffer, 1, *index, file_out);
     
     // Copy over what we want to keep
     int bytes_to_keep = BUFFER_SIZE - *index;
-    memmove(buffer, buffer + *index, bytes_to_keep);
+    if (*index) {
+        memmove(buffer, buffer + *index, bytes_to_keep);
+        *index = 0;
+    }
     
     // Read in the rest
-    *index = 0;
     return read_into_buffer(bytes_to_keep);
 }
 
@@ -62,30 +65,68 @@ int main(int argc, char **argv) {
     
     i = 0;
     read_into_buffer(0);
+    // read_more(&i, FALSE);
     
+    int in_whitespace = FALSE;
     char *c = buffer;
     while (c[i]) {
-        if (i >= BUFFER_SIZE - 32) read_more(&i);
+        if (i >= BUFFER_SIZE - 32) read_more(&i, !in_whitespace);
         
-        if (is_whitespace(c[i])) {
-            i++;
-            continue;
+        switch (c[i]) {
+            // Remove escaped newlines
+            case '\\':
+                assert(c[i+1], "Translation units cannot end with a backslash\n");
+                i += 1;
+                int linebreak = linebreak_length(c+i);
+                if (in_whitespace) {
+                    i += linebreak;
+                } else if (linebreak) {
+                    if (i > 1) fwrite(buffer, 1, i-1, file_out);
+                    i += linebreak;
+                    read_more(&i, FALSE);
+                }
+                break;
+            
+            // Keep newlines, flatten whitespace into a single space
+            case '\n':
+                if (in_whitespace) {
+                    read_more(&i, FALSE);
+                    in_whitespace = FALSE;
+                }
+                i++;
+                break;
+            case '\r':
+                if (c[i+1] == '\n') {
+                    if (in_whitespace) {
+                        read_more(&i, FALSE);
+                        in_whitespace = FALSE;
+                    }
+                    i += 2;
+                    break;
+                }
+                // Needed because of GCC warnings, yay...:
+                // Fall through
+            case '\t':
+            case '\v':
+            case '\f':
+                if (!in_whitespace) c[i] = ' ';
+                // Fall through
+            case ' ':
+                i++;
+                if (!in_whitespace) {
+                    fwrite(buffer, 1, i, file_out);
+                    in_whitespace = TRUE;
+                }
+                break;
+            
+            default:
+                //TODO: Unicode
+                if (in_whitespace) {
+                    read_more(&i, FALSE);
+                    in_whitespace = FALSE;
+                }
+                i++;
         }
-        
-        //TODO: Unicode
-        
-        // Handle escaped newlines
-        if (c[i] == '\\') {
-            assert(c[i+1], "Translation units cannot end with a backslash\n");
-            c[i] = ' ';
-            if (c[i+1] == '\r' && c[i+2] == '\n')
-                c[i+1] = ' ', c[i+2] = ' ', i += 3;
-            if (c[i+1] == '\n')
-                c[i+1] = ' ', i += 2;
-            continue;
-        }
-        
-        i++;
     }
     
     fwrite(buffer, 1, i, file_out);
