@@ -41,7 +41,8 @@ int read_more(int *index, int should_write) {
     }
     
     // Read in the rest
-    return read_into_buffer(bytes_to_keep);
+    int added = read_into_buffer(bytes_to_keep);
+    return bytes_to_keep + added;
 }
 
 int main(int argc, char **argv) {
@@ -65,13 +66,14 @@ int main(int argc, char **argv) {
     
     i = 0;
     read_into_buffer(0);
-    // read_more(&i, FALSE);
     
     int in_whitespace = FALSE;
+    int was_newline = FALSE;
     char *c = buffer;
     while (c[i]) {
         if (i >= BUFFER_SIZE - 32) read_more(&i, !in_whitespace);
         
+        was_newline = FALSE;
         switch (c[i]) {
             // Remove escaped newlines
             case '\\':
@@ -93,6 +95,7 @@ int main(int argc, char **argv) {
                     read_more(&i, FALSE);
                     in_whitespace = FALSE;
                 }
+                was_newline = TRUE;
                 i++;
                 break;
             case '\r':
@@ -101,6 +104,7 @@ int main(int argc, char **argv) {
                         read_more(&i, FALSE);
                         in_whitespace = FALSE;
                     }
+                    was_newline = TRUE;
                     i += 2;
                     break;
                 }
@@ -128,6 +132,8 @@ int main(int argc, char **argv) {
                 i++;
         }
     }
+    
+    assert(was_newline, "Translation units must end with a newline\n");
     
     fwrite(buffer, 1, i, file_out);
     
