@@ -18,7 +18,7 @@ static void exe_rd(cpu_state_t* cpu) {
     word_t ibyte = peek(cpu, cpu->pc);
     switch(ibyte & i_rd.opcode_mask) {
         case REG_SP: cpu->acc = cpu->sp; break;
-        case REG_IO: cpu->acc = cpu->ioin; break; // todo: data ping
+        case REG_IO: cpu->acc = cpu->ioin; cpu->io_rd = true; break;
         case REG_DX: cpu->acc = cpu->dx; break;
         case REG_DY: cpu->acc = cpu->dy; break;
     }
@@ -37,7 +37,7 @@ static void exe_wr(cpu_state_t* cpu) {
     word_t ibyte = peek(cpu, cpu->pc);
     switch(ibyte & i_wr.opcode_mask) {
         case REG_SP: cpu->sp = cpu->acc; break;
-        case REG_IO: cpu->ioout = cpu->acc; break; // todo: data ping
+        case REG_IO: cpu->ioout = cpu->acc; cpu->io_wr = true; break;
         case REG_DX: cpu->dx = cpu->acc; break;
         case REG_DY: cpu->dy = cpu->acc; break;
     }
@@ -57,7 +57,8 @@ static void exe_sw(cpu_state_t* cpu) {
     word_t tmp = cpu->acc;
     switch(ibyte & i_rd.opcode_mask) {
         case REG_SP: cpu->acc = cpu->sp; cpu->sp = tmp; break;
-        case REG_IO: cpu->acc = cpu->ioin; cpu->ioout = tmp; break; // todo: data ping
+        case REG_IO: cpu->acc = cpu->ioin; cpu->ioout = tmp; 
+                     cpu->io_rd = true; cpu->io_wr = true; break;
         case REG_DX: cpu->acc = cpu->dx; cpu->dx = tmp; break;
         case REG_DY: cpu->acc = cpu->dy; cpu->dy = tmp; break;
     }

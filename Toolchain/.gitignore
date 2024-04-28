@@ -3,8 +3,8 @@
 *.logi
 parse-test
 nandy-emu
+nandy-emu-new
 nandy-asm
-nandy-asm-racket
 binconvert
 shuntingyard_test
 

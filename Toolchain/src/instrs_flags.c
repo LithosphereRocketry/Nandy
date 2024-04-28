@@ -3,7 +3,7 @@
 #include "stdio.h"
 
 static void exe_brk(cpu_state_t* cpu) {
-    // TODO: exit to debugger
+    cpu->idbg = true;
     cpu->pc ++;
 }
 

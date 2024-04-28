@@ -74,7 +74,7 @@ void dis_reljump(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char
 }
 
 static void exe_j(cpu_state_t* cpu) {
-    cpu->pc += signExtend((((int) peek(cpu, cpu->pc)) << 8) | peek(cpu, cpu->pc+1), 12);
+    cpu->pc += signExtend((((int) peek(cpu, cpu->pc)) << 8) | peek(cpu, cpu->pc+1), 12) + 1;
 }
 const instruction_t i_j = {
     .mnemonic = "j",
@@ -87,7 +87,9 @@ const instruction_t i_j = {
 
 static void exe_jcz(cpu_state_t* cpu) {
     if(!cpu->carry) {
-        cpu->pc += signExtend((((int) peek(cpu, cpu->pc)) << 8) | peek(cpu, cpu->pc+1), 12);
+        cpu->pc += signExtend((((int) peek(cpu, cpu->pc)) << 8) | peek(cpu, cpu->pc+1), 12) + 1;
+    } else {
+        cpu->pc += 2;
     }
 }
 const instruction_t i_jcz = {
