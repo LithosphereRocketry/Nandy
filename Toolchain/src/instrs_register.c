@@ -3,7 +3,7 @@
 #include "stdio.h"
 
 static void exe_nop(cpu_state_t* cpu) {
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i_nop = {
     .mnemonic = "nop",
@@ -22,7 +22,7 @@ static void exe_rd(cpu_state_t* cpu) {
         case REG_DX: cpu->acc = cpu->dx; break;
         case REG_DY: cpu->acc = cpu->dy; break;
     }
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i_rd = {
     .mnemonic = "rd",
@@ -41,7 +41,7 @@ static void exe_wr(cpu_state_t* cpu) {
         case REG_DX: cpu->dx = cpu->acc; break;
         case REG_DY: cpu->dy = cpu->acc; break;
     }
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i_wr = {
     .mnemonic = "wr",
@@ -62,7 +62,7 @@ static void exe_sw(cpu_state_t* cpu) {
         case REG_DX: cpu->acc = cpu->dx; cpu->dx = tmp; break;
         case REG_DY: cpu->acc = cpu->dy; cpu->dy = tmp; break;
     }
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i_sw = {
     .mnemonic = "sw",

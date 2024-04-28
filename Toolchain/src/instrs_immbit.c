@@ -3,7 +3,7 @@
 
 static void exe_rdi(cpu_state_t* cpu) {
     cpu->acc = peek(cpu, cpu->pc + 1);
-    cpu->pc += 2;
+    cpu->pc += 2; cpu->elapsed += 2;
 }
 const instruction_t i_rdi = {
     .mnemonic = "rdi",
@@ -16,7 +16,7 @@ const instruction_t i_rdi = {
 
 static void exe_ori(cpu_state_t* cpu) {
     cpu->acc |= peek(cpu, cpu->pc + 1);
-    cpu->pc += 2;
+    cpu->pc += 2; cpu->elapsed += 2;
 }
 const instruction_t i_ori = {
     .mnemonic = "ori",
@@ -29,7 +29,7 @@ const instruction_t i_ori = {
 
 static void exe_andi(cpu_state_t* cpu) {
     cpu->acc &= peek(cpu, cpu->pc + 1);
-    cpu->pc += 2;
+    cpu->pc += 2; cpu->elapsed += 2;
 }
 const instruction_t i_andi = {
     .mnemonic = "andi",
@@ -42,7 +42,7 @@ const instruction_t i_andi = {
 
 static void exe_xori(cpu_state_t* cpu) {
     cpu->acc ^= peek(cpu, cpu->pc + 1);
-    cpu->pc += 2;
+    cpu->pc += 2; cpu->elapsed += 2;
 }
 const instruction_t i_xori = {
     .mnemonic = "xori",
@@ -55,7 +55,7 @@ const instruction_t i_xori = {
 
 static void exe_invi(cpu_state_t* cpu) {
     cpu->acc = ~peek(cpu, cpu->pc + 1);
-    cpu->pc += 2;
+    cpu->pc += 2; cpu->elapsed += 2;
 }
 const instruction_t i_invi = {
     .mnemonic = "invi",
@@ -68,7 +68,7 @@ const instruction_t i_invi = {
 
 static void exe_nori(cpu_state_t* cpu) {
     cpu->acc = ~(cpu->acc | getALUReg(cpu));
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i_nori = {
     .mnemonic = "nori",
@@ -81,7 +81,7 @@ const instruction_t i_nori = {
 
 static void exe_nandi(cpu_state_t* cpu) {
     cpu->acc = ~(cpu->acc & getALUReg(cpu));
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i_nandi = {
     .mnemonic = "nandi",
@@ -94,7 +94,7 @@ const instruction_t i_nandi = {
 
 static void exe_xnori(cpu_state_t* cpu) {
     cpu->acc = ~(cpu->acc ^ getALUReg(cpu));
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i_xnori = {
     .mnemonic = "xnori",

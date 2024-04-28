@@ -5,6 +5,7 @@
 
 static void exe_ja(cpu_state_t* cpu) {
     cpu->pc = (((addr_t) cpu->dy) << 8) + cpu->dx;
+    cpu->elapsed ++;
 }
 const instruction_t i_ja = {
     .mnemonic = "ja",
@@ -18,6 +19,7 @@ const instruction_t i_ja = {
 static void exe_jri(cpu_state_t* cpu) {
     cpu->pc = (((addr_t) cpu->dy) << 8) + cpu->dx;
     cpu->int_active = false;
+    cpu->elapsed ++;
 }
 const instruction_t i_jri = {
     .mnemonic = "jri",
@@ -33,6 +35,7 @@ static void exe_jar(cpu_state_t* cpu) {
     cpu->pc = (((addr_t) cpu->dy) << 8) + cpu->dx;
     cpu->dx = prevAddr & 0xFF;
     cpu->dy = prevAddr >> 8;
+    cpu->elapsed ++;
 }
 const instruction_t i_jar = {
     .mnemonic = "jar",
@@ -75,6 +78,7 @@ void dis_reljump(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char
 
 static void exe_j(cpu_state_t* cpu) {
     cpu->pc += signExtend((((int) peek(cpu, cpu->pc)) << 8) | peek(cpu, cpu->pc+1), 12) + 1;
+    cpu->elapsed += 2;
 }
 const instruction_t i_j = {
     .mnemonic = "j",
@@ -91,6 +95,7 @@ static void exe_jcz(cpu_state_t* cpu) {
     } else {
         cpu->pc += 2;
     }
+    cpu->elapsed += 2;
 }
 const instruction_t i_jcz = {
     .mnemonic = "jcz",

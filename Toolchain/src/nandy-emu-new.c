@@ -42,6 +42,9 @@ int main(int argc, char** argv) {
     fread(state.rom, sizeof(word_t), ADDR_RAM_MASK, f);
     
     while(!emu_step(&state, fout));
+
+    printf("Complete, executed %li cycles\n", state.elapsed);
+
     fclose(f);
     if(arg_out.result.value) { // technically it's probably harmless to close
             // stdout here but it makes me sad

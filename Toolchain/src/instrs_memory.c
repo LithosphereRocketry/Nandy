@@ -4,7 +4,7 @@
 
 static void exe__isp(cpu_state_t* cpu) {
     cpu->sp = alu_add(cpu->sp, signExtend(peek(cpu, cpu->pc), 4), false, NULL);
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i__isp = {
     .mnemonic = "_isp",
@@ -17,7 +17,7 @@ const instruction_t i__isp = {
 
 static void exe_isp(cpu_state_t* cpu) {
     cpu->sp = alu_add(cpu->sp, signExtend(peek(cpu, cpu->pc), 4), false, &cpu->carry);
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i_isp = {
     .mnemonic = "isp",
@@ -30,7 +30,7 @@ const instruction_t i_isp = {
 
 static void exe_lda(cpu_state_t* cpu) {
     cpu->acc = peek(cpu, getAbsAddr(cpu));
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed += 2;
 }
 const instruction_t i_lda = {
     .mnemonic = "lda",
@@ -43,7 +43,7 @@ const instruction_t i_lda = {
 
 static void exe_lds(cpu_state_t* cpu) {
     cpu->acc = peek(cpu, getStackAddr(cpu));
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed += 2;
 }
 const instruction_t i_lds = {
     .mnemonic = "lds",
@@ -56,7 +56,7 @@ const instruction_t i_lds = {
 
 static void exe_stra(cpu_state_t* cpu) {
     poke(cpu, getAbsAddr(cpu), cpu->acc);
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed += 2;
 }
 const instruction_t i_stra = {
     .mnemonic = "stra",
@@ -69,7 +69,7 @@ const instruction_t i_stra = {
 
 static void exe_strs(cpu_state_t* cpu) {
     poke(cpu, getStackAddr(cpu), cpu->acc);
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed += 2;
 }
 const instruction_t i_strs = {
     .mnemonic = "strs",
