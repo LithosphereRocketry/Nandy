@@ -24,7 +24,7 @@ instruction_t* ilookup(word_t word) {
     return cache[(unsigned char) word];
 }
 
-bool emu_step(cpu_state_t* state) {
+bool emu_step(cpu_state_t* state, FILE* outstream) {
     // instruction execute phase (up clock)
     state->io_rd = false;
     state->io_wr = false;
@@ -37,7 +37,7 @@ bool emu_step(cpu_state_t* state) {
 
     // I/O phase (down clock)
     if(state->io_wr) {
-        putchar(state->ioout);
+        putc(state->ioout, outstream);
     }
     return state->idbg;
 }
