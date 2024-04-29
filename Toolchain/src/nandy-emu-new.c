@@ -34,8 +34,7 @@ void scanDisasm(cpu_state_t* state, addr_t start) {
         // because their jump target is runtime-variable
         if(instr != &i_ja && instr != &i_jar && instr != &i_jri) {
             // TODO: how do we scan targets of relative jumps without creating
-            // infinite loops of misaligned instructions fighting with each                return;
-
+            // infinite loops of misaligned instructions fighting with each
             // other
             if(instr == &i_jcz) {
                 scanDisasm(state, start + len);
