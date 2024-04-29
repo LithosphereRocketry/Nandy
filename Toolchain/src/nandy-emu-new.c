@@ -4,6 +4,7 @@
 
 #include "nandy_emu_tools.h"
 #include "argparse.h"
+#include "nandy_instr_defs.h"
 
 argument_t arg_debug = { .abbr = 'g', .name = "debug", .hasval = false };
 argument_t arg_out = { .abbr = 'o', .name = "out", .hasval = true };
@@ -17,6 +18,36 @@ const size_t n_args = sizeof(args) / sizeof(argument_t*);
 cpu_state_t state;
 
 instruction_t* disasm_cache[65536];
+
+void scanDisasm(cpu_state_t* state, addr_t start) {
+    // If the disassembly is already done, don't bother
+    if(disasm_cache[start]) return;
+    int len = nbytes(peek(state, start));
+    instruction_t* instr = ilookup(peek(state, start));
+    if(instr) {
+        disasm_cache[start] = instr;
+        // Delete any disassemblies of instructions that are now part of the
+        // data field of this instructions
+        // This loop is super unnecessary but it supports longer instructions
+        for(int i = 1; i < len; i++) { disasm_cache[start + i] = NULL; }
+        // These instructions are completely intractable to the disassembler
+        // because their jump target is runtime-variable
+        if(instr != &i_ja && instr != &i_jar && instr != &i_jri) {
+            // TODO: how do we scan targets of relative jumps without creating
+            // infinite loops of misaligned instructions fighting with each                return;
+
+            // other
+            if(instr == &i_jcz) {
+                scanDisasm(state, start + len);
+                // scan jump target
+            } else if(instr == &i_j) {
+                // scan jump target
+            } else {
+                scanDisasm(state, start + len);
+            }
+        }
+    }
+}
 
 void printDebug(cpu_state_t* state) {
     /** Layout should look like this:
@@ -100,19 +131,12 @@ int main(int argc, char** argv) {
 
     state = INIT_STATE;
     fread(state.rom, sizeof(word_t), ADDR_RAM_MASK, f);
-
-    for(size_t i = 0; i < ADDR_RAM_MASK; ) {
-        instruction_t* instr = ilookup(peek(&state, i));
-        if(instr) {
-            disasm_cache[i] = instr;
-            i += nbytes(peek(&state, i));
-        } else {
-            i ++;
-        }
-    }
     
     while(1) {
-        while(!emu_step(&state, fout));
+        while(1) {
+            scanDisasm(&state, state.pc);
+            if(emu_step(&state, fout)) break;
+        }
         if(arg_debug.result.present) {
             printDebug(&state);
             while(1);
