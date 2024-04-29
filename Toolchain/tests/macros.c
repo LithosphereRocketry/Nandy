@@ -4,8 +4,11 @@ C \
     F
 
 #define DE "de"
-#define F "f"
+#define F L"f"
 
 char *abc = ABC;
 char *de = DE;
 char *f = F;
+
+#include <stdio.h>
+#include "long.c"

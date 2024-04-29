@@ -13,6 +13,7 @@ shuntingyard_test
 
 # Intermediate Files
 *.i
+*.it
 
 # Racket
 *.bak
