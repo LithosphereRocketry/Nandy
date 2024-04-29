@@ -16,6 +16,8 @@ const size_t n_args = sizeof(args) / sizeof(argument_t*);
 
 cpu_state_t state;
 
+instruction_t* disasm_cache[65536];
+
 void printDebug(cpu_state_t* state) {
     /** Layout should look like this:
 PC  0x123F  CARRY 1         FF      ...
@@ -28,9 +30,27 @@ IE  1       INT 1           FF      jri
 Cycles 1234567890       SP> FF      nop
 > 
     */
-    char linebuf[40][8];
+    static char linebuf[40][8];
     for(int i = 0; i < 8; i++) {
-        strncpy(linebuf[i], "hihihi", 40);
+        strncpy(linebuf[i], "???", 40);
+    }
+    addr_t pcdis = state->pc;
+    int pos = 0;
+    for(int i = 0; i < 4; i++) {
+        if(disasm_cache[state->pc + pos - 1]) {
+            pos --;
+            pcdis --;
+        } else if(disasm_cache[state->pc + pos - 2]) {
+            pos --;
+            pcdis -= 2;
+        } else {
+            break;
+        }
+    }
+    for(; pos < 4; pos++) {
+        disasm_cache[pcdis]->disassemble(disasm_cache[pcdis],
+                state, pcdis, linebuf[pos + 4], 40);
+        pcdis += nbytes(peek(state, pcdis));
     }
 
     printf("PC  0x%04hx  CARRY %c         %02hhx      %-40s\n",
@@ -51,8 +71,9 @@ Cycles 1234567890       SP> FF      nop
     snprintf(cyclesbuf, 17, "%lu", state->elapsed);
     printf("Cycles %-16s SP> %02hhx      %-40s\n",
             cyclesbuf, peek(state, 0xFF00 + state->sp), linebuf[7]);
-
 }
+
+
 
 int main(int argc, char** argv) {
     argc = argparse(args, n_args, argc, argv);
@@ -79,12 +100,22 @@ int main(int argc, char** argv) {
 
     state = INIT_STATE;
     fread(state.rom, sizeof(word_t), ADDR_RAM_MASK, f);
+
+    for(size_t i = 0; i < ADDR_RAM_MASK; ) {
+        instruction_t* instr = ilookup(peek(&state, i));
+        if(instr) {
+            disasm_cache[i] = instr;
+            i += nbytes(peek(&state, i));
+        } else {
+            i ++;
+        }
+    }
     
     while(1) {
         while(!emu_step(&state, fout));
         if(arg_debug.result.present) {
             printDebug(&state);
-            break;
+            while(1);
         } else {
             break;
         }
