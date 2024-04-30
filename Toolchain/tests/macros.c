@@ -14,3 +14,5 @@ char g = u8'c' \
 
 #include <stdio.h>
 #include "long.c"
+
+char *e = "xyz";
