@@ -73,18 +73,20 @@ void tokenizer_pass(void) {
     int in_string = FALSE;
     int was_string = FALSE;
     int was_newline = FALSE;
+    int newlines_since_string = 0;
     candy_string_modifier_t string_modifier = CANDY_STRING_MODIFIER_NONE;
     int comment = 0;
     int header_name = 0;
     char *c = buffer;
     while (c[i]) {
         if (i >= BUFFER_SIZE - PADDING) read_more(&i, FALSE);
+        int linebreak = linebreak_length(c);
         
         // Remove escaped newlines
         if (c[i] == '\\') {
             assert(c[i+1], "Translation units cannot end with a backslash\n");
             i += 1;
-            int linebreak = linebreak_length(c+i);
+            linebreak = linebreak_length(c+i);
             i += linebreak;
             continue;
         }
@@ -123,19 +125,19 @@ void tokenizer_pass(void) {
         if (!comment && c[i] == '/') {
             if (c[i+1] == '/') comment = 1;
             else if (c[i+1] == '*') comment = 2;
-            else goto do_switch;
-            printf("Creating token type %d\n", CANDY_PREPROCESSOR_COMMENT);
-            candy_preprocessor_token_t t = {CANDY_PREPROCESSOR_COMMENT};
-            fwrite(&t, sizeof(t), 1, file_out);
-            i += 2;
-            continue;
+            if (comment) {
+                printf("Creating token type %d\n", CANDY_PREPROCESSOR_COMMENT);
+                candy_preprocessor_token_t t = {CANDY_PREPROCESSOR_COMMENT};
+                fwrite(&t, sizeof(t), 1, file_out);
+                i += 2;
+                continue;
+            }
         }
         if (comment) {
-            int linebreak = linebreak_length(c);
             if (comment == 1 && linebreak) {
                 comment = 0;
                 fwrite(&(char){0}, sizeof(char), 1, file_out);
-                goto do_switch;
+                continue;
             } else if (comment == 2 && c[i] == '*' && c[i+1] == '/') {
                 comment = 0;
                 fwrite(&(char){0}, sizeof(char), 1, file_out);
@@ -147,31 +149,22 @@ void tokenizer_pass(void) {
             continue;
         }
         
+        // Keep newlines
+        if (linebreak) {
+            END_WHITESPACE();
+            was_newline = TRUE;
+            assert(!header_name, "Cannot have a newline in a header name\n");
+            printf("Creating token type %d\n", CANDY_PREPROCESSOR_NEWLINE);
+            candy_preprocessor_token_t t = {CANDY_PREPROCESSOR_NEWLINE};
+            fwrite(&t, sizeof(t), 1, file_out);
+            i += linebreak;
+        }
+        
         do_switch:
         was_newline = FALSE;
         switch (c[i]) {
-            // Keep newlines, flatten whitespace into a single space
-            case '\n':
-                END_WHITESPACE();
-                was_newline = TRUE;
-                assert(!header_name, "Cannot have a newline in a header name\n");
-                printf("Creating token type %d\n", CANDY_PREPROCESSOR_NEWLINE);
-                candy_preprocessor_token_t t = {CANDY_PREPROCESSOR_NEWLINE};
-                fwrite(&t, sizeof(t), 1, file_out);
-                i++;
-                break;
+            // Flatten whitespace into a single space
             case '\r':
-                if (c[i+1] == '\n') {
-                    END_WHITESPACE();
-                    was_newline = TRUE;
-                    assert(!header_name, "Cannot have a newline in a header name\n");
-                    printf("Creating token type %d\n", CANDY_PREPROCESSOR_NEWLINE);
-                    candy_preprocessor_token_t t = {CANDY_PREPROCESSOR_NEWLINE};
-                    fwrite(&t, sizeof(t), 1, file_out);
-                    i += 2;
-                    break;
-                }
-                // Fall through
             case '\t':
             case '\v':
             case '\f':
