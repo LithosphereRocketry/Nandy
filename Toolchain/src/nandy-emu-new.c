@@ -5,12 +5,15 @@
 #include "nandy_emu_tools.h"
 #include "argparse.h"
 #include "nandy_instr_defs.h"
+#include "shuntingyard.h"
 
 argument_t arg_debug = { .abbr = 'g', .name = "debug", .hasval = false };
+argument_t arg_forcedebug = { .abbr = 'G', .name = "force-debug", .hasval = false };
 argument_t arg_out = { .abbr = 'o', .name = "out", .hasval = true };
 
 argument_t* args[] = {
     &arg_debug,
+    &arg_forcedebug,
     &arg_out
 };
 const size_t n_args = sizeof(args) / sizeof(argument_t*);
@@ -38,9 +41,9 @@ void scanDisasm(cpu_state_t* state, addr_t start) {
             // other
             if(instr == &i_jcz) {
                 scanDisasm(state, start + len);
-                // scan jump target
+                // TODO: scan jump target
             } else if(instr == &i_j) {
-                // scan jump target
+                // TODO: scan jump target
             } else {
                 scanDisasm(state, start + len);
             }
@@ -57,33 +60,36 @@ IRX 0x3F    IRY 0x3F        FF      add dx
 IN  0x3F    OUT 0x3F        FF  PC> addi 1
 IE  1       INT 1           FF      jri
                             FF      nop
-Cycles 1234567890       SP> FF      nop
-> 
+Cycles 1234567890       SP> FF      nop 
     */
-    static char linebuf[40][8];
+    static char linebuf[8][40];
     for(int i = 0; i < 8; i++) {
         strncpy(linebuf[i], "???", 40);
     }
     addr_t pcdis = state->pc;
     int pos = 0;
     for(int i = 0; i < 4; i++) {
-        if(disasm_cache[state->pc + pos - 1]) {
-            pos --;
-            pcdis --;
-        } else if(disasm_cache[state->pc + pos - 2]) {
+        if(disasm_cache[pcdis - 2] && nbytes(peek(state, pcdis - 2)) == 2) {
             pos --;
             pcdis -= 2;
+        } else if(disasm_cache[pcdis - 1]) {
+            pos --;
+            pcdis --;
         } else {
             break;
         }
     }
     for(; pos < 4; pos++) {
-        disasm_cache[pcdis]->disassemble(disasm_cache[pcdis],
-                state, pcdis, linebuf[pos + 4], 40);
-        pcdis += nbytes(peek(state, pcdis));
+        if(disasm_cache[pcdis]) {
+            disasm_cache[pcdis]->disassemble(disasm_cache[pcdis],
+                    state, pcdis, linebuf[pos + 4], 40);
+            pcdis += nbytes(peek(state, pcdis));
+        } else {
+            break;
+        }
     }
 
-    printf("PC  0x%04hx  CARRY %c         %02hhx      %-40s\n",
+    printf("\nPC  0x%04hx  CARRY %c         %02hhx      %-40s\n",
             state->pc, state->carry ? '1' : '0', peek(state, 0xFF00 + state->sp + 7), linebuf[0]);
     printf("ACC 0x%02hhx    SP  0x%02hhx        %02hhx      %-40s\n",
             state->acc, state->sp, peek(state, 0xFF00 + state->sp + 6), linebuf[1]);
@@ -103,7 +109,27 @@ Cycles 1234567890       SP> FF      nop
             cyclesbuf, peek(state, 0xFF00 + state->sp), linebuf[7]);
 }
 
-
+bool debug(cpu_state_t* state) {
+    printDebug(state);
+    while(1) {
+        printf("DEBUG> ");
+        char input[256];
+        fgets(input, 255, stdin);
+        char cmd[64];
+        sscanf(input, "%63s", cmd);
+        if(!strcmp(cmd, "quit") || !strcmp(cmd, "q")) {
+            return false;
+        } else if(!strcmp(cmd, "step") || !strcmp(cmd, "s")) {
+            state->idbg = true;
+            return true;
+        } else if(!strcmp(cmd, "continue") || !strcmp(cmd, "c")) {
+            state->idbg = false;
+            return true;
+        } else {
+            printf("Unrecognized command \"%s\"\n", cmd);
+        }
+    }
+}
 
 int main(int argc, char** argv) {
     argc = argparse(args, n_args, argc, argv);
@@ -131,18 +157,18 @@ int main(int argc, char** argv) {
     state = INIT_STATE;
     fread(state.rom, sizeof(word_t), ADDR_RAM_MASK, f);
     
-    while(1) {
-        while(1) {
+    scanDisasm(&state, state.pc);
+    do {
+        if(arg_forcedebug.result.present) {
+            if(!debug(&state)) { break; }
+        }
+        do {
             scanDisasm(&state, state.pc);
-            if(emu_step(&state, fout)) break;
-        }
+        } while(!emu_step(&state, fout));
         if(arg_debug.result.present) {
-            printDebug(&state);
-            while(1);
-        } else {
-            break;
+            if(!debug(&state)) { break; }
         }
-    }
+    } while(arg_debug.result.present || arg_forcedebug.result.present);
 
     printf("Complete, executed %li cycles\n", state.elapsed);
 
