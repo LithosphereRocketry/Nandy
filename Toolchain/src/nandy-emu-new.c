@@ -2,10 +2,11 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "nandy_emu_tools.h"
 #include "argparse.h"
-#include "nandy_instr_defs.h"
 #include "shuntingyard.h"
+#include "nandy_emu_tools.h"
+#include "nandy_instr_defs.h"
+#include "nandy_parse_tools.h"
 
 argument_t arg_debug = { .abbr = 'g', .name = "debug", .hasval = false };
 argument_t arg_forcedebug = { .abbr = 'G', .name = "force-debug", .hasval = false };
@@ -20,13 +21,13 @@ const size_t n_args = sizeof(args) / sizeof(argument_t*);
 
 cpu_state_t state;
 
-instruction_t* disasm_cache[65536];
+const instruction_t* disasm_cache[65536];
 
 void scanDisasm(cpu_state_t* state, addr_t start) {
     // If the disassembly is already done, don't bother
     if(disasm_cache[start]) return;
     int len = nbytes(peek(state, start));
-    instruction_t* instr = ilookup(peek(state, start));
+    const instruction_t* instr = ilookup(peek(state, start));
     if(instr) {
         disasm_cache[start] = instr;
         // Delete any disassemblies of instructions that are now part of the
@@ -98,7 +99,7 @@ Cycles 1234567890       SP> FF      nop
     printf("IRX 0x%02hhx    IRY 0x%02hhx        %02hhx      %-40s\n",
             state->irx, state->iry, peek(state, 0xFF00 + state->sp + 4), linebuf[3]);
     printf("IN  0x%02hhx    OUT 0x%02hhx        %02hhx  PC> %-40s\n",
-            state->irx, state->iry, peek(state, 0xFF00 + state->sp + 3), linebuf[4]);
+            state->ioin, state->ioout, peek(state, 0xFF00 + state->sp + 3), linebuf[4]);
     printf("IE  %c       INT %c           %02hhx      %-40s\n",
             state->int_en ? '1' : '0', state->int_active ? '1' : '0', peek(state, 0xFF00 + state->sp + 2), linebuf[5]);
     printf("                            %02hhx      %-40s\n",
@@ -112,11 +113,17 @@ Cycles 1234567890       SP> FF      nop
 bool debug(cpu_state_t* state) {
     printDebug(state);
     while(1) {
+
         printf("DEBUG> ");
         char input[256];
         fgets(input, 255, stdin);
+        if(input[0] == '\n') {
+            // On empty line, reprint the display
+            return debug(state);
+        }
         char cmd[64];
-        sscanf(input, "%63s", cmd);
+        int scanlen;
+        sscanf(input, "%63s%n", cmd, &scanlen);
         if(!strcmp(cmd, "quit") || !strcmp(cmd, "q")) {
             return false;
         } else if(!strcmp(cmd, "step") || !strcmp(cmd, "s")) {
@@ -125,6 +132,47 @@ bool debug(cpu_state_t* state) {
         } else if(!strcmp(cmd, "continue") || !strcmp(cmd, "c")) {
             state->idbg = false;
             return true;
+        } else if(!strcmp(cmd, "io") || !strcmp(cmd, "i")) {
+            int64_t io;
+            if(parseExp(NULL, input+scanlen, &io, stdout) != SHUNT_DONE) {
+                printf("Failed to parse value\n");
+            } else if(!isBounded(io, 8, BOUND_EITHER)) {
+                printf("Value does not fit in word\n");
+            } else {
+                state->ioin = (word_t) io;
+                return debug(state);
+            }
+        } else if(!strcmp(cmd, "peek") || !strcmp(cmd, "e")) {
+            int64_t addr;
+            if(parseExp(NULL, input+scanlen, &addr, stdout) != SHUNT_DONE) {
+                printf("Failed to parse address\n");
+            } else if(!isBounded(addr, 16, BOUND_UNSIGNED)) {
+                printf("Address is out of bounds\n");
+            } else {
+                printf("0x%hhx\n", peek(state, (addr_t) addr));
+            }
+        } else if(!strcmp(cmd, "poke") || !strcmp(cmd, "o")) {
+            char* div = strchr(input+scanlen, ',');
+            if(div == NULL) {
+                printf("Format: poke <addr>, <value>\n");
+            } else {
+                *div = '\0';
+                int64_t addr;
+                if(parseExp(NULL, input+scanlen, &addr, stdout) != SHUNT_DONE) {
+                    printf("Failed to parse address\n");
+                } else if(!isBounded(addr, 16, BOUND_UNSIGNED)) {
+                    printf("Address is out of bounds\n");
+                } else {
+                    int64_t val;
+                    if(parseExp(NULL, div+1, &val, stdout) != SHUNT_DONE) {
+                        printf("Failed to parse value\n");
+                    } else if(!isBounded(val, 8, BOUND_EITHER)) {
+                        printf("Value does not fit in word\n");
+                    } else {
+                        poke(state, (addr_t) addr, (word_t) val);
+                    }
+                }
+            }
         } else {
             printf("Unrecognized command \"%s\"\n", cmd);
         }

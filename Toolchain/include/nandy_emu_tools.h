@@ -3,7 +3,7 @@
 
 #include "nandy_tools.h"
 
-instruction_t* ilookup(word_t word);
+const instruction_t* ilookup(word_t word);
 bool emu_step(cpu_state_t* state, FILE* outstream);
 
 #endif
