@@ -24,7 +24,13 @@ const instruction_t* ilookup(word_t word) {
     return cache[(unsigned char) word];
 }
 
+static void doInterrupt(cpu_state_t* state) {
+}
+
+// TODO: more flexibility
+#define COOLDOWN (1000000 / 1200)
 bool emu_step(cpu_state_t* state, FILE* outstream) {
+    static size_t lastIOcycle = 0;
     // instruction execute phase (up clock)
     state->io_rd = false;
     state->io_wr = false;
@@ -35,9 +41,30 @@ bool emu_step(cpu_state_t* state, FILE* outstream) {
     }
     instr->execute(state);
 
+
     // I/O phase (down clock)
+    // TODO: this whole block should really be modularized
+    if(state->io_rd) {
+        // Experimenting with a new method of interrupt handling here
+        state->int_in = false;
+    }
     if(state->io_wr) {
         putc(state->ioout, outstream);
+    }
+    if(state->elapsed - lastIOcycle > COOLDOWN) {
+        int nextchar = getc(stdin);
+        if(nextchar != EOF) {
+            state->ioin = nextchar;
+            lastIOcycle = state->elapsed;
+            state->int_in = true;
+        }
+    }
+    // End of I/O block
+    if(state->int_en && state->int_in) {
+        state->irx = state->pc & 0xFF;
+        state->iry = (state->pc >> 8) & 0xFF;
+        state->pc = ISR_ADDR;
+        state->int_active = true;
     }
     return state->idbg;
 }

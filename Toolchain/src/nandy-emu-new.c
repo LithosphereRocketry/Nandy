@@ -179,6 +179,15 @@ bool debug(cpu_state_t* state) {
     }
 }
 
+// Weird little block here for Unix signal support
+#ifdef __unix__
+#include <signal.h>
+void onInterrupt() {
+    state.idbg = true;
+}
+struct sigaction act = { .sa_handler = onInterrupt };
+#endif
+
 int main(int argc, char** argv) {
     argc = argparse(args, n_args, argc, argv);
     if(argc <= 0) return -1;
@@ -204,7 +213,11 @@ int main(int argc, char** argv) {
 
     state = INIT_STATE;
     fread(state.rom, sizeof(word_t), ADDR_RAM_MASK, f);
-    
+
+#ifdef __unix__
+    sigaction(SIGINT, &act, NULL);
+#endif
+
     scanDisasm(&state, state.pc);
     do {
         if(arg_forcedebug.result.present) {
