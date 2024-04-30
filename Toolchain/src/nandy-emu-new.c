@@ -91,26 +91,27 @@ Cycles 1234567890       SP> FF      nop
     }
 
     printf("\nPC  0x%04hx  CARRY %c         %02hhx      %-40s\n",
-            state->pc, state->carry ? '1' : '0', peek(state, 0xFF00 + state->sp + 7), linebuf[0]);
+            state->pc, state->carry ? '1' : '0', peek(state, 0xFF00 + (uint8_t) state->sp + 7), linebuf[0]);
     printf("ACC 0x%02hhx    SP  0x%02hhx        %02hhx      %-40s\n",
-            state->acc, state->sp, peek(state, 0xFF00 + state->sp + 6), linebuf[1]);
+            state->acc, state->sp, peek(state, 0xFF00 + (uint8_t) state->sp + 6), linebuf[1]);
     printf("DX  0x%02hhx    DY  0x%02hhx        %02hhx      %-40s\n",
-            state->dx, state->dy, peek(state, 0xFF00 + state->sp + 5), linebuf[2]);
+            state->dx, state->dy, peek(state, 0xFF00 + (uint8_t) state->sp + 5), linebuf[2]);
     printf("IRX 0x%02hhx    IRY 0x%02hhx        %02hhx      %-40s\n",
-            state->irx, state->iry, peek(state, 0xFF00 + state->sp + 4), linebuf[3]);
+            state->irx, state->iry, peek(state, 0xFF00 + (uint8_t) state->sp + 4), linebuf[3]);
     printf("IN  0x%02hhx    OUT 0x%02hhx        %02hhx  PC> %-40s\n",
-            state->ioin, state->ioout, peek(state, 0xFF00 + state->sp + 3), linebuf[4]);
+            state->ioin, state->ioout, peek(state, 0xFF00 + (uint8_t) state->sp + 3), linebuf[4]);
     printf("IE  %c       INT %c           %02hhx      %-40s\n",
-            state->int_en ? '1' : '0', state->int_active ? '1' : '0', peek(state, 0xFF00 + state->sp + 2), linebuf[5]);
+            state->int_en ? '1' : '0', state->int_active ? '1' : '0', peek(state, 0xFF00 + (uint8_t) state->sp + 2), linebuf[5]);
     printf("                            %02hhx      %-40s\n",
-            peek(state, 0xFF00 + state->sp + 1), linebuf[6]);
+            peek(state, 0xFF00 + (uint8_t) state->sp + 1), linebuf[6]);
     char cyclesbuf[17];
     snprintf(cyclesbuf, 17, "%lu", state->elapsed);
     printf("Cycles %-16s SP> %02hhx      %-40s\n",
-            cyclesbuf, peek(state, 0xFF00 + state->sp), linebuf[7]);
+            cyclesbuf, peek(state, 0xFF00 | state->sp), linebuf[7]);
 }
 
 bool debug(cpu_state_t* state) {
+    scanDisasm(state, state->pc);
     printDebug(state);
     while(1) {
 
@@ -217,15 +218,11 @@ int main(int argc, char** argv) {
 #ifdef __unix__
     sigaction(SIGINT, &act, NULL);
 #endif
-
-    scanDisasm(&state, state.pc);
     do {
         if(arg_forcedebug.result.present) {
             if(!debug(&state)) { break; }
         }
-        do {
-            scanDisasm(&state, state.pc);
-        } while(!emu_step(&state, fout));
+        do { scanDisasm(&state, state.pc); } while(!emu_step(&state, fout));
         if(arg_debug.result.present) {
             if(!debug(&state)) { break; }
         }

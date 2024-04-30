@@ -24,9 +24,6 @@ const instruction_t* ilookup(word_t word) {
     return cache[(unsigned char) word];
 }
 
-static void doInterrupt(cpu_state_t* state) {
-}
-
 // TODO: more flexibility
 #define COOLDOWN (1000000 / 1200)
 bool emu_step(cpu_state_t* state, FILE* outstream) {
@@ -60,7 +57,7 @@ bool emu_step(cpu_state_t* state, FILE* outstream) {
         }
     }
     // End of I/O block
-    if(state->int_en && state->int_in) {
+    if(state->int_en && state->int_in && !state->int_active) {
         state->irx = state->pc & 0xFF;
         state->iry = (state->pc >> 8) & 0xFF;
         state->pc = ISR_ADDR;

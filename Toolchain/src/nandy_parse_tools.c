@@ -167,14 +167,23 @@ word_t getXYReg(cpu_state_t* cpu, bool isY) {
     return cpu->int_active ? (isY ? cpu->iry : cpu->irx)
                            : (isY ? cpu->dy : cpu->dx);
 }
+void putXYreg(cpu_state_t* cpu, bool isY, word_t value) {
+    if(cpu->int_active) {
+        if(isY) { cpu->iry = value; } else { cpu->irx = value; }
+    } else {
+        if(isY) { cpu->dy = value; } else { cpu->dx = value; }
+    }
+}
 
 word_t getALUReg(cpu_state_t* cpu) {
     return getXYReg(cpu, peek(cpu, cpu->pc) & XY_MASK);
 }
 
+addr_t getXYAddr(cpu_state_t* cpu) {
+    return (((int) getXYReg(cpu, true)) << 8 | getXYReg(cpu, false));
+}
 addr_t getAbsAddr(cpu_state_t* cpu) {
-    return (((int) getXYReg(cpu, true)) << 8 | getXYReg(cpu, false))
-             + (peek(cpu, cpu->pc) & IMM4_MASK);
+    return getXYAddr(cpu) + (peek(cpu, cpu->pc) & IMM4_MASK);
 }
 
 addr_t getStackAddr(cpu_state_t* cpu) {

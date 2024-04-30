@@ -4,7 +4,7 @@
 #include "shuntingyard.h"
 
 static void exe_ja(cpu_state_t* cpu) {
-    cpu->pc = (((addr_t) cpu->dy) << 8) + cpu->dx;
+    cpu->pc = getXYAddr(cpu);
     cpu->elapsed ++;
 }
 const instruction_t i_ja = {
@@ -17,7 +17,7 @@ const instruction_t i_ja = {
 };
 
 static void exe_jri(cpu_state_t* cpu) {
-    cpu->pc = (((addr_t) cpu->dy) << 8) + cpu->dx;
+    cpu->pc = getXYAddr(cpu);
     cpu->int_active = false;
     cpu->elapsed ++;
 }
@@ -32,9 +32,9 @@ const instruction_t i_jri = {
 
 static void exe_jar(cpu_state_t* cpu) {
     addr_t prevAddr = cpu->pc + 1;
-    cpu->pc = (((addr_t) cpu->dy) << 8) + cpu->dx;
-    cpu->dx = prevAddr & 0xFF;
-    cpu->dy = prevAddr >> 8;
+    cpu->pc = getXYAddr(cpu);
+    putXYreg(cpu, false, prevAddr & 0xFF);
+    putXYreg(cpu, true, (prevAddr >> 8) & 0xFF);
     cpu->elapsed ++;
 }
 const instruction_t i_jar = {

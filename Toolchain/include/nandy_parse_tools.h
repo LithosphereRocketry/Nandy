@@ -26,7 +26,9 @@ const char *asm_imm4u(const instruction_t *instr, const char *text, asm_state_t 
 
 // Execution tools
 word_t getXYReg(cpu_state_t* cpu, bool isY);
+void putXYreg(cpu_state_t* cpu, bool isY, word_t value);
 word_t getALUReg(cpu_state_t* cpu);
+addr_t getXYAddr(cpu_state_t* cpu);
 addr_t getAbsAddr(cpu_state_t* cpu);
 addr_t getStackAddr(cpu_state_t* cpu);
 

@@ -19,8 +19,8 @@ static void exe_rd(cpu_state_t* cpu) {
     switch(ibyte & i_rd.opcode_mask) {
         case REG_SP: cpu->acc = cpu->sp; break;
         case REG_IO: cpu->acc = cpu->ioin; cpu->io_rd = true; break;
-        case REG_DX: cpu->acc = cpu->dx; break;
-        case REG_DY: cpu->acc = cpu->dy; break;
+        case REG_DX: cpu->acc = getXYReg(cpu, false); break;
+        case REG_DY: cpu->acc = getXYReg(cpu, true); break;
     }
     cpu->pc ++; cpu->elapsed ++;
 }
@@ -38,8 +38,8 @@ static void exe_wr(cpu_state_t* cpu) {
     switch(ibyte & i_wr.opcode_mask) {
         case REG_SP: cpu->sp = cpu->acc; break;
         case REG_IO: cpu->ioout = cpu->acc; cpu->io_wr = true; break;
-        case REG_DX: cpu->dx = cpu->acc; break;
-        case REG_DY: cpu->dy = cpu->acc; break;
+        case REG_DX: putXYreg(cpu, false, cpu->acc); break;
+        case REG_DY: putXYreg(cpu, true, cpu->acc); break;
     }
     cpu->pc ++; cpu->elapsed ++;
 }
@@ -59,8 +59,8 @@ static void exe_sw(cpu_state_t* cpu) {
         case REG_SP: cpu->acc = cpu->sp; cpu->sp = tmp; break;
         case REG_IO: cpu->acc = cpu->ioin; cpu->ioout = tmp; 
                      cpu->io_rd = true; cpu->io_wr = true; break;
-        case REG_DX: cpu->acc = cpu->dx; cpu->dx = tmp; break;
-        case REG_DY: cpu->acc = cpu->dy; cpu->dy = tmp; break;
+        case REG_DX: cpu->acc = getXYReg(cpu, false); putXYreg(cpu, false, tmp); break;
+        case REG_DY: cpu->acc = getXYReg(cpu, true); putXYreg(cpu, true, tmp); break;
     }
     cpu->pc ++; cpu->elapsed ++;
 }
