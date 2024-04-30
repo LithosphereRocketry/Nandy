@@ -24,13 +24,13 @@
     #define assert(condition, ...) ((void)0)
 #endif
 
-typedef enum candy_string_modifier {
-    CANDY_STRING_MODIFIER_NONE = 0,
-    CANDY_STRING_MODIFIER_WIDE,
-    CANDY_STRING_MODIFIER_UTF8,
-    CANDY_STRING_MODIFIER_UTF16,
-    CANDY_STRING_MODIFIER_UTF32,
-} candy_string_modifier_t;
+typedef enum candy_encoding_modifier {
+    CANDY_ENCODING_MODIFIER_NONE = 0,
+    CANDY_ENCODING_MODIFIER_WIDE,
+    CANDY_ENCODING_MODIFIER_UTF8,
+    CANDY_ENCODING_MODIFIER_UTF16,
+    CANDY_ENCODING_MODIFIER_UTF32,
+} candy_encoding_modifier_t;
 
 typedef enum candy_operator {
     CANDY_OPERATOR_NONE = 0,

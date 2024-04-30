@@ -5,7 +5,7 @@
 #include "candy-preprocessor.h"
 #include "stringtools.h"
 
-#define BUFFER_SIZE 512
+#define BUFFER_SIZE 1024
 #define PADDING 32
 char buffer[BUFFER_SIZE + 1];
 
@@ -63,7 +63,7 @@ void tokenizer_pass(void) {
     #define END_STRING() \
         do { \
             if (was_string) {\
-                string_modifier = CANDY_STRING_MODIFIER_NONE; \
+                encoding_modifier = CANDY_ENCODING_MODIFIER_NONE; \
                 was_string = FALSE; \
                 fwrite(&(char){0}, sizeof(char), 1, file_out); \
             } \
@@ -71,16 +71,16 @@ void tokenizer_pass(void) {
     
     int in_whitespace = FALSE;
     int in_string = FALSE;
+    int in_character = FALSE;
     int was_string = FALSE;
     int was_newline = FALSE;
-    int newlines_since_string = 0;
-    candy_string_modifier_t string_modifier = CANDY_STRING_MODIFIER_NONE;
+    candy_encoding_modifier_t encoding_modifier = CANDY_ENCODING_MODIFIER_NONE;
     int comment = 0;
     int header_name = 0;
     char *c = buffer;
     while (c[i]) {
         if (i >= BUFFER_SIZE - PADDING) read_more(&i, FALSE);
-        int linebreak = linebreak_length(c);
+        int linebreak = linebreak_length(c+i);
         
         // Remove escaped newlines
         if (c[i] == '\\') {
@@ -104,6 +104,24 @@ void tokenizer_pass(void) {
             continue;
         }
         
+        // Characters
+        if (in_character) {
+            assert(!linebreak_length(c), "Cannot have a line break inside a character constant\n");
+            if (c[i] == '\'') {
+                fwrite(&(char){0}, sizeof(char), 1, file_out);
+                in_character = FALSE;
+                encoding_modifier = CANDY_ENCODING_MODIFIER_NONE;
+                i += 1;
+                continue;
+            }
+            else if (c[i] == '\\') {
+                
+            }
+            fwrite(c+i, sizeof(char), 1, file_out);
+            i += 1;
+            continue;
+        }
+        
         // Strings
         if (in_string) {
             assert(!linebreak_length(c), "Cannot have a line break inside a string\n");
@@ -116,7 +134,7 @@ void tokenizer_pass(void) {
             if (c[i] == '\\') {
                 
             }
-            fwrite(c+i, 1, 1, file_out);
+            fwrite(c+i, sizeof(char), 1, file_out);
             i += 1;
             continue;
         }
@@ -126,7 +144,7 @@ void tokenizer_pass(void) {
             if (c[i+1] == '/') comment = 1;
             else if (c[i+1] == '*') comment = 2;
             if (comment) {
-                printf("Creating token type %d\n", CANDY_PREPROCESSOR_COMMENT);
+                printf("Creating token type CANDY_PREPROCESSOR_COMMENT\n");
                 candy_preprocessor_token_t t = {CANDY_PREPROCESSOR_COMMENT};
                 fwrite(&t, sizeof(t), 1, file_out);
                 i += 2;
@@ -143,7 +161,7 @@ void tokenizer_pass(void) {
                 fwrite(&(char){0}, sizeof(char), 1, file_out);
                 i += 2;
             } else {
-                fwrite(c+i, 1, 1, file_out);
+                fwrite(c+i, sizeof(char), 1, file_out);
                 i += 1;
             }
             continue;
@@ -151,16 +169,17 @@ void tokenizer_pass(void) {
         
         // Keep newlines
         if (linebreak) {
+            END_STRING();
             END_WHITESPACE();
             was_newline = TRUE;
             assert(!header_name, "Cannot have a newline in a header name\n");
-            printf("Creating token type %d\n", CANDY_PREPROCESSOR_NEWLINE);
+            printf("Creating token type CANDY_PREPROCESSOR_NEWLINE\n");
             candy_preprocessor_token_t t = {CANDY_PREPROCESSOR_NEWLINE};
             fwrite(&t, sizeof(t), 1, file_out);
             i += linebreak;
+            continue;
         }
         
-        do_switch:
         was_newline = FALSE;
         switch (c[i]) {
             // Flatten whitespace into a single space
@@ -173,12 +192,21 @@ void tokenizer_pass(void) {
                 i++;
             } break;
             
+            case '\'':
+                END_WHITESPACE();
+                printf("Creating token type CANDY_PREPROCESSOR_CHARACTER\n");
+                candy_preprocessor_character_t t = {CANDY_PREPROCESSOR_CHARACTER, encoding_modifier};
+                fwrite(&t, sizeof(t), 1, file_out);
+                in_character = TRUE;
+                i += 1;
+                break;
+            
             case '"':
                 if (!header_name) {
                     if (!was_string) {
                         END_WHITESPACE();
-                        printf("Creating token type %d\n", CANDY_PREPROCESSOR_STRING);
-                        candy_preprocessor_string_t t = {CANDY_PREPROCESSOR_STRING, string_modifier};
+                        printf("Creating token type CANDY_PREPROCESSOR_STRING\n");
+                        candy_preprocessor_string_t t = {CANDY_PREPROCESSOR_STRING, encoding_modifier};
                         fwrite(&t, sizeof(t), 1, file_out);
                     }
                     in_string = TRUE;
@@ -193,7 +221,8 @@ void tokenizer_pass(void) {
                     header_name = c[i] == '"'
                         ? CANDY_PREPROCESSOR_LOCAL_HEADER_NAME
                         : CANDY_PREPROCESSOR_INCLUDE_HEADER_NAME;
-                    printf("Creating token type %d\n", header_name);
+                    if (c[i] == '"') printf("Creating token type CANDY_PREPROCESSOR_LOCAL_HEADER_NAME\n");
+                    else printf("Creating token type CANDY_PREPROCESSOR_INCLUDE_HEADER_NAME\n");
                     candy_preprocessor_token_t t = {header_name};
                     fwrite(&t, sizeof(t), 1, file_out);
                     i += 1;
@@ -230,7 +259,7 @@ void tokenizer_pass(void) {
                 assert(header_name != 1, "Encountered '%c' instead of a header name\n", c[i]);
                 #define WRITE_OP(name, size) \
                     { \
-                        printf("Creating token type %d\n", CANDY_PREPROCESSOR_PUNCTUATOR); \
+                        printf("Creating token type CANDY_PREPROCESSOR_PUNCTUATOR\n"); \
                         candy_preprocessor_punctuator_t t = {CANDY_PREPROCESSOR_PUNCTUATOR, name}; \
                         fwrite(&t, sizeof(t), 1, file_out); \
                         i += size; \
@@ -290,24 +319,25 @@ void tokenizer_pass(void) {
                 END_WHITESPACE();
                 assert(header_name != 1, "Encountered '%c' instead of a header name", c[i]);
                 
-                candy_string_modifier_t old_modifier = string_modifier;
-                if (c[i] == 'L' && c[i+1] == '"')
-                    i += 1, string_modifier = CANDY_STRING_MODIFIER_WIDE;
-                else if (c[i] == 'u' && c[i+1] == '8' && c[i+2] == '"')
-                    i += 2, string_modifier = CANDY_STRING_MODIFIER_UTF8;
-                else if (c[i] == 'u' && c[i+2] == '"')
-                    i += 1, string_modifier = CANDY_STRING_MODIFIER_UTF16;
-                else if (c[i] == 'U' && c[i+2] == '"')
-                    i += 1, string_modifier = CANDY_STRING_MODIFIER_UTF32;
+                candy_encoding_modifier_t old_modifier = encoding_modifier;
+                if (c[i] == 'L' && (c[i+1] == '"' || c[i+1] == '\''))
+                    i += 1, encoding_modifier = CANDY_ENCODING_MODIFIER_WIDE;
+                else if (c[i] == 'u' && c[i+1] == '8' && (c[i+2] == '"' || c[i+2] == '\''))
+                    i += 2, encoding_modifier = CANDY_ENCODING_MODIFIER_UTF8;
+                else if (c[i] == 'u' && (c[i+1] == '"' || c[i+1] == '\''))
+                    i += 1, encoding_modifier = CANDY_ENCODING_MODIFIER_UTF16;
+                else if (c[i] == 'U' && (c[i+1] == '"' || c[i+1] == '\''))
+                    i += 1, encoding_modifier = CANDY_ENCODING_MODIFIER_UTF32;
                 else {
                     END_STRING();
                     i++;
                 }
-                assert(old_modifier == CANDY_STRING_MODIFIER_NONE || old_modifier == string_modifier, "Concatenated string literals cannot have different modifiers\n");
+                assert(old_modifier == CANDY_ENCODING_MODIFIER_NONE || old_modifier == encoding_modifier, "Concatenated string literals cannot have different modifiers\n");
         }
     }
     
     assert(was_newline, "Translation units must end with a newline\n");
+    assert(!in_character, "Incomplete character constant at the end of the translation unit\n");
     assert(!in_string, "Incomplete string at the end of the translation unit\n");
     assert(!comment, "Incomplete comment at the end of the translation unit\n");
     assert(!header_name, "Incomplete header name at the end of the translation unit\n");
@@ -330,6 +360,7 @@ void preprocessor_pass(void) {
                 fwrite(c+i, sizeof(char), 1, file_out); \
                 i += 1; \
             } \
+            i += 1; \
         } while (0)
     
     char *c = buffer;
@@ -364,19 +395,31 @@ void preprocessor_pass(void) {
                 break;
             
             case CANDY_PREPROCESSOR_CHARACTER:
-                i += sizeof(*token);
+                candy_preprocessor_character_t *t = (void*) token;
+                i += sizeof(*t);
+                switch (t->modifier) {
+                    case CANDY_ENCODING_MODIFIER_NONE: break;
+                    case CANDY_ENCODING_MODIFIER_WIDE: fwrite("L", 1, 1, file_out); break;
+                    case CANDY_ENCODING_MODIFIER_UTF8: fwrite("u8", 1, 2, file_out); break;
+                    case CANDY_ENCODING_MODIFIER_UTF16: fwrite("u", 1, 1, file_out); break;
+                    case CANDY_ENCODING_MODIFIER_UTF32: fwrite("U", 1, 1, file_out); break;
+                    default: assert(FALSE, "Unknown encoding modifier type %d\n", t->modifier);
+                }
+                fwrite("'", 1, 1, file_out);
+                WRITE_STRING();
+                fwrite("'", 1, 1, file_out);
                 break;
             
             case CANDY_PREPROCESSOR_STRING: {
                 candy_preprocessor_string_t *t = (void*) token;
                 i += sizeof(*t);
                 switch (t->modifier) {
-                    case CANDY_STRING_MODIFIER_NONE: break;
-                    case CANDY_STRING_MODIFIER_WIDE: fwrite("L", 1, 1, file_out); break;
-                    case CANDY_STRING_MODIFIER_UTF8: fwrite("u8", 1, 2, file_out); break;
-                    case CANDY_STRING_MODIFIER_UTF16: fwrite("u", 1, 1, file_out); break;
-                    case CANDY_STRING_MODIFIER_UTF32: fwrite("U", 1, 1, file_out); break;
-                    default: assert(FALSE, "Unknown string modifier type %d\n", t->modifier);
+                    case CANDY_ENCODING_MODIFIER_NONE: break;
+                    case CANDY_ENCODING_MODIFIER_WIDE: fwrite("L", 1, 1, file_out); break;
+                    case CANDY_ENCODING_MODIFIER_UTF8: fwrite("u8", 1, 2, file_out); break;
+                    case CANDY_ENCODING_MODIFIER_UTF16: fwrite("u", 1, 1, file_out); break;
+                    case CANDY_ENCODING_MODIFIER_UTF32: fwrite("U", 1, 1, file_out); break;
+                    default: assert(FALSE, "Unknown encoding modifier type %d\n", t->modifier);
                 }
                 fwrite("\"", 1, 1, file_out);
                 WRITE_STRING();

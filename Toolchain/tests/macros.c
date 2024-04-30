@@ -9,6 +9,8 @@ C \
 char *abc = ABC;
 char *de = DE;
 char *f = F;
+char g = u8'c' \
+;
 
 #include <stdio.h>
 #include "long.c"
