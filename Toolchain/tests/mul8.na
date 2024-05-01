@@ -60,6 +60,7 @@ mul8_skip:
     rd dy
     subi 1
     wr dy
+    ctog
     jcz mul8_loop
 
     lds 0
