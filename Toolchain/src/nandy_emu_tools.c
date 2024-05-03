@@ -52,9 +52,9 @@ bool emu_step(cpu_state_t* state, FILE* outstream) {
     if(state->elapsed - lastIOcycle > COOLDOWN) {
         if(stdinAvail()) {
             state->ioin = getc(stdin);
-            lastIOcycle = state->elapsed;
             state->int_in = true;
         }
+        lastIOcycle = state->elapsed;
     }
     // End of I/O block
     if(state->int_en && state->int_in && !state->int_active) {
