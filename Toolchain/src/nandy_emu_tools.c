@@ -3,6 +3,7 @@
 #include <stdbool.h>
 
 #include "nandy_instructions.h"
+#include "stdin_avail.h"
 
 
 const instruction_t* ilookup(word_t word) {
@@ -49,9 +50,8 @@ bool emu_step(cpu_state_t* state, FILE* outstream) {
         putc(state->ioout, outstream);
     }
     if(state->elapsed - lastIOcycle > COOLDOWN) {
-        int nextchar = getc(stdin);
-        if(nextchar != EOF) {
-            state->ioin = nextchar;
+        if(stdinAvail()) {
+            state->ioin = getc(stdin);
             lastIOcycle = state->elapsed;
             state->int_in = true;
         }
