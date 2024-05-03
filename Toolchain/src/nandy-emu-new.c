@@ -218,6 +218,8 @@ int main(int argc, char** argv) {
 #ifdef __unix__
     sigaction(SIGINT, &act, NULL);
 #endif
+
+    setbuf(stdin, NULL);
     do {
         if(arg_forcedebug.result.present) {
             if(!debug(&state)) { break; }
