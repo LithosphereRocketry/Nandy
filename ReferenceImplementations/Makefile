@@ -1,7 +1,7 @@
 # Semi-automated C/C++ makefile
 
 # This should be all you need to change
-TARGETS = test_allocator
+TARGETS = test_allocator test_fat
 # RKT_TARGETS = nandy-asm-racket
 
 INCDIR = include/

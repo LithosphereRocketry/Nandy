@@ -2,6 +2,7 @@
 *.nb
 *.logi
 test_allocator
+test_fat
 
 # Racket
 *.bak
