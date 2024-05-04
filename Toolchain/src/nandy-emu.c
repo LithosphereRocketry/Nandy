@@ -1,400 +1,240 @@
+#include <stdlib.h>
 #include <stdio.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include <stddef.h>
 #include <string.h>
-#include <time.h>
 
-#include "nandy_tools.h"
+#include "argparse.h"
+#include "shuntingyard.h"
+#include "nandy_emu_tools.h"
+#include "nandy_instr_defs.h"
+#include "nandy_parse_tools.h"
 
-#ifdef __unix__
-#include <unistd.h>
-#endif
+argument_t arg_debug = { .abbr = 'g', .name = "debug", .hasval = false };
+argument_t arg_forcedebug = { .abbr = 'G', .name = "force-debug", .hasval = false };
+argument_t arg_out = { .abbr = 'o', .name = "out", .hasval = true };
 
-// TODO: finish refactoring
-extern bool parity(word_t w);
-
-#define ALU_INST_MASK 0xF
-#define ALU_WRITESBOTH_MASK 0b1000 // any instruction with either of these bits can
-								   // write ACC and CARRY simultaneously
-#define WRITABLE_REGION (1<<15)
-
-unsigned int cpufreq = 1000000;
-unsigned int baudrate = 1200;
-
-#define SIGNAL_MASK 0x7
-enum Signal {
-	SIGNAL_BRK = 00,
-	SIGNAL_BEL = 01,
-	SIGNAL_DINT = 04,
-	SIGNAL_EINT = 05,
-	SIGNAL_ICLR = 06,
-	SIGNAL_ISET = 07
+argument_t* args[] = {
+    &arg_debug,
+    &arg_forcedebug,
+    &arg_out
 };
+const size_t n_args = sizeof(args) / sizeof(argument_t*);
 
-enum {
-	RADIX_DECIMAL,
-	RADIX_UNSIGNED,
-	RADIX_HEX
-} radix = RADIX_HEX;
+cpu_state_t state;
 
-enum RegID {
-	REGID_SP = 0x0,
-	REGID_IO = 0x1,
-	REGID_DX = 0x2,
-	REGID_DY = 0x3
-};
+const instruction_t* disasm_cache[65536];
 
-unsigned long cycles = -1;
-word_t acc, x, y, sp, ix, iy;
-bool carry;
-addr_t pc = -1;
-word_t mem[65536];
-word_t ioin, ioout;
-bool intEnabled;
-bool isInterrupt;
-
-unsigned long ioCooldown;
-
-word_t signExt(word_t value, int bits) {
-	word_t mask = ~((1 << bits) - 1);
-	if(value & (1 << (bits-1))) {
-		return value | mask;
-	} else {
-		return value & ~mask;
-	}
+void scanDisasm(cpu_state_t* state, addr_t start) {
+    // If the disassembly is already done, don't bother
+    if(disasm_cache[start]) return;
+    int len = nbytes(peek(state, start));
+    const instruction_t* instr = ilookup(peek(state, start));
+    if(instr) {
+        disasm_cache[start] = instr;
+        // Delete any disassemblies of instructions that are now part of the
+        // data field of this instructions
+        // This loop is super unnecessary but it supports longer instructions
+        for(int i = 1; i < len; i++) { disasm_cache[start + i] = NULL; }
+        // These instructions are completely intractable to the disassembler
+        // because their jump target is runtime-variable
+        if(instr != &i_ja && instr != &i_jar && instr != &i_jri) {
+            // TODO: how do we scan targets of relative jumps without creating
+            // infinite loops of misaligned instructions fighting with each
+            // other
+            if(instr == &i_jcz) {
+                scanDisasm(state, start + len);
+                // TODO: scan jump target
+            } else if(instr == &i_j) {
+                // TODO: scan jump target
+            } else {
+                scanDisasm(state, start + len);
+            }
+        }
+    }
 }
 
-bool wantsInterrupt() {
-	if(ioCooldown == 0) {
-		int nextChar = getc(stdin);
-		if(nextChar == EOF) {
-			return false;
-		} else {
-			ioin = nextChar;
-			ioCooldown = (cpufreq / baudrate);
-			return true;
-		}
-	} else {
-		return false;
-	}
+void printDebug(cpu_state_t* state) {
+    /** Layout should look like this:
+PC  0x123F  CARRY 1         FF      ...
+ACC 0x3F    SP  0x3F        FF      rd io
+DX  0x3F    DY  0x3F        FF      sw dy
+IRX 0x3F    IRY 0x3F        FF      add dx
+IN  0x3F    OUT 0x3F        FF  PC> addi 1
+IE  1       INT 1           FF      jri
+                            FF      nop
+Cycles 1234567890       SP> FF      nop 
+    */
+    static char linebuf[8][40];
+    for(int i = 0; i < 8; i++) {
+        strncpy(linebuf[i], "???", 40);
+    }
+    addr_t pcdis = state->pc;
+    int pos = 0;
+    for(int i = 0; i < 4; i++) {
+        if(disasm_cache[pcdis - 2] && nbytes(peek(state, pcdis - 2)) == 2) {
+            pos --;
+            pcdis -= 2;
+        } else if(disasm_cache[pcdis - 1]) {
+            pos --;
+            pcdis --;
+        } else {
+            break;
+        }
+    }
+    for(; pos < 4; pos++) {
+        if(disasm_cache[pcdis]) {
+            disasm_cache[pcdis]->disassemble(disasm_cache[pcdis],
+                    state, pcdis, linebuf[pos + 4], 40);
+            pcdis += nbytes(peek(state, pcdis));
+        } else {
+            break;
+        }
+    }
+
+    printf("\nPC  0x%04hx  CARRY %c         %02hhx      %-40s\n",
+            state->pc, state->carry ? '1' : '0', peek(state, 0xFF00 + (uint8_t) state->sp + 7), linebuf[0]);
+    printf("ACC 0x%02hhx    SP  0x%02hhx        %02hhx      %-40s\n",
+            state->acc, state->sp, peek(state, 0xFF00 + (uint8_t) state->sp + 6), linebuf[1]);
+    printf("DX  0x%02hhx    DY  0x%02hhx        %02hhx      %-40s\n",
+            state->dx, state->dy, peek(state, 0xFF00 + (uint8_t) state->sp + 5), linebuf[2]);
+    printf("IRX 0x%02hhx    IRY 0x%02hhx        %02hhx      %-40s\n",
+            state->irx, state->iry, peek(state, 0xFF00 + (uint8_t) state->sp + 4), linebuf[3]);
+    printf("IN  0x%02hhx    OUT 0x%02hhx        %02hhx  PC> %-40s\n",
+            state->ioin, state->ioout, peek(state, 0xFF00 + (uint8_t) state->sp + 3), linebuf[4]);
+    printf("IE  %c       INT %c           %02hhx      %-40s\n",
+            state->int_en ? '1' : '0', state->int_active ? '1' : '0', peek(state, 0xFF00 + (uint8_t) state->sp + 2), linebuf[5]);
+    printf("                            %02hhx      %-40s\n",
+            peek(state, 0xFF00 + (uint8_t) state->sp + 1), linebuf[6]);
+    char cyclesbuf[17];
+    snprintf(cyclesbuf, 17, "%lu", state->elapsed);
+    printf("Cycles %-16s SP> %02hhx      %-40s\n",
+            cyclesbuf, peek(state, 0xFF00 | state->sp), linebuf[7]);
 }
 
-bool step(bool debugint);
-bool pauseToDbg() {
-	printf("\nBreakpoint\n");
-	while(1) {
-		switch(radix) {
-			case RADIX_DECIMAL:
-				printf("    PC %hi\t   ACC %hhi\t  IOIN %hhi\tCycles %lu\t Carry %hhi\n"\
-					   "Inst %hhi\t    SP %hhi\t    DX %hhi\t    DY %hhi\tIOOUT %hhi\n"\
-					   "DEBUG> ",
-					pc, acc, ioin, cycles, carry, mem[pc], sp,
-					isInterrupt ? ix : x, isInterrupt ? iy : y, ioout);
-				break;
-			case RADIX_UNSIGNED:
-				printf("    PC %hu\t   ACC %hhu\t  IOIN %hhu\tCycles %lu\t Carry %hhi\n"\
-					   "Inst %hhu\t    SP %hhu\t    DX %hhu\t    DY %hhu\tIOOUT %hhu\n"\
-					   "DEBUG> ",
-					pc, acc, ioin, cycles, carry, mem[pc], sp,
-					isInterrupt ? ix : x, isInterrupt ? iy : y, ioout);
-				break;
-			case RADIX_HEX:
-			default:
-				printf("    PC 0x%hx\t   ACC 0x%hhx\t  IOIN 0x%hhx\tCycles 0x%lx\t Carry %hhi\n"\
-					   "Inst 0x%hhx\t    SP 0x%hhx\t    DX 0x%hhx\t    DY 0x%hhx\tIOOUT 0x%hhx\n"\
-					   "DEBUG> ",
-					pc, acc, ioin, cycles, carry, mem[pc], sp,
-					isInterrupt ? ix : x, isInterrupt ? iy : y, ioout);
-		}
-		char input[256];
-		fgets(input, 255, stdin);
-		char cmd[64];
-		sscanf(input, "%63s", cmd);
-		if(!strcmp(cmd, "quit") || !strcmp(cmd, "q")) {
-			return false;
-		} else if(!strcmp(cmd, "step") || !strcmp(cmd, "s")) {
-			step(false);
-		} else if(!strcmp(cmd, "continue") || !strcmp(cmd, "c")) {
-			return true;
-		} else if(!strcmp(cmd, "radix") || !strcmp(cmd, "r")) {
-			char radtxt[64];
-			if(sscanf(input, "%*s %63s", radtxt) < 1) {
-				printf("No radix mode given\n");
-			} else if(!strcmp(radtxt, "decimal") || !strcmp(radtxt, "signed") || !strcmp(radtxt, "d") || !strcmp(radtxt, "s")) {
-				radix = RADIX_DECIMAL;
-			} else if(!strcmp(radtxt, "unsigned") || !strcmp(radtxt, "u")) {
-				radix = RADIX_UNSIGNED;
-			} else if(!strcmp(radtxt, "hexadecimal") || !strcmp(radtxt, "hex") || !strcmp(radtxt, "h") || !strcmp(radtxt, "x")) {
-				radix = RADIX_HEX;
-			} else {
-				printf("Unrecognized radix mode \"%s\"\n", radtxt);
-			}
-		} else if(!strcmp(cmd, "io") || !strcmp(cmd, "i")) {
-			long newio = 0;
-			if(sscanf(input, "%*s %li", &newio) < 1) {
-				printf("No I/O value given\n");
-			} else if((radix == RADIX_DECIMAL || radix == RADIX_HEX) && newio >= -128 && newio <= 127) {
-				ioin = newio;
-			} else if((radix == RADIX_UNSIGNED || radix == RADIX_HEX) && newio >= 0 && newio <= 255) {
-				ioin = newio;
-			} else {
-				printf("Warning: IO value %li will be truncated\n", newio);
-				ioin = newio;
-			}
-		} else if(!strcmp(cmd, "peek") || !strcmp(cmd, "p")) {
-			long peekaddr = 0;
-			if(sscanf(input, "%*s %lx", &peekaddr) < 1) {
-				printf("No I/O value given\n");
-			} else {
-				printf("mem[%hx] = 0x%hhx\n", (short) peekaddr, mem[peekaddr & 0xFFFF]);
-			}
-		} else {
-			printf("Unrecognized command \"%s\"\n", cmd);
-		}
-	}
+bool debug(cpu_state_t* state) {
+    scanDisasm(state, state->pc);
+    printDebug(state);
+    while(1) {
+
+        printf("DEBUG> ");
+        char input[256];
+        fgets(input, 255, stdin);
+        if(input[0] == '\n') {
+            // On empty line, reprint the display
+            return debug(state);
+        }
+        char cmd[64];
+        int scanlen;
+        sscanf(input, "%63s%n", cmd, &scanlen);
+        if(!strcmp(cmd, "quit") || !strcmp(cmd, "q")) {
+            return false;
+        } else if(!strcmp(cmd, "step") || !strcmp(cmd, "s")) {
+            state->idbg = true;
+            return true;
+        } else if(!strcmp(cmd, "continue") || !strcmp(cmd, "c")) {
+            state->idbg = false;
+            return true;
+        } else if(!strcmp(cmd, "io") || !strcmp(cmd, "i")) {
+            int64_t io;
+            if(parseExp(NULL, input+scanlen, &io, stdout) != SHUNT_DONE) {
+                printf("Failed to parse value\n");
+            } else if(!isBounded(io, 8, BOUND_EITHER)) {
+                printf("Value does not fit in word\n");
+            } else {
+                state->ioin = (word_t) io;
+                return debug(state);
+            }
+        } else if(!strcmp(cmd, "peek") || !strcmp(cmd, "e")) {
+            int64_t addr;
+            if(parseExp(NULL, input+scanlen, &addr, stdout) != SHUNT_DONE) {
+                printf("Failed to parse address\n");
+            } else if(!isBounded(addr, 16, BOUND_UNSIGNED)) {
+                printf("Address is out of bounds\n");
+            } else {
+                printf("0x%hhx\n", peek(state, (addr_t) addr));
+            }
+        } else if(!strcmp(cmd, "poke") || !strcmp(cmd, "o")) {
+            char* div = strchr(input+scanlen, ',');
+            if(div == NULL) {
+                printf("Format: poke <addr>, <value>\n");
+            } else {
+                *div = '\0';
+                int64_t addr;
+                if(parseExp(NULL, input+scanlen, &addr, stdout) != SHUNT_DONE) {
+                    printf("Failed to parse address\n");
+                } else if(!isBounded(addr, 16, BOUND_UNSIGNED)) {
+                    printf("Address is out of bounds\n");
+                } else {
+                    int64_t val;
+                    if(parseExp(NULL, div+1, &val, stdout) != SHUNT_DONE) {
+                        printf("Failed to parse value\n");
+                    } else if(!isBounded(val, 8, BOUND_EITHER)) {
+                        printf("Value does not fit in word\n");
+                    } else {
+                        poke(state, (addr_t) addr, (word_t) val);
+                    }
+                }
+            }
+        } else {
+            printf("Unrecognized command \"%s\"\n", cmd);
+        }
+    }
 }
 
-word_t fetch() {
+// Weird little block here for Unix signal support
 #ifdef __unix__
-	// We assume the actual emulator takes zero time at all
-	// we can probably get better timing precision by using a different timing
-	// method but this is pretty OK
-	// update: this sucks
-	// static const struct timespec us = {0, 1000};
-	// nanosleep(&us, NULL);
+#include <signal.h>
+void onInterrupt() {
+    state.idbg = true;
+}
+struct sigaction act = { .sa_handler = onInterrupt };
 #endif
-	if(ioCooldown != 0) { ioCooldown--; }
-	cycles++;
-	return mem[++pc];
-}
-
-void aluop(enum alu_mode mode, bool isCarry, bool isXY, word_t a, word_t b, word_t* result) {
-	bool newcarry = false;
-	int newresult = 0;
-	switch(mode) {
-		case ALU_B:
-			newresult = b;
-			newcarry = a >> 7;
-			break;
-		case ALU_OR:
-			newresult = a | b;
-			newcarry = carry;
-			break;
-		case ALU_AND:
-			newresult = a & b;
-			newcarry = (a != 0);
-			break;
-		case ALU_XOR:
-			newresult = a ^ b;
-			newcarry = parity(a);
-			break;
-		case ALU_NB:
-			newresult = ~b;
-			newcarry = !(a >> 7);
-			break;
-		case ALU_NOR:
-			newresult = ~(a | b);
-			newcarry = !carry;
-			break;
-		case ALU_NAND:
-			newresult = ~(a & b);
-			newcarry = (a == 0);
-			break;
-		case ALU_XNOR:
-			newresult = ~(a ^ b);
-			newcarry = !parity(a);
-			break;
-		case ALU_ADD:
-			newresult = (((int) a) & 0xFF) + (((int) b) & 0xFF);
-			newcarry = (newresult >> 8) & 1;
-			break;
-		case ALU_ADDC:
-			newresult = (((int) a) & 0xFF) + (((int) b) & 0xFF) + ((int) carry);
-			newcarry = (newresult >> 8) & 1;
-			break;
-		case ALU_SUB:
-			newresult = (((int) a) & 0xFF) + 256 - (((int) b) & 0xFF);
-			newcarry = (newresult >> 8) & 1;
-			break;
-		case ALU_SUBC:
-			newresult = (((int) a) & 0xFF) + 255 + ((int) carry)
-					- (((int) b) & 0xFF);
-			newcarry = (newresult >> 8) & 1;
-			break;
-		case ALU_SL:
-			if(!isXY) {
-				newresult = a << 1;
-				newcarry = (a >> 7) & 1;
-			} else {
-				newresult = (a >> 1) & 0x7F;
-				newcarry = a & 1;
-			}
-			break;
-		case ALU_SLC:
-			if(!isXY) {
-				newresult = a << 1 | (carry ? 1 : 0);
-				newcarry = (a >> 7) & 1;
-			} else {
-				newresult = ((a >> 1) & 0x7F) | (carry ? 0x80 : 0);
-				newcarry = a & 1;
-			}
-			break;
-		default:
-			printf("ALU operation 0x%x not implemented\n", mode);
-	}
-	if(isCarry) {
-		carry = newcarry;
-		if(mode & ALU_WRITESBOTH_MASK) {
-			*result = newresult & 0xFF;
-		}
-	} else {
-		*result = newresult & 0xFF;
-	}
-}
-
-bool step(bool debugint) {
-	if(intEnabled && !isInterrupt && wantsInterrupt()) {
-		isInterrupt = true;
-		ix = (pc+1) & 0xFF;
-		iy = (pc+1) >> 8;
-		pc = ISR_ADDR-1;
-	}
-
-	word_t i = fetch();
-	if(!(i & MULTICYCLE_MASK)) { // single cycle operations
-		if(!(i & ALU_SEL_MASK)) { // basic instructions
-			if(!(i & ISP_MASK)) { // housekeeping/program logic
-				if(!(i & PROGFLOW_MASK)) { // Register swaps
-					word_t from;
-					word_t* to;
-					switch(i & REGID_MASK) {
-						case REGID_SP:
-							from = sp;
-							to = &sp;
-							break;
-						case REGID_IO:
-							from = ioin;
-							to = &ioout;
-							break;
-						case REGID_DX:
-							from = isInterrupt ? ix : x;
-							to = isInterrupt ? &ix : &x;
-							break;
-						case REGID_DY:
-							from = isInterrupt ? iy : y;
-							to = isInterrupt ? &iy : &y;
-							break;
-					}
-					if(i & WR_MASK) {
-						*to = acc;
-						if(to == &ioout) {
-							putc(acc, stdout);
-						}
-					}
-					if(i & RD_MASK) {
-						acc = from;
-					}
-				} else { // program flow
-					if(!(i & SIG_MASK)) { // ret/call
-						addr_t oldpc = pc + 1;
-						pc = (((addr_t) (isInterrupt ? iy : y)) << 8)
-						   + (isInterrupt ? ix : x) - 1;
-						if(i & RET_MASK) { // call only
-							*(isInterrupt ? &ix : &x) = oldpc & 0xFF;
-							*(isInterrupt ? &iy : &y) = oldpc >> 8;
-						}
-						if(i & CI_MASK) { // jri only
-							isInterrupt = false;
-						}
-					} else { // signal
-						switch(i & SIGNAL_MASK) {
-							case SIGNAL_BRK: if(debugint) return pauseToDbg(); break;
-							case SIGNAL_BEL: putchar('\a'); break;
-							case SIGNAL_DINT: intEnabled = false; break;
-							case SIGNAL_EINT: intEnabled = true; break;
-							case SIGNAL_ICLR: isInterrupt = false; break;
-							case SIGNAL_ISET: isInterrupt = true; break;
-						}
-					}
-				}
-			} else { // isp instructions
-				aluop(ALU_ADD, i & CARRY_SEL_MASK, i & XY_MASK, sp, signExt(i, 4), &sp);
-			}
-		} else { // normal math
-			word_t alub = (i & XY_MASK) ? (isInterrupt ? iy : y)
-										: (isInterrupt ? ix : x);
-			aluop(i & ALU_INST_MASK, i & CARRY_SEL_MASK, i & XY_MASK, acc, alub, &acc);
-		}
-	} else { // multicycle operations
-		if(!(i & ALU_SEL_MASK)) { // memory 
-			cycles++; // These operations don't move PC but they do consume a cycle
-			addr_t memaddr;
-			if(!(i & MEM_STACK_MASK)) {
-				memaddr = (((int) (isInterrupt ? iy : y)) << 8 
-								| (isInterrupt ? ix : x)) + (i & 0xF);
-			} else {
-				memaddr = 0xFF00 + (((int) sp) & 0xFF)  + (i & 0xF);
-			}
-			if(!(i & MEM_WRITE_MASK)) { // reads
-				acc = mem[memaddr];
-			} else { // writes
-				if(memaddr & WRITABLE_REGION) {
-					mem[memaddr] = acc;
-				}
-			}
-		} else { // immediates
-			word_t imm = fetch();
-			if(!(i & JUMP_MASK)) { // immediate ops
-				aluop(i & ALU_INST_MASK, i & CARRY_SEL_MASK, i & XY_MASK, acc, imm, &acc);
-			} else { // jumps
-				int offs = ((((int) signExt(i, 4)) << 8)
-							| (((int) imm) & 0xFF)) - 1;
-				if(!((i & COND_MASK) && carry)) {
-					pc += offs;
-				}
-			}
-		}
-	}
-	return true;
-}
 
 int main(int argc, char** argv) {
-	if(argc != 2) {
-		printf("Usage: %s <filename>\n", argv[0]);
-		return 1;
-	}
-    char* path = argv[1];
-	printf("Loading file %s...\n", path);
-	FILE* binfile = fopen(path, "rb");
-	size_t loaded = fread(mem, sizeof(word_t), 32768, binfile);
-	printf("%lu bytes loaded\n", loaded);
-	// A bit of a hack to start in the debug menu but then continue running with
-	// no debug afterward
-	if(pauseToDbg()) {
-		while(step(true));
-	}
-	// char* path = NULL;
-    // bool debug = false;
-    // for(int i = 1; i < argc; i++) {
-	// 	if(argv[i][0] == '-') {
-	// 		for(int j = 1; argv[i][j] != '\0'; j++) {
-	// 			switch(argv[i][j]) {
-	// 				case 'd':
-	// 					debug = true;
-	// 					break;
-	// 				default:
-	// 					printf("Unexpected flag %c\n", argv[i][j]);
-	// 					return 1;
-	// 			}
-	// 		}
-	// 	} else {
-	// 		if(!path) {
-	// 			path = argv[i];
-	// 		} else {
-	// 			printf("Unexpected argument %s\n", argv[i]);
-	// 			return 1;
-	// 		}
-	// 	}
-	// }
+    argc = argparse(args, n_args, argc, argv);
+    if(argc <= 0) return -1;
+    if(argc != 2) {
+        printf("Wrong number of args\n");
+        return -1;
+    }
+    
+    FILE* f = fopen(argv[1], "rb");
+    if(!f) {
+        printf("File %s not found\n", argv[1]);
+        return -1;
+    }
+
+    FILE* fout = stdout;
+    if(arg_out.result.value) {
+        fout = fopen(arg_out.result.value, "wb");
+        if(!fout) {
+            printf("File %s not found\n", arg_out.result.value);
+            return -1;
+        }
+    }
+
+    state = INIT_STATE;
+    fread(state.rom, sizeof(word_t), ADDR_RAM_MASK, f);
+
+#ifdef __unix__
+    sigaction(SIGINT, &act, NULL);
+#endif
+
+    setbuf(stdin, NULL);
+    do {
+        if(arg_forcedebug.result.present) {
+            if(!debug(&state)) { break; }
+        }
+        do { scanDisasm(&state, state.pc); } while(!emu_step(&state, fout));
+        if(arg_debug.result.present) {
+            if(!debug(&state)) { break; }
+        }
+    } while(arg_debug.result.present || arg_forcedebug.result.present);
+
+    printf("Complete, executed %li cycles\n", state.elapsed);
+
+    fclose(f);
+    if(arg_out.result.value) { // technically it's probably harmless to close
+            // stdout here but it makes me sad
+        fclose(fout);
+    }
 }
