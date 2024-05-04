@@ -8,36 +8,80 @@
 #define MBR_SIGNATURE 0xAA55
 
 FILE* disk;
+
+// Driver functions
+struct __attribute__((packed)) {
+    uint8_t mbractive : 1;
+    uint8_t dirty : 1;
+    uint8_t partsactive : 4;
+    uint8_t part : 2;
+} diskStatus;
+
+struct {
+    uint16_t start;
+    uint16_t length;
+} partitions[4];
+
+uint16_t currentSector;
 uint8_t sectorBuf[SECTOR_SZ];
-void sectorFetch(uint16_t sector) {
+
+void fetch(uint16_t sector) {
     fseek(disk, ((long) sector) * SECTOR_SZ, SEEK_SET);
     fread(sectorBuf, 1, SECTOR_SZ, disk);
+    currentSector = sector;
+    diskStatus.dirty = 0;
+}
+void flush() {
+    fseek(disk, ((long) currentSector) * SECTOR_SZ, SEEK_SET);
+    fwrite(sectorBuf, 1, SECTOR_SZ, disk);
+    diskStatus.dirty = 0;
+}
+
+// in asm, will return diskStatus
+void diskInit() {
+    disk = fopen("exampledisk.img", "rb+");
+    fetch(0);
+    diskStatus.partsactive = 0;
+    diskStatus.part = 0;
+
+    uint16_t sig = *((uint16_t*) &sectorBuf[MBR_SIGADDR]);
+    if(sig == MBR_SIGNATURE) {
+        diskStatus.mbractive = 1;
+        for(int i = 0; i < 4; i++) {
+            uint8_t* partfield = sectorBuf + MBR_PARTITIONS + i*16;
+            if((partfield[0] == 0x00 || partfield[0] == 0x80) && partfield[4] == 0x04) {
+                partitions[i].start = (((uint16_t) partfield[9]) << 8) | partfield[8];
+                partitions[i].length = (((uint16_t) partfield[0xD]) << 8) | partfield[0xC];
+                diskStatus.partsactive |= 1 << i;
+            }
+        }
+    } else {
+        diskStatus.mbractive = 0;
+    }
+}
+
+void loadSector(uint16_t sector) {
+    if(sector != currentSector) {
+        if(diskStatus.dirty) {
+            flush();
+        }
+        fetch(sector);
+    }
 }
 
 int main(int argc, char** argv) {
-    disk = fopen("exampledisk.img", "rb+");
-    // Read MBR
-    sectorFetch(0);
-    uint16_t sig = *((uint16_t*) &sectorBuf[MBR_SIGADDR]);
-    if(sig != MBR_SIGNATURE) {
-        printf("Bad signature!\n");
-    } else {
+    diskInit();
+    if(diskStatus.mbractive) {
         printf("Good signature\n");
+    } else {
+        printf("Bad signature!\n");
     }
 
     for(int i = 0; i < 4; i++) {
-        printf("Partition %i:\n", i);
-        uint8_t* partfield = sectorBuf + MBR_PARTITIONS + i*16;
-        if(partfield[0] == 0x00) {
-            printf("\tInactive, type %hhx\n", partfield[4]);
-        } else if(partfield[0] == 0x80) {
-            printf("\tActive, type %hhx\n", partfield[4]);
-        } else {
-            printf("\tInvalid\n");
-            continue;
+        if(diskStatus.mbractive & (1 << i)) {
+            printf("Partition %i:\n", i);
+            printf("\tStart sector %x, length %x (%u MiB)\n",
+                partitions[i].start, partitions[i].length, partitions[i].length/2048);
         }
-        uint32_t addr = *((uint32_t*) (partfield + 8));
-        uint32_t len = *((uint32_t*) (partfield + 0xC));
-        printf("\tStart sector %x, length %x (%u MiB)\n", addr, len, len/2048);
     }
 }
