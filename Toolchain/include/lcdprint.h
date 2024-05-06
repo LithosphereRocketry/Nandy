@@ -19,7 +19,7 @@ typedef struct lcd {
     uint8_t cgram[64]; // Custom char printing not supported
 } lcd_t;
 
-void lcd_clock(lcd_t* lcd);
+void lcd_clock(lcd_t* lcd, bool active);
 void lcd_print(const lcd_t* lcd);
 
 #endif
