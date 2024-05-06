@@ -4,7 +4,6 @@
 parse-test
 nandy-emu
 nandy-asm
-nandy-asm-racket
 binconvert
 shuntingyard_test
 

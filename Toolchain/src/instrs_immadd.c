@@ -5,7 +5,7 @@
 
 static void exe__addi(cpu_state_t* cpu) {
     cpu->acc = alu_add(cpu->acc, peek(cpu, cpu->pc + 1), false, NULL);
-    cpu->pc += 2;
+    cpu->pc += 2; cpu->elapsed += 2;
 }
 const instruction_t i__addi = {
     .mnemonic = "_addi",
@@ -18,7 +18,7 @@ const instruction_t i__addi = {
 
 static void exe__addci(cpu_state_t* cpu) {
     cpu->acc = alu_add(cpu->acc, peek(cpu, cpu->pc + 1), cpu->carry, NULL);
-    cpu->pc += 2;
+    cpu->pc += 2; cpu->elapsed += 2;
 }
 const instruction_t i__addci = {
     .mnemonic = "_addci",
@@ -31,7 +31,7 @@ const instruction_t i__addci = {
 
 static void exe__subi(cpu_state_t* cpu) {
     cpu->acc = alu_sub(cpu->acc, peek(cpu, cpu->pc + 1), true, NULL);
-    cpu->pc += 2;
+    cpu->pc += 2; cpu->elapsed += 2;
 }
 const instruction_t i__subi = {
     .mnemonic = "_subi",
@@ -44,7 +44,7 @@ const instruction_t i__subi = {
 
 static void exe__subci(cpu_state_t* cpu) {
     cpu->acc = alu_sub(cpu->acc, peek(cpu, cpu->pc + 1), cpu->carry, NULL);
-    cpu->pc += 2;
+    cpu->pc += 2; cpu->elapsed += 2;
 }
 const instruction_t i__subci = {
     .mnemonic = "_subci",
@@ -57,7 +57,7 @@ const instruction_t i__subci = {
 
 static void exe_addi(cpu_state_t* cpu) {
     cpu->acc = alu_add(cpu->acc, peek(cpu, cpu->pc + 1), false, &cpu->carry);
-    cpu->pc += 2;
+    cpu->pc += 2; cpu->elapsed += 2;
 }
 const instruction_t i_addi = {
     .mnemonic = "addi",
@@ -70,7 +70,7 @@ const instruction_t i_addi = {
 
 static void exe_addci(cpu_state_t* cpu) {
     cpu->acc = alu_add(cpu->acc, peek(cpu, cpu->pc + 1), cpu->carry, &cpu->carry);
-    cpu->pc += 2;
+    cpu->pc += 2; cpu->elapsed += 2;
 }
 const instruction_t i_addci = {
     .mnemonic = "addci",
@@ -83,7 +83,7 @@ const instruction_t i_addci = {
 
 static void exe_subi(cpu_state_t* cpu) {
     cpu->acc = alu_sub(cpu->acc, peek(cpu, cpu->pc + 1), true, &cpu->carry);
-    cpu->pc += 2;
+    cpu->pc += 2; cpu->elapsed += 2;
 }
 const instruction_t i_subi = {
     .mnemonic = "subi",
@@ -96,7 +96,7 @@ const instruction_t i_subi = {
 
 static void exe_subci(cpu_state_t* cpu) {
     cpu->acc = alu_sub(cpu->acc, peek(cpu, cpu->pc + 1), cpu->carry, &cpu->carry);
-    cpu->pc += 2;
+    cpu->pc += 2; cpu->elapsed += 2;
 }
 const instruction_t i_subci = {
     .mnemonic = "subci",

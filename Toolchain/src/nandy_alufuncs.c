@@ -33,7 +33,7 @@ word_t alu_sl(word_t a, word_t b, bool cin, bool* cout) {
 }
 
 word_t alu_sr(word_t a, word_t b, bool cin, bool* cout) {
-    word_t result = a >> 1 | (cin ? 0x80 : 0);
+    word_t result = ((a >> 1) & 0x7F) | (cin ? 0x80 : 0);
     if(cout) {
         *cout = a & 1;
     }

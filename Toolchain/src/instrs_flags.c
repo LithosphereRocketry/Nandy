@@ -3,8 +3,8 @@
 #include "stdio.h"
 
 static void exe_brk(cpu_state_t* cpu) {
-    // TODO: exit to debugger
-    cpu->pc ++;
+    cpu->idbg = true;
+    cpu->pc ++; cpu->elapsed ++;
 }
 
 const instruction_t i_brk = {
@@ -18,7 +18,7 @@ const instruction_t i_brk = {
 
 static void exe_bell(cpu_state_t* cpu) {
     putchar('\a');
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i_bell = {
     .mnemonic = "bell",
@@ -31,7 +31,7 @@ const instruction_t i_bell = {
 
 static void exe_dint(cpu_state_t* cpu) {
     cpu->int_en = false;
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i_dint = {
     .mnemonic = "dint",
@@ -44,7 +44,7 @@ const instruction_t i_dint = {
 
 static void exe_eint(cpu_state_t* cpu) {
     cpu->int_en = true;
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i_eint = {
     .mnemonic = "eint",
@@ -57,7 +57,7 @@ const instruction_t i_eint = {
 
 static void exe_iclr(cpu_state_t* cpu) {
     cpu->int_active = false;
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i_iclr = {
     .mnemonic = "iclr",
@@ -70,7 +70,7 @@ const instruction_t i_iclr = {
 
 static void exe_iset(cpu_state_t* cpu) {
     cpu->int_active = true;
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i_iset = {
     .mnemonic = "iset",

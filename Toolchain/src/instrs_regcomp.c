@@ -4,7 +4,7 @@
 
 static void exe_sgn(cpu_state_t* cpu) {
     cpu->carry = (cpu->acc & 0x80) != 0;
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i_sgn = {
     .mnemonic = "sgn",
@@ -17,7 +17,7 @@ const instruction_t i_sgn = {
 
 static void exe_nzero(cpu_state_t* cpu) {
     cpu->carry = cpu->acc != 0;
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i_nzero = {
     .mnemonic = "nzero",
@@ -30,7 +30,7 @@ const instruction_t i_nzero = {
 
 static void exe_par(cpu_state_t* cpu) {
     cpu->carry = parity(cpu->acc);
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i_par = {
     .mnemonic = "par",
@@ -43,7 +43,7 @@ const instruction_t i_par = {
 
 static void exe_nsgn(cpu_state_t* cpu) {
     cpu->carry = (cpu->acc & 0x80) == 0;
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i_nsgn = {
     .mnemonic = "nsgn",
@@ -56,7 +56,7 @@ const instruction_t i_nsgn = {
 
 static void exe_ctog(cpu_state_t* cpu) {
     cpu->carry = !cpu->carry;
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i_ctog = {
     .mnemonic = "ctog",
@@ -69,7 +69,7 @@ const instruction_t i_ctog = {
 
 static void exe_zero(cpu_state_t* cpu) {
     cpu->carry = cpu->acc == 0;
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i_zero = {
     .mnemonic = "zero",
@@ -82,7 +82,7 @@ const instruction_t i_zero = {
 
 static void exe_npar(cpu_state_t* cpu) {
     cpu->carry = !parity(cpu->acc);
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i_npar = {
     .mnemonic = "npar",

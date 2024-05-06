@@ -4,7 +4,7 @@
 
 static void exe__sl(cpu_state_t* cpu) {
     cpu->acc = alu_sl(cpu->acc, 0, false, NULL);
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i__sl = {
     .mnemonic = "_sl",
@@ -17,7 +17,7 @@ const instruction_t i__sl = {
 
 static void exe__slc(cpu_state_t* cpu) {
     cpu->acc = alu_sl(cpu->acc, 0, cpu->carry, NULL);
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i__slc = {
     .mnemonic = "_slc",
@@ -30,7 +30,7 @@ const instruction_t i__slc = {
 
 static void exe__sla(cpu_state_t* cpu) {
     cpu->acc = alu_sl(cpu->acc, 0, cpu->acc & 1, NULL);
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i__sla = {
     .mnemonic = "_sla",
@@ -43,7 +43,7 @@ const instruction_t i__sla = {
 
 static void exe__slr(cpu_state_t* cpu) {
     cpu->acc = alu_sl(cpu->acc, 0, cpu->acc & 0x80, NULL);
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i__slr = {
     .mnemonic = "_slr",
@@ -56,7 +56,7 @@ const instruction_t i__slr = {
 
 static void exe__sr(cpu_state_t* cpu) {
     cpu->acc = alu_sr(cpu->acc, 0, false, NULL);
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i__sr = {
     .mnemonic = "_sr",
@@ -69,7 +69,7 @@ const instruction_t i__sr = {
 
 static void exe__src(cpu_state_t* cpu) {
     cpu->acc = alu_sr(cpu->acc, 0, cpu->carry, NULL);
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i__src = {
     .mnemonic = "_src",
@@ -82,7 +82,7 @@ const instruction_t i__src = {
 
 static void exe__srr(cpu_state_t* cpu) {
     cpu->acc = alu_sr(cpu->acc, 0, cpu->acc & 0x80, NULL);
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i__srr = {
     .mnemonic = "_srr",
@@ -95,7 +95,7 @@ const instruction_t i__srr = {
 
 static void exe__sra(cpu_state_t* cpu) {
     cpu->acc = alu_sr(cpu->acc, 0, cpu->acc & 1, NULL);
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i__sra = {
     .mnemonic = "_sra",
@@ -108,7 +108,7 @@ const instruction_t i__sra = {
 
 static void exe_sl(cpu_state_t* cpu) {
     cpu->acc = alu_sl(cpu->acc, 0, false, &cpu->carry);
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i_sl = {
     .mnemonic = "sl",
@@ -121,7 +121,7 @@ const instruction_t i_sl = {
 
 static void exe_slc(cpu_state_t* cpu) {
     cpu->acc = alu_sl(cpu->acc, 0, cpu->carry, &cpu->carry);
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i_slc = {
     .mnemonic = "slc",
@@ -134,7 +134,7 @@ const instruction_t i_slc = {
 
 static void exe_sla(cpu_state_t* cpu) {
     cpu->acc = alu_sl(cpu->acc, 0, cpu->acc & 1, &cpu->carry);
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i_sla = {
     .mnemonic = "sla",
@@ -147,7 +147,7 @@ const instruction_t i_sla = {
 
 static void exe_slr(cpu_state_t* cpu) {
     cpu->acc = alu_sl(cpu->acc, 0, cpu->acc & 0x80, &cpu->carry);
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i_slr = {
     .mnemonic = "slr",
@@ -160,7 +160,7 @@ const instruction_t i_slr = {
 
 static void exe_sr(cpu_state_t* cpu) {
     cpu->acc = alu_sr(cpu->acc, 0, false, &cpu->carry);
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i_sr = {
     .mnemonic = "sr",
@@ -173,7 +173,7 @@ const instruction_t i_sr = {
 
 static void exe_src(cpu_state_t* cpu) {
     cpu->acc = alu_sr(cpu->acc, 0, cpu->carry, &cpu->carry);
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i_src = {
     .mnemonic = "src",
@@ -186,7 +186,7 @@ const instruction_t i_src = {
 
 static void exe_srr(cpu_state_t* cpu) {
     cpu->acc = alu_sr(cpu->acc, 0, cpu->acc & 0x80, &cpu->carry);
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i_srr = {
     .mnemonic = "srr",
@@ -199,7 +199,7 @@ const instruction_t i_srr = {
 
 static void exe_sra(cpu_state_t* cpu) {
     cpu->acc = alu_sr(cpu->acc, 0, cpu->acc & 1, &cpu->carry);
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i_sra = {
     .mnemonic = "sra",

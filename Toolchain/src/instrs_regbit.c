@@ -4,7 +4,7 @@
 
 static void exe_or(cpu_state_t* cpu) {
     cpu->acc |= getALUReg(cpu);
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i_or = {
     .mnemonic = "or",
@@ -17,7 +17,7 @@ const instruction_t i_or = {
 
 static void exe_and(cpu_state_t* cpu) {
     cpu->acc &= getALUReg(cpu);
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i_and = {
     .mnemonic = "and",
@@ -30,7 +30,7 @@ const instruction_t i_and = {
 
 static void exe_xor(cpu_state_t* cpu) {
     cpu->acc ^= getALUReg(cpu);
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i_xor = {
     .mnemonic = "xor",
@@ -43,7 +43,7 @@ const instruction_t i_xor = {
 
 static void exe_inv(cpu_state_t* cpu) {
     cpu->acc = ~getALUReg(cpu);
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i_inv = {
     .mnemonic = "inv",
@@ -56,7 +56,7 @@ const instruction_t i_inv = {
 
 static void exe_nor(cpu_state_t* cpu) {
     cpu->acc = ~(cpu->acc | getALUReg(cpu));
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i_nor = {
     .mnemonic = "nor",
@@ -69,7 +69,7 @@ const instruction_t i_nor = {
 
 static void exe_nand(cpu_state_t* cpu) {
     cpu->acc = ~(cpu->acc & getALUReg(cpu));
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i_nand = {
     .mnemonic = "nand",
@@ -82,7 +82,7 @@ const instruction_t i_nand = {
 
 static void exe_xnor(cpu_state_t* cpu) {
     cpu->acc = ~(cpu->acc ^ getALUReg(cpu));
-    cpu->pc ++;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i_xnor = {
     .mnemonic = "xnor",
