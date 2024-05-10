@@ -1,9 +1,16 @@
 #include "lcdprint.h"
 #include <stdio.h>
 
-void lcd_clock(lcd_t* lcd, bool active) {
-    lcd->ir = lcd->db;
-    if(lcd->rs) {
+// TODO: doesn't support data reads very well, and not at all in 4-bit mode
+// I don't plan on supporting this in hardware so I'm not too worried
+// who even uses HD44780 read commands anyway?
+
+static void lcd_cmd(lcd_t* lcd) {
+    if(lcd->rw && !lcd->rs) { // read BF/AC
+        lcd->d = ((lcd->cooldown > 0) ? 0x80 : 0) | (lcd->ac & 0x7F);
+    } else if(lcd->cooldown > 0) { // no talk me im angy
+        fprintf(stderr, "LCD command when busy\n");
+    } else if(lcd->rs) {
         if(lcd->rw) { // read RAM
             if(lcd->ramsel) {
                 if(lcd->ac < 64) {
@@ -49,8 +56,6 @@ void lcd_clock(lcd_t* lcd, bool active) {
                 }
             }
         }
-    } else if(lcd->rw) { // read BF/AC
-
     } else if(lcd->ir & 0b10000000) { // Set DDRAM address
         lcd->ramsel = false;
         lcd->ac = lcd->ir & 0b1111111;
@@ -89,6 +94,25 @@ void lcd_clock(lcd_t* lcd, bool active) {
         lcd->ramsel = false;
         lcd->id = true;
         lcd->scroll = 0;
+    }
+}
+
+void lcd_clock(lcd_t* lcd, bool active) {
+    if(active) {
+        if(lcd->dl) {
+            lcd->ir = lcd->d;
+            lcd_cmd(lcd);
+        } else if(lcd->cycle) {
+            lcd->ir |= lcd->d >> 4;
+            lcd_cmd(lcd);
+            lcd->cycle = false;
+        } else {
+            lcd->ir = lcd->d & 0xF0;
+            lcd->cycle = true;
+        }
+    }
+    if(lcd->cooldown > 0) {
+        lcd->cooldown --;
     }
 }
 
