@@ -58,7 +58,7 @@ PC  0x123F  CARRY 1         FF      ...
 ACC 0x3F    SP  0x3F        FF      rd io
 DX  0x3F    DY  0x3F        FF      sw dy
 IRX 0x3F    IRY 0x3F        FF      add dx
-IN  0x3F    OUT 0x3F        FF  PC> addi 1
+IN  0x3F    OUT 0x3F        FF  PC> addi 6
 IE  1       INT 1           FF      jri
                             FF      nop
 Cycles 1234567890       SP> FF      nop 

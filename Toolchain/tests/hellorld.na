@@ -7,10 +7,10 @@ loop:
     jcz done
     wr io
     rd x
-    addi 1
+    inc 1
     wr x
     rd y
-    addci 0
+    acf
     wr y
     j loop
 done:

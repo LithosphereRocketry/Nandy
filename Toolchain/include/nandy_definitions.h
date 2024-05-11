@@ -12,7 +12,6 @@
 #define ALU_SEL_MASK (1<<6)
 #define ISP_MASK (1<<5)
 #define XY_MASK (1<<5)
-#define SR_MASK (1<<5)
 #define MEM_WRITE_MASK (1<<5)
 #define JUMP_MASK (1<<5)
 #define CARRY_SEL_MASK (1<<4)
@@ -21,12 +20,15 @@
 #define COND_MASK (1<<4)
 #define SIG_MASK (1<<3)
 #define WR_MASK (1<<3)
+#define ONEOP_MASK (1<<3)
 #define RD_MASK (1<<2)
 #define RET_MASK (1<<2)
+#define SCF_MASK (1<<2)
 #define CI_MASK (1<<1)
 
 #define REGID_MASK 0b0011
 #define IMM4_MASK 0b1111
+#define INC_MASK 0b111
 
 #define ISR_ADDR 0x7F00
 
@@ -35,18 +37,18 @@ typedef enum alu_mode {
 	ALU_OR = 0x1,
 	ALU_AND = 0x2,
 	ALU_XOR = 0x3,
-	ALU_NB = 0x4,
-	ALU_NOR = 0x5,
-	ALU_NAND = 0x6,
-	ALU_XNOR = 0x7,
-	ALU_ADD = 0x8,
-	ALU_ADDC = 0x9,
-	ALU_SUB = 0xA,
-	ALU_SUBC = 0xB,
-	ALU_SL = 0xC,
-	ALU_SLC = 0xD,
-	ALU_SLA = 0xE,
-	ALU_SLR = 0xF
+	ALU_ADD = 0x4,
+	ALU_ADDC = 0x5,
+	ALU_SUB = 0x6,
+	ALU_SUBC = 0x7,
+	ALU_SL = 0x8,
+	ALU_SLC = 0x9,
+	ALU_SLA = 0xA,
+	ALU_SLR = 0xB,
+	ALU_SR = 0xC,
+	ALU_SRC = 0xD,
+	ALU_SRR = 0xE,
+	ALU_SRA = 0xF
 } alu_mode_t;
 
 #define RAM_SIZE (1<<15)

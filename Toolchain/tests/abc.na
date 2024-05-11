@@ -1,11 +1,11 @@
 
 	rdi 25
 	wr sp
-	rdi 65 # 'A'
+	rdi 'A'
 
 lbl:wr io
 	isp -1
-	_addi 1
+	_inc 1
 	ctog
 	jcz lbl
 	brk

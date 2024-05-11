@@ -16,17 +16,17 @@ extern const instruction_t i_ja, i_jar, i_jri, i_j, i_jcz;
 // flags
 extern const instruction_t i_brk, i_bell, i_dint, i_eint, i_iclr, i_iset;
 // regbit
-extern const instruction_t i_or, i_and, i_xor, i_inv, i_nor, i_nand, i_xnor;
+extern const instruction_t i_or, i_and, i_xor;
 // regadd
-extern const instruction_t i__add, i__addc, i__sub, i__subc;
-extern const instruction_t i_add, i_addc, i_sub, i_subc;
+extern const instruction_t i__add, i__addc, i__sub, i__subc, i__inc, i__acf, i__scf;
+extern const instruction_t i_add, i_addc, i_sub, i_subc, i_inc, i_acf, i_scf;
 // regshift
 extern const instruction_t i__sl, i__slc, i__sla, i__slr, i__sr, i__src, i__srr, i__sra;
 extern const instruction_t i_sl, i_slc, i_sla, i_slr, i_sr, i_src, i_srr, i_sra;
 // regcomp
-extern const instruction_t i_sgn, i_nzero, i_par, i_nsgn, i_ctog, i_zero, i_npar;
+extern const instruction_t i_ctog, i_sgn, i_nzero, i_par;
 // immbit
-extern const instruction_t i_rdi, i_ori, i_andi, i_xori, i_nori, i_nandi, i_xnori;
+extern const instruction_t i_rdi, i_ori, i_andi, i_xori;
 // immadd
 extern const instruction_t i__addi, i__addci, i__subi, i__subci;
 extern const instruction_t i_addi, i_addci, i_subi, i_subci;
