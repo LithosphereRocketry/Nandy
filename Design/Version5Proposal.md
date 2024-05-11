@@ -26,10 +26,10 @@
     * Performance impact: 1-2 extra cycles per usage
     * Usability impact: Replaceable with 2-instruction sequence or macro
     * Justification: Both of these instruction types can be directly replaced by
-      a 2-instruction sequence: e.g. `nzero` can be replaced by `zero; ctog` and
+      a 2-instruction sequence: e.g. `zero` can be replaced by `nzero; ctog` and
       `nand` can be replaced by `and; xori 0xFF`.
 * Add instruction `inc`/`_inc`.
-    * Size impact: add approx. 12 chips
+    * Size impact: add approx. 8 chips
     * Performance impact: 1 fewer cycle for loop counters and other small-value
       additions
     * Usability impact: Some added confusion betwteen `inc` and `addi`, but
@@ -40,7 +40,7 @@
       increasing or decreasing a value by up to 3 in a single cycle. This can
       give a performance gain of up to 10% in tight loops.
 * Add instruction `acf`/`_acf`.
-    * Size impact: add approx. 3 chips
+    * Size impact: add approx. 2 chips
     * Performance impact: 1 fewer cycle per additional byte in wide additions
     * Usability impact: Some added confusion betwteen `acf` and `addci 0`, but
       otherwise minimal
@@ -48,3 +48,21 @@
       arithmetic, which requires a sequence like `addi 2; sw dx; addci 0`. While
       `inc` allows the `addi 2` component to occur in 1 cycle, `acf` does the
       same for the `addci 0` component.
+
+
+## TODO Status
+* Arithmetic changes
+  * Toolchain: done
+  * Logisim: in progress
+  * Verilog: not started
+  * Documentation: not started
+* Interrupt changes
+  * Toolchain: done, mostly
+  * Logisim: not started
+  * Verilog: not started
+  * Documentation: not started
+* Chip select
+  * Toolchain: not started
+  * Logisim: not started
+  * Verilog: not started
+  * Documentation: not started
