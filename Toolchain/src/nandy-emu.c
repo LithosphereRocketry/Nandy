@@ -7,15 +7,18 @@
 #include "nandy_emu_tools.h"
 #include "nandy_instr_defs.h"
 #include "nandy_parse_tools.h"
+#include "micros.h"
 
 argument_t arg_debug = { .abbr = 'g', .name = "debug", .hasval = false };
 argument_t arg_forcedebug = { .abbr = 'G', .name = "force-debug", .hasval = false };
 argument_t arg_out = { .abbr = 'o', .name = "out", .hasval = true };
+argument_t arg_timeacc = { .abbr = 't', .name = "time-accurate", .hasval = false };
 
 argument_t* args[] = {
     &arg_debug,
     &arg_forcedebug,
-    &arg_out
+    &arg_out,
+    &arg_timeacc
 };
 const size_t n_args = sizeof(args) / sizeof(argument_t*);
 
@@ -220,11 +223,24 @@ int main(int argc, char** argv) {
 #endif
 
     setbuf(stdin, NULL);
+    micros_init();
+    long lastMicros = 0;
     do {
         if(arg_forcedebug.result.present) {
             if(!debug(&state)) { break; }
         }
-        do { scanDisasm(&state, state.pc); } while(!emu_step(&state, fout));
+        lastMicros = micros(); // Don't count the time spent in the debugger as
+                               // execution time
+        do {
+            scanDisasm(&state, state.pc);
+
+            // Stall for realistic execution times
+            if(arg_timeacc.result.present && state.elapsed % 1000 == 0) {
+                while(micros() - lastMicros < 1000);
+                // really this should use a system delay call probably
+                lastMicros += 1000;
+            }
+        } while(!emu_step(&state, fout));
         if(arg_debug.result.present) {
             if(!debug(&state)) { break; }
         }
