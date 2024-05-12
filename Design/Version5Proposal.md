@@ -21,13 +21,12 @@
       distinguish commands sent to the controller from commands sent to the
       peripheral devices. The presence of a chip-select flag allows commands to
       be routed to a controller without the need for this additional complexity.
-* Remove inverted comparison and bitwise instructions.
-    * Size impact: remove 9 chips
+* Remove inverted bitwise instructions.
+    * Size impact: remove 8 chips
     * Performance impact: 1-2 extra cycles per usage
     * Usability impact: Replaceable with 2-instruction sequence or macro
-    * Justification: Both of these instruction types can be directly replaced by
-      a 2-instruction sequence: e.g. `zero` can be replaced by `nzero; ctog` and
-      `nand` can be replaced by `and; xori 0xFF`.
+    * Justification: These instruction types can be directly replaced by
+      a 2-instruction sequence: e.g. `nand` can be replaced by `and; xori 0xFF`.
 * Add instruction `inc`/`_inc`.
     * Size impact: add approx. 8 chips
     * Performance impact: 1 fewer cycle for loop counters and other small-value
@@ -53,7 +52,7 @@
 ## TODO Status
 * Arithmetic changes
   * Toolchain: done
-  * Logisim: in progress
+  * Logisim: done
   * Verilog: not started
   * Documentation: not started
 * Interrupt changes
