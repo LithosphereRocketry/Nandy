@@ -28,7 +28,7 @@ mul10_8:
     strs 1
     
     rd io
-    inc -10 # is newline?
+    addi -10 # is newline?
     nzero
     ctog
     jcz is_numeral
@@ -40,7 +40,7 @@ mul10_8:
     rdi 0
     j done
 is_numeral:
-    inc -38 # '0' - '\n'
+    addi -38 # '0' - '\n'
  #   brk
     strs 2
     rd x
