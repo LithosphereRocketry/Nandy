@@ -105,7 +105,8 @@ Cycles 1234567890       SP> FF      nop
             state->ioin, state->ioout, peek(state, 0xFF00 + (uint8_t) state->sp + 3), linebuf[4]);
     printf("IE  %c       INT %c           %02hhx      %-40s\n",
             state->int_en ? '1' : '0', state->int_active ? '1' : '0', peek(state, 0xFF00 + (uint8_t) state->sp + 2), linebuf[5]);
-    printf("                            %02hhx      %-40s\n",
+    printf("CS  %c       IOS %c%c          %02hhx      %-40s\n",
+            state->cs ? '1' : '0', state->io_rd ? 'R' : '-', state->io_wr ? 'W' : '-',
             peek(state, 0xFF00 + (uint8_t) state->sp + 1), linebuf[6]);
     char cyclesbuf[17];
     snprintf(cyclesbuf, 17, "%lu", state->elapsed);
@@ -154,6 +155,16 @@ bool debug(cpu_state_t* state) {
                 printf("Address is out of bounds\n");
             } else {
                 printf("0x%hhx\n", peek(state, (addr_t) addr));
+            }
+        } else if(!strcmp(cmd, "goto") || !strcmp(cmd, "g")) {
+            int64_t addr;
+            if(parseExp(NULL, input+scanlen, &addr, stdout) != SHUNT_DONE) {
+                printf("Failed to parse address\n");
+            } else if(!isBounded(addr, 16, BOUND_UNSIGNED)) {
+                printf("Address is out of bounds\n");
+            } else {
+                state->pc = addr;
+                scanDisasm(state, state->pc);
             }
         } else if(!strcmp(cmd, "poke") || !strcmp(cmd, "o")) {
             char* div = strchr(input+scanlen, ',');

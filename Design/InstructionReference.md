@@ -89,9 +89,6 @@ Sets the carry bit to 1 if the accumulator contains an odd or even number of
 high bits, respecitvely.
 
 #### Bitwise logic
-##### `inv <dx/dy>`
-Sets the contents of the accumulator to the bitwise inverse of the specified
-register.
 ##### `and <dx/dy>`
 Bitwise-ands the contents of the accumulator with the specified register and
 stores the results in the accumulator.

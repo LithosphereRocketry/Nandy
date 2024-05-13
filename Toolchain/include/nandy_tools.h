@@ -23,7 +23,7 @@ typedef struct cpu_state {
     size_t elapsed;
     addr_t pc;
     word_t acc, sp, dx, dy, irx, iry, ioin, ioout;
-    bool cycle, carry, int_en, int_active, int_prev, int_in, io_rd, io_wr, idbg;
+    bool cycle, carry, int_en, int_active, int_in, io_rd, io_wr, idbg, cs;
     word_t rom[ROM_SIZE];
     word_t ram[RAM_SIZE];
 } cpu_state_t;
