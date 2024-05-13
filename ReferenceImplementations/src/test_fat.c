@@ -84,4 +84,39 @@ int main(int argc, char** argv) {
                 partitions[i].start, partitions[i].length, partitions[i].length/2048);
         }
     }
+    int partnum;
+    while(1) {
+        printf("Select a partition: ");
+        scanf("%i", &partnum);
+        if(partnum < 0 || partnum >= 4) {        
+            printf("Invalid partition number\n");
+        } else if(!(diskStatus.partsactive & (1 << partnum))) {
+            printf("Partition has unrecognized filesystem\n");
+        } else {
+            break;
+        }
+    }
+    loadSector(partitions[partnum].start);
+    printf("OEM name: %8s\n", sectorBuf + 3);
+    int sectorsz = *((uint16_t*) (sectorBuf + 0xB));
+    int clustersz = sectorBuf[0xD];
+    int reserved = *((uint16_t*) (sectorBuf + 0xE));
+    int nfats = sectorBuf[0x10];
+    int rootents = *((uint16_t*) (sectorBuf + 0x11)); // unaligned ewwww
+    int totalsectors = *((uint16_t*) (sectorBuf + 0x13)); // unaligned ewwww
+    int meddesc = sectorBuf[0x15];
+    int fatsz = *((uint16_t*) (sectorBuf + 0x16));
+    printf("%i\n", fatsz);
+
+    // printf("Contents of FAT:\n");
+    // for(int i = 0; i < partitions[partnum].length; i++) {
+    //     loadSector(partitions[partnum].start + i);
+    //     for(int j = 0; j < SECTOR_SZ; j += 32) {
+    //         for(int k = 0; k < 32; k++) {
+    //             printf("%.2hhx ", sectorBuf[j + k]);
+    //         }
+    //         printf("\n");
+    //     }
+    //     printf("\n");
+    // }
 }
