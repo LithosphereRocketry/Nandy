@@ -68,7 +68,6 @@ Cycles 1234567890       SP> FF      nop
     */
     static char linebuf[8][40];
     for(int i = 0; i < 8; i++) {
-        strncpy(linebuf[i], "???", 40);
     }
     addr_t pcdis = state->pc;
     int pos = 0;
@@ -83,13 +82,20 @@ Cycles 1234567890       SP> FF      nop
             break;
         }
     }
-    for(; pos < 4; pos++) {
-        if(disasm_cache[pcdis]) {
+    for(int i = -4; i < 4; i++) {
+        if(i >= pos && disasm_cache[pcdis]) {
             disasm_cache[pcdis]->disassemble(disasm_cache[pcdis],
-                    state, pcdis, linebuf[pos + 4], 40);
+                    state, pcdis, linebuf[i + 4], 40);
             pcdis += nbytes(peek(state, pcdis));
         } else {
-            break;
+            addr_t fallback_ind;
+            if(i < pos) {
+                fallback_ind = pcdis + i;
+            } else {
+                fallback_ind = pcdis;
+                pcdis ++;
+            }
+            snprintf(linebuf[i + 4], 40, "??? (0x%.2hhx)", peek(state, fallback_ind));
         }
     }
 
