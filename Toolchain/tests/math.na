@@ -1,0 +1,12 @@
+@define my_label a*b
+@echo my_label + 4
+
+@assert b > a
+
+nop
+nop
+nop
+a:
+nop
+nop
+b:

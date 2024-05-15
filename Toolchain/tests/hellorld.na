@@ -1,0 +1,21 @@
+    rdi 0
+    wr sp
+    rda hellostr
+loop:
+    lda 0
+    nzero
+    jcz done
+    wr io
+    rd x
+    addi 1
+    wr x
+    rd y
+    addci 0
+    wr y
+    j loop
+done:
+    bell
+    brk
+
+hellostr:
+    @string "Hellorld!\n"

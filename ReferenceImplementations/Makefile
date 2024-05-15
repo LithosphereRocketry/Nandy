@@ -1,7 +1,7 @@
 # Semi-automated C/C++ makefile
 
 # This should be all you need to change
-TARGETS = nandy-emu binconvert nandy-asm shuntingyard_test
+TARGETS = test_allocator
 # RKT_TARGETS = nandy-asm-racket
 
 INCDIR = include/
@@ -9,15 +9,13 @@ INCDIR = include/
 SRCDIR = src/
 # Generated object files go here
 OBJDIR = obj/
-# Assembly tests go here
-TESTDIR = tests/
 
 COPTS = -Wall -Wextra -O2 -flto -Wno-unused-result -Wno-unused-parameter -Werror=implicit-function-declaration -Werror=int-conversion
 
 # if you just type "make", this happens
 .DEFAULT_GOAL: all
 # these rules don't refer to real files, so they shouldn't get timestamp-checked
-.PHONY: all clean assemble
+.PHONY: all clean
 
 # make all = make (all of the final targets given)
 all: $(TARGETS) $(RKT_TARGETS)
@@ -34,14 +32,6 @@ OBJ = $(patsubst $(SRCDIR)%.c,$(OBJDIR)%.o,$(CSRC)) $(patsubst $(SRCDIR)%.cpp,$(
 TGTOBJ = $(patsubst %,$(OBJDIR)%.o,$(TARGETS))
 # Dependency objects = things that should be given to targets = whatever objects aren't targets
 DEPOBJ = $(filter-out $(TGTOBJ),$(OBJ))
-
-# Test code
-ASMTESTS = $(patsubst $(TESTDIR)%.na,%.nb,$(wildcard $(TESTDIR)*.na))
-
-assemble: $(ASMTESTS)
-
-$(ASMTESTS): %.nb: $(TESTDIR)%.na nandy-asm
-	./nandy-asm $< $@
 
 # Special case for Racket programs
 $(RKT_TARGETS): %: $(SRCDIR)%.rkt $(SRCDIR)*.rkt

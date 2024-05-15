@@ -6,6 +6,7 @@
 lbl:wr io
 	isp -1
 	_addi 1
+	ctog
 	jcz lbl
 	brk
 

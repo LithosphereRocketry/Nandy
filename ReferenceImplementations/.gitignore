@@ -1,11 +1,7 @@
 # NANDy specific
 *.nb
 *.logi
-parse-test
-nandy-emu
-nandy-asm
-binconvert
-shuntingyard_test
+test_allocator
 
 # Racket
 *.bak
