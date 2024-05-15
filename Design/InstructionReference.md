@@ -42,6 +42,8 @@ Moves the contents of the accumulator into the specified register.
 Exchanges the contents of the accumulator with the specified register.
 ##### `rdi <value>`
 Loads the specified 8-bit value into the accumulator.
+##### `cset`, `cclr`
+Sets or clears the carry bit, respectively.
 ##### `ctog`
 Toggles the value of the carry bit.
 
@@ -66,25 +68,27 @@ carry bit.
 ##### `addi`, `addci`, `subi`, `subci`, `_addi`, `_addci`, `_subi`, `_subci`
 Identical to their respective non-`i` variants, but use the provided immediate
 value in place of the DX or DY register.
+##### `inc/_inc <value>`
+Identical to `addi/_addi`, but takes only one cycle and one byte of program
+memory. Value must be nonzero and between -3 and 3.
+##### `acf/_acf`
+Identical to `addci/_addci` with an immediate value of 0, but takes only one
+cycle and one byte of program memory. Typically used as part of a multi-byte
+arithmetic operation.
+##### `scf/_scf`
+Identical to `subci/_subci` with an immediate value of 0, but takes only one
+cycle and one byte of program memory. Typically used as part of a multi-byte
+arithmetic operation.
 
 #### Comparison
-##### `zero`
-Sets the carry bit to 1 if the accumulator holds the value 0, and sets it to 0
-otherwise.
-##### `nzero`
-Sets the carry bit to 0 if the accumulator holds the value 0, and sets it to 1 
-otherwise.
+##### `zero`, `nzero`
+Sets the carry bit to 1 if the accumulator does or does not hold the value 0,
+respectively, and sets it to zero otherwise.
 ##### `par`, `npar`
 Sets the carry bit to 1 if the accumulator contains an odd or even number of
 high bits, respecitvely.
-##### `sgn`, `nsgn`
-Sets the carry bit to 1 if the accumulator contains a negative or positive
-two's-complement value, respectively.
 
 #### Bitwise logic
-##### `inv <dx/dy>`
-Sets the contents of the accumulator to the bitwise inverse of the specified
-register.
 ##### `and <dx/dy>`
 Bitwise-ands the contents of the accumulator with the specified register and
 stores the results in the accumulator.
@@ -94,16 +98,7 @@ stores the results in the accumulator.
 ##### `or <dx/dy>`
 Bitwise-ors the contents of the accumulator with the specified register and
 stores the results in the accumulator.
-##### `nor <dx/dy>`
-Bitwise-nors the contents of the accumulator with the specified register and
-stores the results in the accumulator.
-##### `xor <dx/dy>`
-Bitwise-xors the contents of the accumulator with the specified register and
-stores the results in the accumulator.
-##### `xnor <dx/dy>`
-Bitwise-xnors the contents of the accumulator with the specified register and
-stores the results in the accumulator.
-##### `andi`, `nandi`, `ori`, `nori`, `xori`, `xnori`
+##### `andi`, `nandi`, `ori`
 Identical to their respective non-`i` variants, but use the provided immediate
 value in place of the DX or DY register.
 

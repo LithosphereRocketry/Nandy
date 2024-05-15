@@ -1,0 +1,72 @@
+    rdi 0
+    wr sp
+
+    rdi 255
+    isp -3
+yloop:
+    subi 128
+    strs 0
+    
+    rdi 0
+xloop:
+    strs 1
+
+    # TODO: Actual math goes here...
+
+    # Time to print?
+    lds 1
+    andi 0b111
+    xori 0b111
+    zero
+    jcz no_print
+    # TODO: Actually print the accumulated value
+    rdi 0x23
+    call puthex
+
+no_print:
+    lds 1
+    inc 1
+    jcz xloop
+
+    lds 0
+    addi 128 # We can't combine these because they don't produce the right carry
+    inc -1
+    ctog
+    jcz yloop
+
+    isp 3
+    brk
+
+puthex:
+    isp -3
+    strs 0
+    sw dx
+    strs 1
+    rd dy
+    strs 2
+    rd dx
+    sr
+    sr
+    sr
+    sr
+    call puthexhalf
+    lds 0
+    andi 0x0F
+    call puthexhalf
+    lds 1
+    wr dx
+    lds 2
+    wr dy
+    isp 3
+    ja
+
+puthexhalf:
+    subi 0xA
+    jcz puthex_digit
+    addi 'A'
+    wr io
+    ja
+puthex_digit:
+    addi 0xA + '0'
+    wr io
+    ja

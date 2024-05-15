@@ -34,7 +34,7 @@ bool emu_step(cpu_state_t* state, FILE* outstream) {
     state->io_wr = false;
     const instruction_t* instr = ilookup(peek(state, state->pc));
     if(!instr) {
-        printf("Invalid or unknown instruction byte %hhx\n", peek(state, state->pc));
+        printf("Invalid or unknown instruction byte 0x%hhx\n", peek(state, state->pc));
         return true;
     }
     instr->execute(state);
