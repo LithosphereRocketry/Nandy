@@ -69,6 +69,8 @@ typedef enum regid {
 typedef enum sigid {
 	SIG_BRK = 0,
 	SIG_BELL = 1,
+	SIG_CSCLR = 2,
+	SIG_CSSET = 3,
 	SIG_DINT = 4,
 	SIG_EINT = 5,
 	SIG_ICLR = 6,

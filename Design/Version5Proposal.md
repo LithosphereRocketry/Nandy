@@ -59,9 +59,9 @@
   * Toolchain: done, mostly
   * Logisim: not started
   * Verilog: not started
-  * Documentation: not started
+  * Documentation: done
 * Chip select
-  * Toolchain: not started
+  * Toolchain: in progress
   * Logisim: not started
   * Verilog: not started
-  * Documentation: not started
+  * Documentation: done
