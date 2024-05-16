@@ -1,0 +1,9 @@
+    putc_A
+    # putc 'B'
+    # putc '\n'
+    brk
+
+@macro putc_A
+    rdi 'A'
+    wr io
+@end

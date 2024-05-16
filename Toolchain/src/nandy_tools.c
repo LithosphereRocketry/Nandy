@@ -23,13 +23,26 @@ const asm_state_t INIT_ASM = {
     .unresolved = NULL
 };
 
+static void free_unresolved(unresolved_t* arr, size_t len) {
+    if(arr) {
+        for(size_t i = 0; i < len; i++) {
+            free(arr[i].str);
+        }
+        free(arr);
+    }
+}
+
 void asm_state_destroy(asm_state_t* state) {
     symtab_destroy(&state->resolved);
-    if(state->unresolved) {
-        for(size_t i = 0; i < state->unresolved_sz; i++) {
-            free(state->unresolved[i].str);
+    free_unresolved(state->unresolved, state->unresolved_sz);
+    if(state->macros) {
+        for(size_t i = 0; i < state->macros_sz; i++) {
+            free(state->macros[i].mnemonic);
+            free(state->macros[i].assembly);
+            free_unresolved(state->macros[i].unresolved,
+                            state->macros[i].unresolved_length);
         }
-        free(state->unresolved);
+        free(state->macros);
     }
 }
 

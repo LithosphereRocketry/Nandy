@@ -44,6 +44,14 @@ typedef struct ilist {
 } ilist_t;
 
 typedef struct unresolved unresolved_t;
+typedef struct macro {
+    const char* mnemonic;
+    size_t length;
+    const word_t* assembly; 
+    size_t unresolved_length;
+    const unresolved_t* unresolved;
+} macro_t;
+
 typedef struct asm_state {
     const ilist_t* instrs;
 
@@ -56,6 +64,10 @@ typedef struct asm_state {
     size_t unresolved_sz;
     size_t unresolved_cap;
     unresolved_t* unresolved;
+
+    size_t macros_sz;
+    size_t macros_cap;
+    macro_t* macros;
 } asm_state_t;
 
 extern const asm_state_t INIT_ASM;
