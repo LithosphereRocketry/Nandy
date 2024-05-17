@@ -1,5 +1,17 @@
     rdi 0
     wr sp
+    eint
+
+    isp -1
+    rdi 68
+    strs 0
+    rdi 150
+
+    call mul2_6
+    call puthex
+    rdi '\n'
+    wr io
+    brk
 
     rdi 255
     isp -3
@@ -70,3 +82,87 @@ puthex_digit:
     addi 0xA + '0'
     wr io
     ja
+
+mul2_6:
+    isp -3
+    sw dx
+    strs 1
+    rd dy
+    strs 2
+    lds 3
+    strs 0
+    rd dx
+    call mul8_ext
+    sl
+    wr dx
+    lds 0
+    slc
+    sw dx
+    sl
+    sw dx
+    slc
+    wr dy
+    lds 1
+    wr dx
+    lds 2
+    sw dy
+    isp 3
+    ja
+
+mul8_ext:
+    isp -2
+    sw dx
+    strs 0
+    rd dy
+    strs 1
+    lds 2
+        # A is in DX, B is in ACC
+        # Interrupt-register reuse segment to save memory accesses
+    dint
+    iset
+    wr dx
+    rdi 0
+    wr dy
+    iclr
+    wr dy
+    rdi -8
+mul8_ext_loop:
+    sw dy
+    sl
+    sw dy
+    iset
+    sw dy
+    slc
+    sw dy
+    sw dx
+    sl
+    sw dx
+    iclr
+    jcz mul8_ext_no_add
+    sw dy
+    add dx
+    sw dy
+    iset
+    sw dy
+    acf
+    sw dy
+    iclr
+mul8_ext_no_add:
+    inc 1
+    jcz mul8_ext_loop
+    iset
+    rd dy
+    strs 2
+    iclr
+    rd dy
+    eint
+    sw dy
+    lds 0
+    wr dx
+    lds 1
+    sw dy
+    isp 2
+    ja
+
+@loc ISR
+    jri

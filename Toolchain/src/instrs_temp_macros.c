@@ -13,6 +13,7 @@ static bool resolveRda(asm_state_t* state, const char* text, addr_t pos, FILE* d
         }
         state->rom[pos+5] = (value >> 8) & 0xFF;
         state->rom[pos+2] = value & 0xFF;
+        printf("%lx %hhx %hhx\n", value, state->rom[pos+5], state->rom[pos+2]);
         return true;
     } else {
         if(debug) fprintf(debug, "Parse failed: %i\n", status);
