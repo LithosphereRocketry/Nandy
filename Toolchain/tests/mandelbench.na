@@ -3,11 +3,26 @@
     eint
 
     isp -1
-    rdi 68
+    rdi 0x9C # -100/64
     strs 0
-    rdi 150
+    rdi 0x32 # 50/64
+
+@echo 0xFFFFFF9C * 0x32
+@echo 0x9C + 100
+@echo 0x32
 
     call mul2_6
+    # output should be -78/64 = 0xB2
+    jcz no_overflow
+    isp -1
+    strs 0
+    rdi 'v'
+    wr io
+    rdi ' '
+    wr io
+    lds 0
+    isp 1
+no_overflow:
     call puthex
     rdi '\n'
     wr io
@@ -49,6 +64,12 @@ no_print:
     isp 3
     brk
 
+mandel8_is_bounded:
+
+
+
+# args: acc
+# return: void
 puthex:
     isp -3
     strs 0
@@ -72,6 +93,8 @@ puthex:
     isp 3
     ja
 
+# args: acc
+# return: void
 puthexhalf:
     subi 0xA
     jcz puthex_digit
@@ -83,16 +106,33 @@ puthex_digit:
     wr io
     ja
 
+# args: acc, sp[0]
+# return: acc
 mul2_6:
-    isp -3
+    isp -4
     sw dx
-    strs 1
-    rd dy
     strs 2
-    lds 3
+    rd dy
+    strs 3
+    lds 4
     strs 0
     rd dx
     call mul8_ext
+    strs 1
+    brk
+# sp[0] = high
+# sp[1] = low
+    lds 0
+    sl
+    jcz no_offset
+    lds 1
+    addi 63
+    strs 1
+    lds 0
+    acf
+    strs 0
+no_offset:
+    lds 1
     sl
     wr dx
     lds 0
@@ -102,13 +142,15 @@ mul2_6:
     sw dx
     slc
     wr dy
-    lds 1
-    wr dx
     lds 2
+    wr dx
+    lds 3
     sw dy
-    isp 3
+    isp 4
     ja
 
+# args: acc, sp[0]
+# return: {sp[0], acc}
 mul8_ext:
     isp -2
     sw dx
@@ -127,6 +169,7 @@ mul8_ext:
     wr dy
     rdi -8
 mul8_ext_loop:
+    brk
     sw dy
     sl
     sw dy
@@ -142,9 +185,10 @@ mul8_ext_loop:
     sw dy
     add dx
     sw dy
+    jcz mul8_ext_no_add
     iset
     sw dy
-    acf
+    addi 0xFF
     sw dy
     iclr
 mul8_ext_no_add:
