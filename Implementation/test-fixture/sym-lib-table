@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "Connector_Nandy")(type "KiCad")(uri "/home/ben/comparch/Nandy/Implementation/Libraries/footprints/Connector_Nandy.kicad_sym")(options "")(descr ""))
+)
