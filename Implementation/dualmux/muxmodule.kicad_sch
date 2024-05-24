@@ -1550,7 +1550,7 @@
     (pin "4" (uuid c5381d7c-9972-47fa-b910-0216bc7fd2c2))
     (pin "2" (uuid 1fc6d9f5-f485-4902-8a31-d43c2050d4c3))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "U7") (unit 2)
         )
@@ -1591,7 +1591,7 @@
     (pin "4" (uuid d8073ec1-560e-4f3c-984e-175c503c14a3))
     (pin "2" (uuid 1fc6d9f5-f485-4902-8a31-d43c2050d4c4))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "U2") (unit 3)
         )
@@ -1632,7 +1632,7 @@
     (pin "4" (uuid d8073ec1-560e-4f3c-984e-175c503c14a4))
     (pin "2" (uuid 287afabc-b1ae-4e88-abd9-5ff5fa8f1eaa))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "U2") (unit 1)
         )
@@ -1661,7 +1661,7 @@
     (pin "1" (uuid 9c0f2e98-cb44-4c0b-97e0-843586cafd2b))
     (pin "2" (uuid 45cfc908-3899-4560-9cad-6c070c9342b6))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "C2") (unit 1)
         )
@@ -1689,7 +1689,7 @@
     )
     (pin "1" (uuid 2682ade8-e1f0-476e-b424-9833742439ac))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "#PWR013") (unit 1)
         )
@@ -1730,7 +1730,7 @@
     (pin "4" (uuid d8073ec1-560e-4f3c-984e-175c503c14a2))
     (pin "2" (uuid 1fc6d9f5-f485-4902-8a31-d43c2050d4c0))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "U4") (unit 3)
         )
@@ -1758,7 +1758,7 @@
     )
     (pin "1" (uuid eb21a982-c418-4c62-b558-7977544f5a7d))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "#PWR015") (unit 1)
         )
@@ -1799,7 +1799,7 @@
     (pin "4" (uuid d8073ec1-560e-4f3c-984e-175c503c149b))
     (pin "2" (uuid 1fc6d9f5-f485-4902-8a31-d43c2050d4b9))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "U7") (unit 3)
         )
@@ -1840,7 +1840,7 @@
     (pin "4" (uuid d8073ec1-560e-4f3c-984e-175c503c148f))
     (pin "2" (uuid 1fc6d9f5-f485-4902-8a31-d43c2050d4ae))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "U2") (unit 4)
         )
@@ -1868,7 +1868,7 @@
     )
     (pin "1" (uuid 2f8c47e6-d0ca-4248-b6ad-c4fadcdd3c83))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "#PWR017") (unit 1)
         )
@@ -1909,7 +1909,7 @@
     (pin "4" (uuid 9c27ed96-5f15-455d-84e8-c6fb87b13e7a))
     (pin "2" (uuid 1fc6d9f5-f485-4902-8a31-d43c2050d4c1))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "U5") (unit 2)
         )
@@ -1950,7 +1950,7 @@
     (pin "4" (uuid 11a624ed-dc2f-495b-8575-490bf7f9148d))
     (pin "2" (uuid 1fc6d9f5-f485-4902-8a31-d43c2050d4c8))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "U3") (unit 2)
         )
@@ -1991,7 +1991,7 @@
     (pin "4" (uuid d8073ec1-560e-4f3c-984e-175c503c1494))
     (pin "2" (uuid e5eacdb2-5f54-46cd-9ffe-93ef19fd1bd6))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "U5") (unit 1)
         )
@@ -2019,7 +2019,7 @@
     )
     (pin "1" (uuid 5a0367bf-061e-456f-9122-5edea9355abf))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "#PWR010") (unit 1)
         )
@@ -2060,7 +2060,7 @@
     (pin "4" (uuid d8073ec1-560e-4f3c-984e-175c503c1499))
     (pin "2" (uuid 1fc6d9f5-f485-4902-8a31-d43c2050d4b4))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "U7") (unit 4)
         )
@@ -2101,7 +2101,7 @@
     (pin "4" (uuid d8073ec1-560e-4f3c-984e-175c503c14aa))
     (pin "2" (uuid 1fc6d9f5-f485-4902-8a31-d43c2050d4c9))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "U3") (unit 3)
         )
@@ -2142,7 +2142,7 @@
     (pin "4" (uuid d8073ec1-560e-4f3c-984e-175c503c149c))
     (pin "2" (uuid 1fc6d9f5-f485-4902-8a31-d43c2050d4ba))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "U7") (unit 5)
         )
@@ -2183,7 +2183,7 @@
     (pin "4" (uuid d8073ec1-560e-4f3c-984e-175c503c149d))
     (pin "2" (uuid 1fc6d9f5-f485-4902-8a31-d43c2050d4bc))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "U5") (unit 5)
         )
@@ -2224,7 +2224,7 @@
     (pin "4" (uuid b5f1059d-5e7d-4df1-a89c-8c272eaf64ef))
     (pin "2" (uuid 1fc6d9f5-f485-4902-8a31-d43c2050d4b5))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "U4") (unit 2)
         )
@@ -2252,7 +2252,7 @@
     )
     (pin "1" (uuid adf4ae57-e149-48d9-a076-3b397be85808))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "#PWR016") (unit 1)
         )
@@ -2280,7 +2280,7 @@
     )
     (pin "1" (uuid 284eef7e-0bd4-4c8b-a25e-4990f567b3b0))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "#PWR012") (unit 1)
         )
@@ -2321,7 +2321,7 @@
     (pin "4" (uuid d8073ec1-560e-4f3c-984e-175c503c1492))
     (pin "2" (uuid 80ee5e5f-abdd-4611-ae62-03f9904df326))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "U7") (unit 1)
         )
@@ -2362,7 +2362,7 @@
     (pin "4" (uuid d8073ec1-560e-4f3c-984e-175c503c14a1))
     (pin "2" (uuid 1fc6d9f5-f485-4902-8a31-d43c2050d4bf))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "U3") (unit 5)
         )
@@ -2391,7 +2391,7 @@
     (pin "1" (uuid fd7adead-45cc-4773-9d8a-401b3d898eaa))
     (pin "2" (uuid d5f32a0d-2595-44c1-b75b-52d4160a909d))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "C6") (unit 1)
         )
@@ -2432,7 +2432,7 @@
     (pin "4" (uuid d8073ec1-560e-4f3c-984e-175c503c14a8))
     (pin "2" (uuid 1a94ce0b-c252-4852-98e7-ef2891f6c5d8))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "U6") (unit 1)
         )
@@ -2460,7 +2460,7 @@
     )
     (pin "1" (uuid 74a211ed-1bd6-4742-830f-f0848dd70a38))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "#PWR08") (unit 1)
         )
@@ -2501,7 +2501,7 @@
     (pin "4" (uuid d8073ec1-560e-4f3c-984e-175c503c149f))
     (pin "2" (uuid 77d65d8f-8037-4ff6-b2ba-282953cd30f8))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "U4") (unit 1)
         )
@@ -2530,7 +2530,7 @@
     (pin "1" (uuid e9b8f547-219a-472e-8cfb-ada11fe2280f))
     (pin "2" (uuid aaf66c20-1a33-4a0a-876a-8ffc6d3994b0))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "C4") (unit 1)
         )
@@ -2571,7 +2571,7 @@
     (pin "4" (uuid d8073ec1-560e-4f3c-984e-175c503c14a9))
     (pin "2" (uuid 1fc6d9f5-f485-4902-8a31-d43c2050d4c7))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "U6") (unit 5)
         )
@@ -2612,7 +2612,7 @@
     (pin "4" (uuid d8073ec1-560e-4f3c-984e-175c503c1493))
     (pin "2" (uuid 1fc6d9f5-f485-4902-8a31-d43c2050d4b1))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "U6") (unit 3)
         )
@@ -2641,7 +2641,7 @@
     (pin "1" (uuid d9daa0a2-c998-4751-8429-1bde87efd437))
     (pin "2" (uuid 2d640f82-a359-4a3c-bb43-250c2c37f239))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "C3") (unit 1)
         )
@@ -2670,7 +2670,7 @@
     (pin "1" (uuid 90d7ce65-8514-4aea-b2e1-95d97f80fd5b))
     (pin "2" (uuid 62461706-16eb-4182-a2aa-852138fc05a1))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "C5") (unit 1)
         )
@@ -2711,7 +2711,7 @@
     (pin "4" (uuid e1e3ab5a-4d38-4f38-a13b-5ac4e43f7644))
     (pin "2" (uuid 1fc6d9f5-f485-4902-8a31-d43c2050d4b8))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "U2") (unit 2)
         )
@@ -2752,7 +2752,7 @@
     (pin "4" (uuid d8073ec1-560e-4f3c-984e-175c503c1490))
     (pin "2" (uuid 1fc6d9f5-f485-4902-8a31-d43c2050d4af))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "U6") (unit 4)
         )
@@ -2780,7 +2780,7 @@
     )
     (pin "1" (uuid 22317d45-838b-4c19-ba55-0210f0cfcec2))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "#PWR014") (unit 1)
         )
@@ -2808,7 +2808,7 @@
     )
     (pin "1" (uuid 57de078f-520e-4b1c-9504-608677b7633c))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "#PWR011") (unit 1)
         )
@@ -2849,7 +2849,7 @@
     (pin "4" (uuid 16b032d7-ddc9-49ba-83ab-25ccc2e90358))
     (pin "2" (uuid 1fc6d9f5-f485-4902-8a31-d43c2050d4c2))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "U6") (unit 2)
         )
@@ -2890,7 +2890,7 @@
     (pin "4" (uuid d8073ec1-560e-4f3c-984e-175c503c14a5))
     (pin "2" (uuid 1fc6d9f5-f485-4902-8a31-d43c2050d4c6))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "U3") (unit 4)
         )
@@ -2919,7 +2919,7 @@
     (pin "1" (uuid 37f99db7-ad78-4db7-8c53-fb145bf85ef3))
     (pin "2" (uuid 30155d22-083b-410a-8af4-7490257a1329))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "C7") (unit 1)
         )
@@ -2960,7 +2960,7 @@
     (pin "4" (uuid d8073ec1-560e-4f3c-984e-175c503c1495))
     (pin "2" (uuid 1fc6d9f5-f485-4902-8a31-d43c2050d4b2))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "U5") (unit 4)
         )
@@ -2988,7 +2988,7 @@
     )
     (pin "1" (uuid 456c3945-40a4-4d75-9b08-fa87cd15edc3))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "#PWR09") (unit 1)
         )
@@ -3029,7 +3029,7 @@
     (pin "4" (uuid d8073ec1-560e-4f3c-984e-175c503c1496))
     (pin "2" (uuid 1fc6d9f5-f485-4902-8a31-d43c2050d4b3))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "U4") (unit 4)
         )
@@ -3070,7 +3070,7 @@
     (pin "4" (uuid d8073ec1-560e-4f3c-984e-175c503c14a0))
     (pin "2" (uuid 1fc6d9f5-f485-4902-8a31-d43c2050d4be))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "U2") (unit 5)
         )
@@ -3111,7 +3111,7 @@
     (pin "4" (uuid d8073ec1-560e-4f3c-984e-175c503c149e))
     (pin "2" (uuid 1fc6d9f5-f485-4902-8a31-d43c2050d4bd))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "U4") (unit 5)
         )
@@ -3152,7 +3152,7 @@
     (pin "4" (uuid d8073ec1-560e-4f3c-984e-175c503c14a7))
     (pin "2" (uuid ee628c2c-eb41-4b9c-bc06-c739e90ccd7f))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "U3") (unit 1)
         )
@@ -3180,7 +3180,7 @@
     )
     (pin "1" (uuid 9b58ce3c-9f03-4820-8dae-aa51104ca8af))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "#PWR07") (unit 1)
         )
@@ -3208,7 +3208,7 @@
     )
     (pin "1" (uuid 759b5b6d-6414-4ec8-bf81-92d14899f41a))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "#PWR018") (unit 1)
         )
@@ -3249,7 +3249,7 @@
     (pin "4" (uuid d8073ec1-560e-4f3c-984e-175c503c1498))
     (pin "2" (uuid 1fc6d9f5-f485-4902-8a31-d43c2050d4b7))
     (instances
-      (project "mux9"
+      (project "dualmux"
         (path "/ecd0978f-53c1-4da1-845e-40c294143218/509afb21-6a24-487d-8797-70eaffcbe0a4"
           (reference "U5") (unit 3)
         )

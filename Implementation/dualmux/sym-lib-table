@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "Connector_Nandy")(type "KiCad")(uri "${KIPRJMOD}/../Libraries/symbols/Connector_Nandy.kicad_sym")(options "")(descr "Custom connectors for NANDy internal modules and interfaces"))
+)
