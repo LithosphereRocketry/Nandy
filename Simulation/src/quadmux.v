@@ -30,7 +30,7 @@ module quadmux #(parameter WIDTH=1) (
 
     wire [WIDTH-1:0] bus;
     pullup p [WIDTH-1:0] (bus);
-    quadmux_segment gsegment [3:0] (
+    quadmux_segment #(WIDTH) gsegment [3:0] (
         .inp({a, b, c, d}),
         .s1({ns[0], s[0], ns[0], s[0]}),
         .s2({ns[1], ns[1], s[1], s[1]}),

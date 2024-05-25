@@ -15,7 +15,14 @@ int main(int argc, char** argv) {
     FILE* in = fopen(argv[2], "rb");
     FILE* out = fopen(argv[3], "w");
     if(!strcmp(argv[1], "l")) { fprintf(out, "v2.0 raw\n"); }
-    while(!feof(in)) {
-        fprintf(out, "%hhx\n", fgetc(in));
+    while(1) {
+        int chr = getc(in);
+        if(chr == EOF) {
+            break;
+        } else {
+            fprintf(out, "%hhx\n", chr);
+        }
     }
+    fclose(in);
+    fclose(out);
 }

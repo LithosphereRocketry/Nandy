@@ -11,25 +11,6 @@ module shift(
         output [7:0] out,
         output cout
     );
-
-    wire encarry, ra, newbit;
-    andgate g_encarry(
-        .a(cin),
-        .b(mode[0]),
-        .q(encarry)
-    );
-    mux m_ra(
-        .a(in[0]),
-        .b(in[7]),
-        .s(mode[0]),
-        .q(ra)
-    );
-    mux m_newbit(
-        .a(encarry),
-        .b(ra),
-        .s(mode[1]),
-        .q(newbit)
-    );
     mux #(.WIDTH(9)) m_out(
         .a({in[7:0], newbit}),
         .b({in[0], newbit, in[7:1]}),

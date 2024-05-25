@@ -141,9 +141,10 @@ module control(
         .q(isalu)
     );
     wire writesacc;
-    nand00 gwritesacc(
+    nand10 gwritesacc(
         .a(inst[4]),
         .b(ninst[3]),
+        .c(ninst[2]),
         .q(writesacc)
     );
     wire nwam, nwaa;
@@ -187,17 +188,23 @@ module control(
         .q(WC)
     );
 
-    selmux gALU3(
-        .a(inst[3]),
-        .sa(inst[6]),
+    wire simplealumode;
+    andgate gsalu(
+        .a(inst[5]),
         .b(ninst[7]),
+        .q(simplealumode)
+    );
+    selmux gALU2(
+        .a(inst[2]),
+        .sa(inst[6]),
+        .b(simplealumode),
         .sb(ninst[6]),
-        .q(ALU[3])
+        .q(ALU[2])
     );
     andgate ALUrest [2:0] (
-        .a(inst[2:0]),
+        .a({inst[3], inst[1:0]}),
         .b(inst[6]),
-        .q(ALU[2:0])
+        .q({ALU[3], ALU[1:0]})
     );
 
     wire issig;

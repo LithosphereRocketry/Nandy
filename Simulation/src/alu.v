@@ -34,27 +34,31 @@ module alu(
         .cout(addout[8])
     );
 
-    wire [8:0] shiftout;
-    shift shifter(
-        .in(a),
-        .cin(cin),
-        .mode({xy, op[1:0]}),
-        .out(shiftout[7:0]),
-        .cout(shiftout[8])
-    );
+    wire s_encarry, s_ra, s_newbit;
+    andgate g_encarry(
+        .a(cin),
+        .b(op[0]),
+        .q(s_encarry)
+    ); // Enable carry-in
+    mux m_ra(
+        .a(a[0]),
+        .b(a[7]),
+        .s(op[0]),
+        .q(s_ra)
+    ); // Rotate or arithmetic
+    mux m_newbit(
+        .a(encarry),
+        .b(ra),
+        .s(op[1]),
+        .q(newbit)
+    ); // Decide which new bit we end up with
 
-    wire [8:0] arithout;
-    mux #(9) arithmux(
-        .a(addout),
-        .b(shiftout),
-        .s(op[2]),
-        .q(arithout)
-    );
-
-    mux #(9) outmux(
+    quadmux #(9) outmux(
         .a(bitout),
-        .b(arithout),
-        .s(op[3]),
+        .b(addout),
+        .c({a, newbit}),
+        .d({a[0], newbit, a[7:1]}),
+        .s(op[3:2]),
         .q({cout, q})
     );
 endmodule
