@@ -119,7 +119,12 @@ module control(
     );
 
     assign Y = inst[5];
-    assign RS = inst[1:0];
+    nand00 grsxy(
+        .a(ninst[1]),
+        .b(ninst[6]),
+        .q(RS[1])
+    );
+    assign RS[0] = inst[0];
 
     // ALL of the garbage that follows is to calculate Writes Accumulator (WA).
     // This is what you get when all of your instructions edit the same register

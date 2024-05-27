@@ -54,19 +54,9 @@ module regfile(
         .q(wracc)
     );
 
-    // Select accumulator input; normally gets the ALU, except on rd-mode
-    // instructions where it gets passed a different register's contents
-    wire [7:0] accin;
-    wire [7:0] regpass;
-    mux #(8) macc(
-        .a(aluout),
-        .b(regpass),
-        .s(RD),
-        .q(accin)
-    );
-    // The accumulator itself, after all that pain
+    // The accumulator itself
     register #(8) accumulator(
-        .d(accin),
+        .d(aluout),
         .clk(clk),
         .en(wracc),
         .nclr(1'b1),
@@ -93,7 +83,7 @@ module regfile(
     // SP normally comes from ALU (as in isp), or ACC on wr-mode
     wire [7:0] spin;
     mux #(8) msp(
-        .a(accin),
+        .a(aluout),
         .b(acc),
         .s(WR),
         .q(spin)
@@ -281,49 +271,36 @@ module regfile(
         .q(ioout)
     );
 
-    // Now the other fun part: the endless tangle of output muxes
-    // 4-way mux to generate the register passback:
-    wire [7:0] regpass_spio;
-    mux #(8) mregpass_spio(
-        .a(sp),
-        .b(ioin),
-        .s(RS[0]),
-        .q(regpass_spio)
-    );
     // This mux serves both ALU output 2 and the passback mux, so we mux its
     // control signal between the two - with some clever optimization a few
     // gates can probably be saved here
     wire seldxdy;
+    wire [7:0] regpass;
     mux #(1) mseldxdy(
         .a(Y),
         .b(RS[0]),
         .s(RD),
         .q(seldxdy)
     );
-    wire [7:0] dxdy;
-    mux #(8) mdxdy(
-        .a(dx),
-        .b(dy),
-        .s(seldxdy),
-        .q(dxdy)
-    );
-    mux #(8) mregpass(
-        .a(regpass_spio),
-        .b(dxdy),
-        .s(RS[1]),
+    quadmux #(8) mregpass(
+        .a(sp),
+        .b(ioin),
+        .c(dx),
+        .d(dy),
+        .s({RS[1], seldxdy}),
         .q(regpass)
     );
     // If we're on the second cycle, ALUB is always going to want the memory
     // output:
     wire [7:0] xymem;
     mux #(8) mxymem(
-        .a(dxdy),
+        .a(regpass),
         .b(mem),
         .s(cycle),
         .q(xymem)
     );
     // isp is weird because it has both a unique ALUA and ALUB, so it gets its
-    // own pair of muxes. Also, 
+    // own pair of muxes.
     mux #(8) mouta(
         .a(sp),
         .b(acc),
