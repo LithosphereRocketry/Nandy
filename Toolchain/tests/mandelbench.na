@@ -1,6 +1,7 @@
     rdi 0
     wr sp
     eint
+    j main
 
     isp -1
     rdi 0x9C # -100/64
@@ -28,6 +29,7 @@ no_overflow:
     wr io
     brk
 
+main:
     rdi 255
     isp -3
 yloop:
@@ -52,12 +54,12 @@ xloop:
 
 no_print:
     lds 1
-    inc 1
+    addi 1
     jcz xloop
 
     lds 0
     addi 128 # We can't combine these because they don't produce the right carry
-    inc -1
+    addi -1
     ctog
     jcz yloop
 
@@ -129,7 +131,7 @@ mul2_6:
     addi 63
     strs 1
     lds 0
-    acf
+    addi 0
     strs 0
 no_offset:
     lds 1
@@ -192,7 +194,7 @@ mul8_ext_loop:
     sw dy
     iclr
 mul8_ext_no_add:
-    inc 1
+    addi 1
     jcz mul8_ext_loop
     iset
     rd dy

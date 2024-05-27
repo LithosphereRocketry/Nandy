@@ -18,8 +18,8 @@ extern const instruction_t i_brk, i_bell, i_csset, i_csclr, i_dint, i_eint, i_ic
 // regbit
 extern const instruction_t i_or, i_and, i_xor;
 // regadd
-extern const instruction_t i__add, i__addc, i__sub, i__subc, i__inc, i__acf, i__scf;
-extern const instruction_t i_add, i_addc, i_sub, i_subc, i_inc, i_acf, i_scf;
+extern const instruction_t i__add, i__addc, i__sub, i__subc;
+extern const instruction_t i_add, i_addc, i_sub, i_subc;
 // regshift
 extern const instruction_t i__sl, i__slc, i__sla, i__slr, i__sr, i__src, i__srr, i__sra;
 extern const instruction_t i_sl, i_slc, i_sla, i_slr, i_sr, i_src, i_srr, i_sra;

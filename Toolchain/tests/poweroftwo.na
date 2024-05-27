@@ -132,7 +132,7 @@ reccall:
     call poweroftwo
     addi 1
     jcz keepone
-    inc -1
+    addi -1
 keepone:
     wr dy
     lds 7
