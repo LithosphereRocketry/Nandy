@@ -68,17 +68,6 @@ carry bit.
 ##### `addi`, `addci`, `subi`, `subci`, `_addi`, `_addci`, `_subi`, `_subci`
 Identical to their respective non-`i` variants, but use the provided immediate
 value in place of the DX or DY register.
-##### `inc/_inc <value>`
-Identical to `addi/_addi`, but takes only one cycle and one byte of program
-memory. Value must be nonzero and between -3 and 3.
-##### `acf/_acf`
-Identical to `addci/_addci` with an immediate value of 0, but takes only one
-cycle and one byte of program memory. Typically used as part of a multi-byte
-arithmetic operation.
-##### `scf/_scf`
-Identical to `subci/_subci` with an immediate value of 0, but takes only one
-cycle and one byte of program memory. Typically used as part of a multi-byte
-arithmetic operation.
 
 #### Comparison
 ##### `zero`, `nzero`

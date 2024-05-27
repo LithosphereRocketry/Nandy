@@ -121,9 +121,6 @@ follows:
 * `sl`/`sr`: Shifts the accumulator left/right by 1 place, filling with zeroes
 * `slr`/`srr`: Rotates the accumulator left/right by 1 place
 * `sla`/`sra`: Shifts the accumulator left/right by 1 place, leaving the vacated
-* `inc`: Increments the accumulator by a nonzero value between -3 and 3.
-* `acf`: Propagates the carry bit as if adding an empty upper byte.
-* `scf`: Propagates the carry bit as if subtracting an empty upper byte.
 position unchanged
 
 By default, all operations except bitwise logical ones (`xor`, `and`, `or`)

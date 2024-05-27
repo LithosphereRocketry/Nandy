@@ -51,10 +51,7 @@
 
 ## TODO Status
 * Arithmetic changes
-  * Toolchain: done
-  * Logisim: done
-  * Verilog: not started
-  * Documentation: not started
+  * Verilog: started
 * Interrupt changes
   * Toolchain: done, mostly
   * Logisim: not started
