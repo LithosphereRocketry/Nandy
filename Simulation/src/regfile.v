@@ -134,7 +134,7 @@ module regfile(
     wire naltxfromreg;
     nand00 galtxfromreg(
         .a(wranyx),
-        .b(nistatus),
+        .b(istatus),
         .q(naltxfromreg)
     );
     // and/or trick here as usual
@@ -209,7 +209,7 @@ module regfile(
     wire naltyfromreg;
     nand00 galtyfromreg(
         .a(wranyy),
-        .b(nistatus),
+        .b(istatus),
         .q(naltyfromreg)
     );
     wire wralty;
