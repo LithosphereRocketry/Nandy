@@ -40,82 +40,43 @@ module tb_alu();
                 {realcarry, realans} = a + ((~b) & 8'hff) + cin;
             end
             4'h8: begin
-                if (~xy) begin
-                    // SL
-                    realans = a << 1;
-                    realcarry = a[7];
-                end else begin
-                    // ACF
-                    {realcarry, realans} = a + cin;
-                end
+                realans = a << 1;
+                realcarry = a[7];
             end
             4'h9: begin
-                if (~xy) begin
-                    // SLC
-                    realans = a << 1 | cin;
-                    realcarry = a[7];
-                end else begin
-                    // inc 1
-                    {realcarry, realans} = a + 1;
-                end
+                realans = a << 1 | cin;
+                realcarry = a[7];
             end
             4'ha: begin
-                if (~xy) begin
-                    // SLA
-                    realans = a << 1 | a[0];
-                    realcarry = a[7];
-                end else begin
-                    // inc 2
-                    {realcarry, realans} = a + 2;
-                end
+                realans = a << 1 | a[0];
+                realcarry = a[7];
             end
             4'hb: begin
-                if (~xy) begin
-                    // SLR
-                    realans = a << 1 | a[0];
-                    realcarry = a[7];
-                end else begin
-                    // inc 3
-                    {realcarry, realans} = a + 3;
-                end
+                realans = a << 1 | a[7];
+                realcarry = a[7];
             end
             4'hc: begin
-                if (~xy) begin
-                    
-                end else begin
-                    
-                end
-                realans = xy ? a >> 1 : ;
-                realcarry = xy ? a[0] : a[7];
+                realans = a >> 1;
+                realcarry = a[0];
             end
             4'hd: begin
-                if (~xy) begin
-                    
-                end else begin
-                    
-                end
-                realans = xy ? (a >> 1) | (cin << 7) : (a << 1) | cin;
-                realcarry = xy ? a[0] : a[7];
+                realans = (a >> 1) | (cin << 7);
+                realcarry = a[0];
             end
             4'he: begin
-                if (~xy) begin
-                    
-                end else begin
-                    
-                end
-                realans = xy ? (a >> 1) | (a[0] << 7) : (a << 1) | a[0];
-                realcarry = xy ? a[0] : a[7];
+                realans = (a >> 1) | (a[0] << 7);
+                realcarry = a[0];
             end
             4'hf: begin
-                if (~xy) begin
-                    
-                end else begin
-                    
-                end
-                realans = xy ? (a >> 1) | (a[7] << 7) : (a << 1) | a[7];
-                realcarry = xy ? a[0] : a[7];
+                realans = (a >> 1) | (a[7] << 7);
+                realcarry = a[0];
             end
         endcase
+    end
+
+    initial begin
+        $dumpfile(`WAVEPATH);
+        $dumpvars;
     end
 
     alu testGate(
@@ -128,7 +89,7 @@ module tb_alu();
         .cout(carry)
     );
 
-    randtest #("alu", 22, 9, 280) tester(
+    randtest #("alu", 22, 9, 1000) tester(
         .comp_in({xy, op, a, b, cin}),
         .verify({realcarry, realans}),
         .comp_out({carry, ans})

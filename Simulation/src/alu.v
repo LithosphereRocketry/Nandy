@@ -18,7 +18,8 @@ module alu(
         .a(a),
         .b(b),
         .cin(cin),
-        .op(op[2:0]),
+        .op(op[1:0]),
+        .invc(xy),
         .cout(bitout[8]),
         .q(bitout[7:0])
     );
@@ -47,17 +48,17 @@ module alu(
         .q(s_ra)
     ); // Rotate or arithmetic
     mux m_newbit(
-        .a(encarry),
-        .b(ra),
+        .a(s_encarry),
+        .b(s_ra),
         .s(op[1]),
-        .q(newbit)
+        .q(s_newbit)
     ); // Decide which new bit we end up with
 
     quadmux #(9) outmux(
         .a(bitout),
         .b(addout),
-        .c({a, newbit}),
-        .d({a[0], newbit, a[7:1]}),
+        .c({a, s_newbit}),
+        .d({a[0], s_newbit, a[7:1]}),
         .s(op[3:2]),
         .q({cout, q})
     );

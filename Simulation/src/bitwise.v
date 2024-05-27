@@ -6,7 +6,8 @@ Bitwise portion of ALU
 
 module bitwise(
         input [7:0] a, b,
-        input [2:0] op,
+        input [1:0] op,
+        input invc,
         input cin,
         output cout,
         output [7:0] q
@@ -19,7 +20,7 @@ module bitwise(
         .q(nop)
     );
 
-    wire [8:0] preq;
+    wire precarry;
     bitwiseblock block [7:0] (
         .op1(op[1]),
         .nop1(nop[1]),
@@ -27,16 +28,14 @@ module bitwise(
         .nop0(nop[0]),
         .a(a),
         .b(b),
-        .q(preq[7:0])
+        .q(q)
     );
 
-    wire scarry, zpar;
-    selmux gscarry(
-        .a(a[7]),
-        .sa(nop[0]),
-        .b(cin),
-        .sb(op[0]),
-        .q(scarry)
+    wire zcarry, zpar;
+    andgate gzcarry(
+        .a(cin),
+        .b(op[0]),
+        .q(zcarry)
     );
 
     zeroparity gzpar(
@@ -45,17 +44,16 @@ module bitwise(
         .q(zpar)
     );
 
-    selmux gcarry(
-        .a(scarry),
-        .sa(nop[1]),
+    mux gcarry(
+        .a(zcarry),
         .b(zpar),
-        .sb(op[1]),
-        .q(preq[8])
+        .s(op[1]),
+        .q(precarry)
     );
 
-    xornand inv [8:0] (
-        .a(preq),
-        .b(op[2]),
-        .q({cout, q})
+    xornand inv (
+        .a(precarry),
+        .b(invc),
+        .q(cout)
     );
 endmodule
