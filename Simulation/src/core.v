@@ -57,7 +57,7 @@ module core #(parameter rompath = "memory.txt") (
     );
 
     // There's a few control signals
-    wire M, S, J, LJ, nCLI, nLJR, MW, MC, RD, WR, Y, WA, nISP, WC;
+    wire M, S, J, LJ, nCLI, nLJR, MW, MC, nMC, RD, WR, Y, WA, nISP, WC;
     wire [1:0] RS;
     wire [3:0] aluop;
     wire [7:0] nSIG;
@@ -75,6 +75,7 @@ module core #(parameter rompath = "memory.txt") (
         .nLJR(nLJR),
         .MW(MW),
         .MC(MC),
+        .nMC(nMC),
         .RD(RD),
         .WR(WR),
         .Y(Y),
@@ -106,7 +107,7 @@ module core #(parameter rompath = "memory.txt") (
         .nclr(nCLI),
         .nis(nSIG[7]),
         .nic(nSIG[6]),
-        .ncycle(ncycle),
+        .ncycle(nMC),
         .clk(clock),
         .rst(reset),
 

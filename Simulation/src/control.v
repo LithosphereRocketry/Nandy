@@ -20,6 +20,7 @@ module control(
         output nLJR,
         output MW,
         output MC,
+        output nMC,
         output RD,
         output WR,
         output Y,
@@ -98,11 +99,12 @@ module control(
         .q(MW)
     );
 
-    andgate gMC(
+    nand00 gNMC(
         .a(ncycle),
         .b(inst[7]),
-        .q(MC)
+        .q(nMC)
     );
+    invert gMC(.a(nMC), .q(MC));
 
     and3 gRD(
         .a(simple),

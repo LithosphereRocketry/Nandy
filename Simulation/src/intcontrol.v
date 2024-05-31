@@ -28,40 +28,15 @@ module intcontrol(
     );
     invert invtick(.a(ntick), .q(tick));
 
-    // Interrupt repeat prevention
-    // An interrupt can only occur when on the last interrupt tick (aka 
-    // non-two-cycle clock), the interrupt wasn't present. This means that
-    // slower peripherals can interface with the CPU without fear that their
-    // interrupts will be double-registered. 
-    wire ipossible, wrprev, notprev;
-    andgate gpossible(
+    wire nready, nistatus;
+    // TODO: is ncycle redundant on the enable/disable inputs?
+    nand10 gready(
         .a(ienabled),
         .b(nistatus),
-        .q(ipossible)
-    );
-    and3 gwrprev(
-        .a(ncycle),
-        .b(ipossible),
-        .q(wrprev)
-    );
-    register #(1) gprev(
-        .d(int),
-        .clk(clk),
-        .en(wrprev),
-        .nclr(rst),
-        .nq(notprev)
-    );
-
-    // Interrupt handling logic
-    // this is the important one: when all three of these go high, an interrupt
-    // happens
-    wire nready, nistatus;
-    nand10 giready(
-        .a(ipossible),
-        .b(int),
-        .c(notprev),
+        .c(int & ncycle),
         .q(nready)
     );
+
     // Manual set/reset
     // Because of negative logic this is basically an or gate
     wire intsrset;
