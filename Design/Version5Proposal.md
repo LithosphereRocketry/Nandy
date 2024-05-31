@@ -54,8 +54,8 @@
   * Verilog: started
 * Interrupt changes
   * Toolchain: done, mostly
-  * Logisim: not started
-  * Verilog: not started
+  * Logisim: done, mostly
+  * Verilog: done, mostly
   * Documentation: done
 * Chip select
   * Toolchain: in progress

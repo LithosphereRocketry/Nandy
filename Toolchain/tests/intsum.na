@@ -1,0 +1,19 @@
+    rdi 0
+    wr sp
+    eint
+
+idle:
+    j idle
+
+@loc ISR
+    sw dx
+    isp -1
+    strs 0
+    rd io
+    add dx
+    wr io
+    wr dx
+    lds 0
+    sw dx
+    isp 1
+    jri
