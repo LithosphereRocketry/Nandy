@@ -6,12 +6,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
+#include <string.h>
 
 typedef enum {
     TYPE_UNRESOLVED,
     TYPE_NULL,
     TYPE_INT,
-    TYPE_PAIR
+    TYPE_PAIR,
+    TYPE_SYMBOL
 } lisp_type_t;
 
 typedef struct {
@@ -24,6 +26,8 @@ typedef struct {
     lisp_obj_t car;
     lisp_obj_t cdr;
 } lisp_pair_t;
+
+#define NAME_LEN 64
 
 #define STACK_SZ (1<<8)
 lisp_obj_t stack[STACK_SZ];
@@ -84,7 +88,26 @@ lisp_obj_t parseInput(FILE* infile) {
             lisp_obj_t newobj = {TYPE_INT, true, i};
             push_obj(newobj);
         } else {
-            error("Unrecognized symbol");
+            ungetc(next, infile);
+            char namebuf[64];
+            int i = 0;
+            for(; i < NAME_LEN; i++) {
+                char c = getc(infile);
+                if(isspace(c) || c == '(' || c == ')') {
+                    ungetc(c, infile);
+                    break;
+                }
+                namebuf[i] = c;
+            }
+            if(i == NAME_LEN) {
+                error("Name too long");
+            } else {
+                namebuf[i] = '\0';
+                char* name = malloc(i+1);
+                strcpy(name, namebuf);
+                lisp_obj_t newobj = {TYPE_SYMBOL, true, name};
+                push_obj(newobj);
+            }
         }
 
         // If only one thing is left on the stack, and it's not an open-paren
@@ -112,7 +135,7 @@ void print_obj(lisp_obj_t obj) {
         case TYPE_UNRESOLVED: printf("[UNRESOLVED]"); break;
         case TYPE_INT: printf("%li", *(long int*) obj.data); break;
         case TYPE_NULL: printf("()"); break;
-        case TYPE_PAIR: {}
+        case TYPE_PAIR:
             printf("(");
             for(lisp_pair_t* pair = obj.data; pair; ) {
                 print_obj(pair->car);
@@ -134,6 +157,7 @@ void print_obj(lisp_obj_t obj) {
                 }
             }
             break;
+        case TYPE_SYMBOL: printf("'%s", (char*) obj.data); break;
     }
 }
 
@@ -144,6 +168,5 @@ int main(int argc, char** argv) {
         print_obj(obj);
         free_obj(obj);
         printf("\n");
-        exit(0);
     }
 }
