@@ -13,7 +13,8 @@ typedef enum {
     TYPE_NULL,
     TYPE_INT,
     TYPE_PAIR,
-    TYPE_SYMBOL
+    TYPE_SYMBOL,
+    TYPE_QUOTE
 } lisp_type_t;
 
 typedef struct {
@@ -58,7 +59,7 @@ long int parseInt(FILE* infile) {
     return acc;
 }
 
-lisp_obj_t parseInput(FILE* infile) {
+lisp_obj_t parseInput(FILE* infile, size_t depth) {
     while(1) {
         int next = getc(infile);
         if(isspace(next)) {
@@ -87,6 +88,11 @@ lisp_obj_t parseInput(FILE* infile) {
             *i = parseInt(infile);
             lisp_obj_t newobj = {TYPE_INT, true, i};
             push_obj(newobj);
+        } else if(next == '\'') {
+            lisp_obj_t* quoted = malloc(sizeof(lisp_obj_t));
+            *quoted = parseInput(infile, STACK_SZ-sp);
+            lisp_obj_t newobj = {TYPE_QUOTE, true, quoted};
+            push_obj(newobj);
         } else {
             ungetc(next, infile);
             char namebuf[64];
@@ -113,7 +119,7 @@ lisp_obj_t parseInput(FILE* infile) {
         // If only one thing is left on the stack, and it's not an open-paren
         // placeholder, we've reached the end of the current statement and we
         // can spit out an answer
-        if(sp == STACK_SZ-1 && stack[sp].type != TYPE_UNRESOLVED) {
+        if(sp == STACK_SZ-depth-1 && stack[sp].type != TYPE_UNRESOLVED) {
             return pop_obj();
         }
     }
@@ -157,14 +163,18 @@ void print_obj(lisp_obj_t obj) {
                 }
             }
             break;
-        case TYPE_SYMBOL: printf("'%s", (char*) obj.data); break;
+        case TYPE_SYMBOL: printf("%s", (char*) obj.data); break;
+        case TYPE_QUOTE:
+            printf("'");
+            print_obj(*(lisp_obj_t*) obj.data);
+            break;
     }
 }
 
 int main(int argc, char** argv) {
     while(1) {
         printf("> ");
-        lisp_obj_t obj = parseInput(stdin);
+        lisp_obj_t obj = parseInput(stdin, 0);
         print_obj(obj);
         free_obj(obj);
         printf("\n");
