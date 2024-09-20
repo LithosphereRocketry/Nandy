@@ -1,7 +1,7 @@
 
 	rdi 25
 	wr sp
-	rdi 65 # 'A'
+	rdi 'A'
 
 lbl:wr io
 	isp -1

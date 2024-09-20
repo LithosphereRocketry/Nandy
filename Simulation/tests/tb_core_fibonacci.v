@@ -27,7 +27,7 @@ module tb_core_fibonacci();
         rst = 0;
         #(2*`DELAY);
         rst = 1;
-        repeat(215) begin
+        repeat(216) begin
             clk = 1;
             #(`DELAY);
             clk = 0;

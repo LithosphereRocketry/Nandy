@@ -36,26 +36,21 @@ any other context.
 ### Literals and Symbols
 Several instructions take a literal value as an argument; this can be any
 mathematical expression of numeric literals and symbols. Generally speaking,
-assignment of symbols is not recursive; more detail may be found in Appendix B.
-
-Symbols may be defined in one of three ways:
-* Placing a label `name:` in the program sets the value of the symbol "name" to
-the address of the first instruction following the label.
-* The macro `@define name <value>` sets the value of the symbol "name" to the
-given value. This assignment is not recursive.
-* The macro `@static name <amount>` reserves `amount` bytes at the bottom of RAM
-for static variables, and creates a symbol `name` containing the address of the
-first byte of the reserved region.
+assignment of symbols is not recursive; more detail may be found in Appendix B. 
+Placing a label `name:` in the program sets the value of the symbol "name" to
+the address of the first instruction following the label; other methods of using
+labels are detailed in the Assembler Manual.
 
 Additionally, a predefined symbol `FREE_MEM` is provided pointing to the first
-byte of RAM not reserved by `@static`, and a predefined symbol `ISR` is provided
-with the value 0x7F00, corresponding to the address of the interrupt service
-routine.
+byte of RAM not reserved by static allocation, and a predefined symbol `ISR` is
+provided with the value 0x7F00, corresponding to the address of the interrupt
+service routine.
 
 Symbols may be used in most arithmetic and program-flow operations as if they
-were numbers. Symbols should only be defined using ASCII letters and
-underscores; defining a symbol using characters outside this set may function on
-some assembler versions but is undefined behavior.
+were numbers. Symbols should only be defined using ASCII letters, digits
+after the first character, and underscores; defining a symbol using characters
+outside this set may function on some assembler versions but is undefined
+behavior.
 
 ## Using The NANDy Architecture
 
@@ -123,19 +118,10 @@ follows:
 * `xor`: Bitwise-xors the two operands
 * `and`: Bitwise-ands the two operands
 * `or`: Bitwise-ors the two operands
-* `xnor`: Bitwise-xnors the two operands
-* `nand`: Bitwise-nands the two operands
-* `nor`: Bitwise-nors the two operands
-* `inv`: Sets accumulator equal to the bitwise inverse of the second operand (*)
 * `sl`/`sr`: Shifts the accumulator left/right by 1 place, filling with zeroes
 * `slr`/`srr`: Rotates the accumulator left/right by 1 place
 * `sla`/`sra`: Shifts the accumulator left/right by 1 place, leaving the vacated
 position unchanged
-
-(*) If this instruction seems like a bit of an anomaly, it is - it is more a
-consequence of spare logic in the ALU and not really needed for any particular
-purpose. However, since it technically fulfils a unique purpose, it is
-included here rather than left undocumented.
 
 By default, all operations except bitwise logical ones (`xor`, `and`, `or`)
 modify the value of the carry bit. For addition and subtraction, the carry bit
@@ -145,11 +131,10 @@ of the register. Operations may be prevented from setting the carry bit by
 prepending an underscore (`_`) to their mnemonic. There also exists a set of
 operations which only modify the carry bit, and do not affect the accumulator at
 all:
+* `cclr`: Sets the carry bit low.
+* `cset`: Sets the carry bit high.
 * `zero`: Set the carry bit high if the accumulator is zero, and low otherwise.
 * `nzero`: Inverse of `zero`.
-* `sgn`: Set the carry bit high if the accumulator is negative, and low
-otherwise.
-* `nsgn`: Inverse of `sgn`.
 * `par`: Set the carry bit high if the accumulator contains an odd number of
 high bits, and low otherwise.
 * `npar`: Inverse of `par`. 
@@ -183,12 +168,13 @@ be combined in the order shown - `addic` is not a valid instruction.
 ### Memory
 NANDy uses a single memory address space for both program and data memory.
 Implementations may choose to use any memory layout they choose, however memory
-address 0 must be the start of program execution and memory address 0xFFFF must
-be writable; the reference implementation places program ROM between 0x0000 and
-0x7FFF and general-purpose RAM between 0x8000 and 0xFFFF. Implementations which
-do not support a full 64KB of memory may choose to ignore upper bits of the
-address in order to satisfy these constraints, but these implementations may
-require modifications to the assembler in order to function correctly.
+address 0 must be the start of program execution, address 0x7F00 must be the
+location of interrupt routines, and memory address 0xFFFF must be writable; the
+reference implementation places program ROM between 0x0000 and 0x7FFF and
+general-purpose RAM between 0x8000 and 0xFFFF. Implementations which do not
+support a full 64KB of memory may choose to ignore upper bits of the address in
+order to satisfy these constraints, but these implementations may require
+modifications to the assembler in order to function correctly.
 
 Memory may be addressed in one of two modes: absolute mode and stack mode. In
 absolute mode, as in the `lda` and `stra` instructions, DX and DY are combined
@@ -245,7 +231,7 @@ of it when a condition is met:
 loop:
     # this is fast
     ...
-    ctog
+    zero
     jcz loop
     # done
 ```
@@ -253,6 +239,7 @@ loop:
 loop:
     # this is slow
     ...
+    nzero
     jcz done
     j loop
 done: # done
@@ -309,7 +296,6 @@ multicycle operation)
 * Interrupts are enabled
 * An interrupt service routine is not currently occurring
 * The INT pin is high
-* The INT pin was low last time an instruction was executed
 
 Upon triggering an interrupt, the CPU exchanges the normal DX and DY registers
 for alternate registers used only for interrupts, populates those registers with
@@ -334,12 +320,24 @@ idle:
     bell
     jri
 ```
+Note that interrupts do not have any debouncing or hysteresis; if the interrupt
+line is held high, interrupts will continue to occur until the interrupt
+stimulus disappears. It is the responsibility of peripheral devices to allow
+their interrupt status to be cleared via some I/O interaction, which may differ
+on a per-device basis.
+
 Interrupts follow similar calling convetions to functions except that they must
 leave all registers unmodified, including the carry bit. The alternate registers
 are interfaced exactly as DX and DY are in normal program execution, and their
 contents are undefined whenever an interrupt is not occurring and interrupts are
 enabled. Their behavior with interrupts disabled is further discussed in
 [Interrupt Register Reuse](#interrupt-register-reuse).
+
+#### Chip Select
+In addition to the 8-bit parallel I/O port, NANDy provides a single-bit output
+intended for use as a chip-select pin, which may be set using the `csset` and
+`csclr` instructions. Typically, peripherals should respond to bus inputs when
+the chip-select pin is set high.
 
 ### Advanced Techniques
 
