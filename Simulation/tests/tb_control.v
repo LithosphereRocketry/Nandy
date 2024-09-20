@@ -66,7 +66,7 @@ module tb_control();
     assign realY = inst[5];
     
     wire [1:0] realRS;
-    assign realRS = inst[1:0];
+    assign realRS = {inst[1] | inst[6], inst[0]};
 
     wire realWA;
     assign realWA = (realM & ~inst[5]) |

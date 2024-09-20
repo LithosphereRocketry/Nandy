@@ -20,6 +20,7 @@ module control(
         output nLJR,
         output MW,
         output MC,
+        output nMC,
         output RD,
         output WR,
         output Y,
@@ -98,11 +99,12 @@ module control(
         .q(MW)
     );
 
-    andgate gMC(
+    nand00 gNMC(
         .a(ncycle),
         .b(inst[7]),
-        .q(MC)
+        .q(nMC)
     );
+    invert gMC(.a(nMC), .q(MC));
 
     and3 gRD(
         .a(simple),
@@ -119,7 +121,12 @@ module control(
     );
 
     assign Y = inst[5];
-    assign RS = inst[1:0];
+    nand00 grsxy(
+        .a(ninst[1]),
+        .b(ninst[6]),
+        .q(RS[1])
+    );
+    assign RS[0] = inst[0];
 
     // ALL of the garbage that follows is to calculate Writes Accumulator (WA).
     // This is what you get when all of your instructions edit the same register
