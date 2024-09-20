@@ -48,8 +48,7 @@ poweroftwo:
     # interrupts so keyboard input doesn't screw up our real stack
     # dint
     # Place the SP at arg[7]
-    _isp 7
-    _isp 2
+    _isp 9
 ptwo_loop:
     # retrieve the old shift result, or the zero at the top if this is the
     # first time through
