@@ -66,11 +66,11 @@ module tb_control();
     assign realY = inst[5];
     
     wire [1:0] realRS;
-    assign realRS = inst[1:0];
+    assign realRS = {inst[1] | inst[6], inst[0]};
 
     wire realWA;
     assign realWA = (realM & ~inst[5]) |
-        (((inst[6] & ~inst[7]) | (cycle & inst[6] & ~inst[5])) & ~(inst[4] & ~inst[3]));
+        (((inst[6] & ~inst[7]) | (cycle & inst[6] & ~inst[5])) & ~(inst[4] & ~inst[3] & ~inst[2]));
 
     wire realISP;
     assign realISP = ~(~inst[7] & ~inst[6] & inst[5]);
@@ -80,7 +80,7 @@ module tb_control();
                      | ~realISP) & inst[4];
 
     wire [3:0] realALU;
-    assign realALU = inst[6] ? inst[3:0] : {~inst[7], 3'b000};
+    assign realALU = inst[6] ? inst[3:0] : {1'b0, ~inst[7] & inst[5], 2'b00};
 
     wire [7:0] realSIG;
     assign realSIG = ~((1 << inst[2:0]) & {8{~inst[7] & ~inst[6] & ~inst[5] & inst[4] & inst[3]}});

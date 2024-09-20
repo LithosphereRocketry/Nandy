@@ -7,15 +7,18 @@
 #include "nandy_emu_tools.h"
 #include "nandy_instr_defs.h"
 #include "nandy_parse_tools.h"
+#include "micros.h"
 
 argument_t arg_debug = { .abbr = 'g', .name = "debug", .hasval = false };
 argument_t arg_forcedebug = { .abbr = 'G', .name = "force-debug", .hasval = false };
 argument_t arg_out = { .abbr = 'o', .name = "out", .hasval = true };
+argument_t arg_timeacc = { .abbr = 't', .name = "time-accurate", .hasval = false };
 
 argument_t* args[] = {
     &arg_debug,
     &arg_forcedebug,
-    &arg_out
+    &arg_out,
+    &arg_timeacc
 };
 const size_t n_args = sizeof(args) / sizeof(argument_t*);
 
@@ -58,14 +61,13 @@ PC  0x123F  CARRY 1         FF      ...
 ACC 0x3F    SP  0x3F        FF      rd io
 DX  0x3F    DY  0x3F        FF      sw dy
 IRX 0x3F    IRY 0x3F        FF      add dx
-IN  0x3F    OUT 0x3F        FF  PC> addi 1
+IN  0x3F    OUT 0x3F        FF  PC> addi 6
 IE  1       INT 1           FF      jri
                             FF      nop
 Cycles 1234567890       SP> FF      nop 
     */
     static char linebuf[8][40];
     for(int i = 0; i < 8; i++) {
-        strncpy(linebuf[i], "???", 40);
     }
     addr_t pcdis = state->pc;
     int pos = 0;
@@ -80,13 +82,20 @@ Cycles 1234567890       SP> FF      nop
             break;
         }
     }
-    for(; pos < 4; pos++) {
-        if(disasm_cache[pcdis]) {
+    for(int i = -4; i < 4; i++) {
+        if(i >= pos && disasm_cache[pcdis]) {
             disasm_cache[pcdis]->disassemble(disasm_cache[pcdis],
-                    state, pcdis, linebuf[pos + 4], 40);
+                    state, pcdis, linebuf[i + 4], 40);
             pcdis += nbytes(peek(state, pcdis));
         } else {
-            break;
+            addr_t fallback_ind;
+            if(i < pos) {
+                fallback_ind = pcdis + i;
+            } else {
+                fallback_ind = pcdis;
+                pcdis ++;
+            }
+            snprintf(linebuf[i + 4], 40, "??? (0x%.2hhx)", peek(state, fallback_ind));
         }
     }
 
@@ -102,7 +111,8 @@ Cycles 1234567890       SP> FF      nop
             state->ioin, state->ioout, peek(state, 0xFF00 + (uint8_t) state->sp + 3), linebuf[4]);
     printf("IE  %c       INT %c           %02hhx      %-40s\n",
             state->int_en ? '1' : '0', state->int_active ? '1' : '0', peek(state, 0xFF00 + (uint8_t) state->sp + 2), linebuf[5]);
-    printf("                            %02hhx      %-40s\n",
+    printf("CS  %c       IOS %c%c          %02hhx      %-40s\n",
+            state->cs ? '1' : '0', state->io_rd ? 'R' : '-', state->io_wr ? 'W' : '-',
             peek(state, 0xFF00 + (uint8_t) state->sp + 1), linebuf[6]);
     char cyclesbuf[17];
     snprintf(cyclesbuf, 17, "%lu", state->elapsed);
@@ -151,6 +161,16 @@ bool debug(cpu_state_t* state) {
                 printf("Address is out of bounds\n");
             } else {
                 printf("0x%hhx\n", peek(state, (addr_t) addr));
+            }
+        } else if(!strcmp(cmd, "goto") || !strcmp(cmd, "g")) {
+            int64_t addr;
+            if(parseExp(NULL, input+scanlen, &addr, stdout) != SHUNT_DONE) {
+                printf("Failed to parse address\n");
+            } else if(!isBounded(addr, 16, BOUND_UNSIGNED)) {
+                printf("Address is out of bounds\n");
+            } else {
+                state->pc = addr;
+                scanDisasm(state, state->pc);
             }
         } else if(!strcmp(cmd, "poke") || !strcmp(cmd, "o")) {
             char* div = strchr(input+scanlen, ',');
@@ -220,11 +240,24 @@ int main(int argc, char** argv) {
 #endif
 
     setbuf(stdin, NULL);
+    micros_init();
+    long lastMicros = 0;
     do {
         if(arg_forcedebug.result.present) {
             if(!debug(&state)) { break; }
         }
-        do { scanDisasm(&state, state.pc); } while(!emu_step(&state, fout));
+        lastMicros = micros(); // Don't count the time spent in the debugger as
+                               // execution time
+        do {
+            scanDisasm(&state, state.pc);
+
+            // Stall for realistic execution times
+            if(arg_timeacc.result.present && state.elapsed % 1000 == 0) {
+                while(micros() - lastMicros < 1000);
+                // really this should use a system delay call probably
+                lastMicros += 1000;
+            }
+        } while(!emu_step(&state, fout));
         if(arg_debug.result.present) {
             if(!debug(&state)) { break; }
         }

@@ -180,7 +180,9 @@ word_t getALUReg(cpu_state_t* cpu) {
 }
 
 addr_t getXYAddr(cpu_state_t* cpu) {
-    return (((int) getXYReg(cpu, true)) << 8 | getXYReg(cpu, false));
+    int upper = (((int) getXYReg(cpu, true)) << 8) & 0xFF00;
+    int lower = ((int) getXYReg(cpu, false)) & 0xFF;
+    return upper | lower;
 }
 addr_t getAbsAddr(cpu_state_t* cpu) {
     return getXYAddr(cpu) + (peek(cpu, cpu->pc) & IMM4_MASK);

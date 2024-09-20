@@ -58,7 +58,7 @@ mul8_loop:
 # Stack : [RAL RAH sum | B]
 mul8_skip:
     rd dy
-    subi 1
+    addi -1
     wr dy
     ctog
     jcz mul8_loop
