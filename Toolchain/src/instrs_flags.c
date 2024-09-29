@@ -106,3 +106,15 @@ const instruction_t i_iset = {
     .disassemble = dis_basic,
     .execute = exe_iset
 };
+
+static void exe_ioa(cpu_state_t* cpu) {
+    cpu->ioaddr = peek(cpu, cpu->pc) & IMM5_MASK;
+}
+const instruction_t i_ioa = {
+    .mnemonic = "ioa",
+    .opcode_mask = IMM5_MASK,
+    .opcode = IOA_MASK,
+    .assemble = asm_imm5u,
+    .disassemble = dis_imm5u,
+    .execute = exe_ioa
+};

@@ -25,9 +25,21 @@ const instruction_t* ilookup(word_t word) {
     return cache[(unsigned char) word];
 }
 
+// Devices after 8 in this order won't get interrupt channels
+static const iorange_t iomap[] = {
+    {0, 1, io_step_intcontrol}
+};
+static const size_t n_ios = sizeof(iomap) / sizeof(iorange_t);
+static word_t ioints;
+
+bool io_step_intcontrol(cpu_state_t* cpu, bool active) {
+    if(active && cpu->io_rd) { cpu->ioin = ioints; }
+    return false;
+}
+
 // TODO: more flexibility
 #define COOLDOWN (1000000 / 1200)
-bool emu_step(cpu_state_t* state, FILE* outstream) {
+bool emu_step(cpu_state_t* state, FILE* outstream, iorange_t* iomap, size_t n_io) {
     static size_t lastIOcycle = 0;
     // instruction execute phase (up clock)
     state->io_rd = false;
@@ -39,6 +51,15 @@ bool emu_step(cpu_state_t* state, FILE* outstream) {
     }
     instr->execute(state);
 
+    for(size_t i = 0; i < n_io; i++) {
+        bool inbounds = (state->ioaddr >= iomap[i].base 
+                       & state->ioaddr < iomap[i].base + iomap[i].bound);
+        bool interrupt = iomap[i].operation(state, inbounds);
+        if(i >= 0 && i < 9) {
+            
+        }
+    }
+    
 
     // I/O phase (down clock)
     // TODO: this whole block should really be modularized

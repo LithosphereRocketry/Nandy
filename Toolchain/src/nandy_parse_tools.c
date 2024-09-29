@@ -92,6 +92,21 @@ static bool resolveImm4u(asm_state_t* state, const char* text, addr_t pos, FILE*
     }
 }
 
+static bool resolveImm5u(asm_state_t* state, const char* text, addr_t pos, FILE* debug) {
+    int64_t value;
+    shunting_status_t status = parseExp(&state->resolved, text, &value, debug);
+    if(status == SHUNT_DONE) {
+        if(!isBounded(value, 5, BOUND_UNSIGNED)) {
+            if(debug) fprintf(debug, "Warning: value of %s ( == %li) will be truncated\n", text, value);
+        }
+        state->rom[pos] |= value & IMM4_MASK;
+        return true;
+    } else {
+        if(debug) fprintf(debug, "Parse failed: %i\n", status);
+        return false;
+    }
+}
+
 static bool resolveImm8(asm_state_t* state, const char* text, addr_t pos, FILE* debug) {
     int64_t value;
     shunting_status_t status = parseExp(&state->resolved, text, &value, debug);
@@ -162,6 +177,12 @@ const char *asm_imm4u(const instruction_t *instr, const char *text, asm_state_t 
     return endptr;
 }
 
+const char *asm_imm5u(const instruction_t *instr, const char *text, asm_state_t *state) {
+    state->rom[state->rom_loc] = instr->opcode;
+    const char* endptr = addUnresolved(state, text, resolveImm5u);
+    state->rom_loc ++;
+    return endptr;
+}
 
 word_t getXYReg(cpu_state_t* cpu, bool isY) {
     return cpu->int_active ? (isY ? cpu->iry : cpu->irx)
@@ -211,6 +232,9 @@ void dis_imm4s(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* 
 }
 void dis_imm4u(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* buf, size_t len) {
     snprintf(buf, len, "%s %i", instr->mnemonic, peek(cpu, addr) & IMM4_MASK);
+}
+void dis_imm5u(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* buf, size_t len) {
+    snprintf(buf, len, "%s %i", instr->mnemonic, peek(cpu, addr) & IMM5_MASK);
 }
 
 bool isBounded(int64_t value, int64_t bitwidth, bound_mode_t bound) {

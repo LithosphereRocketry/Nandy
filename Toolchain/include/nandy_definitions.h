@@ -10,7 +10,7 @@
 #define ADDR_RAM_MASK (1<<15)
 #define MULTICYCLE_MASK (1<<7)
 #define ALU_SEL_MASK (1<<6)
-#define ISP_MASK (1<<5)
+#define IOA_MASK (1<<5)
 #define XY_MASK (1<<5)
 #define MEM_WRITE_MASK (1<<5)
 #define JUMP_MASK (1<<5)
@@ -28,6 +28,7 @@
 
 #define REGID_MASK 0b0011
 #define IMM4_MASK 0b1111
+#define IMM5_MASK 0b11111
 #define INC_MASK 0b111
 
 #define ISR_ADDR 0x7F00
