@@ -3,8 +3,7 @@
 #include <stdbool.h>
 
 #include "nandy_instructions.h"
-#include "stdin_avail.h"
-
+#include "nandy_ios.h"
 
 const instruction_t* ilookup(word_t word) {
     static bool instrs_cached = false;
@@ -25,37 +24,42 @@ const instruction_t* ilookup(word_t word) {
     return cache[(unsigned char) word];
 }
 
+// Devices after 8 in this order won't get interrupt channels
+// TODO: what about devices that take up more than one interrupt channel?
+static const iorange_t iomap[] = {
+    {0, 1, io_step_tty}
+};
+static const size_t n_ios = sizeof(iomap) / sizeof(iorange_t);
+
 // TODO: more flexibility
-#define COOLDOWN (1000000 / 1200)
 bool emu_step(cpu_state_t* state, FILE* outstream) {
-    static size_t lastIOcycle = 0;
+    tty_outstream = outstream;
     // instruction execute phase (up clock)
     state->io_rd = false;
     state->io_wr = false;
     const instruction_t* instr = ilookup(peek(state, state->pc));
     if(!instr) {
-        printf("Invalid or unknown instruction byte %hhx\n", peek(state, state->pc));
+        printf("Invalid or unknown instruction byte 0x%hhx\n", peek(state, state->pc));
         return true;
     }
     instr->execute(state);
 
-
     // I/O phase (down clock)
-    // TODO: this whole block should really be modularized
-    if(state->io_rd) {
-        // Experimenting with a new method of interrupt handling here
-        state->int_in = false;
-    }
-    if(state->io_wr) {
-        putc(state->ioout, outstream);
-    }
-    if(state->elapsed - lastIOcycle > COOLDOWN) {
-        if(stdinAvail()) {
-            state->ioin = getc(stdin);
-            state->int_in = true;
+    word_t ioints = 0;
+    state->ioin = 0;
+    for(size_t i = 0; i < n_ios; i++) {
+        bool inbounds = (state->ioaddr >= iomap[i].base 
+                      && state->ioaddr < iomap[i].base + iomap[i].bound);
+        bool interrupt = iomap[i].operation(state, inbounds);
+        if(i < 8 && interrupt) {
+            ioints |= 1 << i;
         }
-        lastIOcycle = state->elapsed;
     }
+    state->int_in = (ioints != 0);
+    if(state->ioaddr == 0x1f && state->io_rd) {
+        state->ioin |= ioints;
+    }
+
     // End of I/O block
     if(state->int_en && state->int_in && !state->int_active) {
         state->irx = state->pc & 0xFF;

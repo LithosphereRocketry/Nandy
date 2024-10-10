@@ -20,6 +20,7 @@ module control(
         output nLJR,
         output MW,
         output MC,
+        output nMC,
         output RD,
         output WR,
         output Y,
@@ -98,11 +99,12 @@ module control(
         .q(MW)
     );
 
-    andgate gMC(
+    nand00 gNMC(
         .a(ncycle),
         .b(inst[7]),
-        .q(MC)
+        .q(nMC)
     );
+    invert gMC(.a(nMC), .q(MC));
 
     and3 gRD(
         .a(simple),
@@ -119,7 +121,12 @@ module control(
     );
 
     assign Y = inst[5];
-    assign RS = inst[1:0];
+    nand00 grsxy(
+        .a(ninst[1]),
+        .b(ninst[6]),
+        .q(RS[1])
+    );
+    assign RS[0] = inst[0];
 
     // ALL of the garbage that follows is to calculate Writes Accumulator (WA).
     // This is what you get when all of your instructions edit the same register
@@ -141,9 +148,10 @@ module control(
         .q(isalu)
     );
     wire writesacc;
-    nand00 gwritesacc(
+    nand10 gwritesacc(
         .a(inst[4]),
         .b(ninst[3]),
+        .c(ninst[2]),
         .q(writesacc)
     );
     wire nwam, nwaa;
@@ -187,17 +195,23 @@ module control(
         .q(WC)
     );
 
-    selmux gALU3(
-        .a(inst[3]),
-        .sa(inst[6]),
+    wire simplealumode;
+    andgate gsalu(
+        .a(inst[5]),
         .b(ninst[7]),
+        .q(simplealumode)
+    );
+    selmux gALU2(
+        .a(inst[2]),
+        .sa(inst[6]),
+        .b(simplealumode),
         .sb(ninst[6]),
-        .q(ALU[3])
+        .q(ALU[2])
     );
     andgate ALUrest [2:0] (
-        .a(inst[2:0]),
+        .a({inst[3], inst[1:0]}),
         .b(inst[6]),
-        .q(ALU[2:0])
+        .q({ALU[3], ALU[1:0]})
     );
 
     wire issig;

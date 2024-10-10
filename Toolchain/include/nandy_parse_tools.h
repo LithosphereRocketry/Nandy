@@ -23,6 +23,7 @@ const char* asm_alu_reg(const instruction_t* instr, const char* text, asm_state_
 const char* asm_alu_imm(const instruction_t* instr, const char* text, asm_state_t* state);
 const char *asm_imm4s(const instruction_t *instr, const char *text, asm_state_t *state);
 const char *asm_imm4u(const instruction_t *instr, const char *text, asm_state_t *state);
+const char *asm_imm5u(const instruction_t *instr, const char *text, asm_state_t *state);
 
 // Execution tools
 word_t getXYReg(cpu_state_t* cpu, bool isY);
@@ -39,6 +40,7 @@ void dis_alu_reg(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char
 void dis_alu_imm(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* buf, size_t len);
 void dis_imm4s(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* buf, size_t len);
 void dis_imm4u(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* buf, size_t len);
+void dis_imm5u(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* buf, size_t len);
 
 // Verification
 typedef enum {

@@ -29,6 +29,32 @@ const instruction_t i_bell = {
     .execute = exe_bell
 };
 
+static void exe_csclr(cpu_state_t* cpu) {
+    cpu->cs = false;
+    cpu->pc ++; cpu->elapsed ++;
+}
+const instruction_t i_csclr = {
+    .mnemonic = "csclr",
+    .opcode_mask = 0,
+    .opcode = PROGFLOW_MASK | SIG_MASK | SIG_CSCLR,
+    .assemble = asm_basic,
+    .disassemble = dis_basic,
+    .execute = exe_csclr
+};
+
+static void exe_csset(cpu_state_t* cpu) {
+    cpu->cs = true;
+    cpu->pc ++; cpu->elapsed ++;
+}
+const instruction_t i_csset = {
+    .mnemonic = "csset",
+    .opcode_mask = 0,
+    .opcode = PROGFLOW_MASK | SIG_MASK | SIG_CSSET,
+    .assemble = asm_basic,
+    .disassemble = dis_basic,
+    .execute = exe_csset
+};
+
 static void exe_dint(cpu_state_t* cpu) {
     cpu->int_en = false;
     cpu->pc ++; cpu->elapsed ++;
@@ -79,4 +105,17 @@ const instruction_t i_iset = {
     .assemble = asm_basic,
     .disassemble = dis_basic,
     .execute = exe_iset
+};
+
+static void exe_ioa(cpu_state_t* cpu) {
+    cpu->ioaddr = peek(cpu, cpu->pc) & IMM5_MASK;
+    cpu->pc ++; cpu->elapsed ++;
+}
+const instruction_t i_ioa = {
+    .mnemonic = "ioa",
+    .opcode_mask = IMM5_MASK,
+    .opcode = IOA_MASK,
+    .assemble = asm_imm5u,
+    .disassemble = dis_imm5u,
+    .execute = exe_ioa
 };

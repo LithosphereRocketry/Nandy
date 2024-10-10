@@ -9,7 +9,7 @@ module tb_rom();
         .data(ans)
     );
 
-    combitest #("adder8_c", 15, 8, 150) tester(
+    combitest #("rom", 15, 8, 151) tester(
         .comp_in(addr),
         .verify(realans),
         .comp_out(ans)

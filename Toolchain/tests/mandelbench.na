@@ -1,0 +1,214 @@
+    rdi 0
+    wr sp
+    eint
+    j main
+
+    isp -1
+    rdi 0x9C # -100/64
+    strs 0
+    rdi 0x32 # 50/64
+
+@echo 0xFFFFFF9C * 0x32
+@echo 0x9C + 100
+@echo 0x32
+
+    call mul2_6
+    # output should be -78/64 = 0xB2
+    jcz no_overflow
+    isp -1
+    strs 0
+    rdi 'v'
+    wr io
+    rdi ' '
+    wr io
+    lds 0
+    isp 1
+no_overflow:
+    call puthex
+    rdi '\n'
+    wr io
+    brk
+
+main:
+    rdi 255
+    isp -3
+yloop:
+    subi 128
+    strs 0
+    
+    rdi 0
+xloop:
+    strs 1
+
+    # TODO: Actual math goes here...
+
+    # Time to print?
+    lds 1
+    andi 0b111
+    xori 0b111
+    zero
+    jcz no_print
+    # TODO: Actually print the accumulated value
+    rdi 0x23
+    call puthex
+
+no_print:
+    lds 1
+    addi 1
+    jcz xloop
+
+    lds 0
+    addi 128 # We can't combine these because they don't produce the right carry
+    addi -1
+    ctog
+    jcz yloop
+
+    isp 3
+    brk
+
+mandel8_is_bounded:
+
+
+
+# args: acc
+# return: void
+puthex:
+    isp -3
+    strs 0
+    sw dx
+    strs 1
+    rd dy
+    strs 2
+    rd dx
+    sr
+    sr
+    sr
+    sr
+    call puthexhalf
+    lds 0
+    andi 0x0F
+    call puthexhalf
+    lds 1
+    wr dx
+    lds 2
+    wr dy
+    isp 3
+    ja
+
+# args: acc
+# return: void
+puthexhalf:
+    subi 0xA
+    jcz puthex_digit
+    addi 'A'
+    wr io
+    ja
+puthex_digit:
+    addi 0xA + '0'
+    wr io
+    ja
+
+# args: acc, sp[0]
+# return: acc
+mul2_6:
+    isp -4
+    sw dx
+    strs 2
+    rd dy
+    strs 3
+    lds 4
+    strs 0
+    rd dx
+    call mul8_ext
+    strs 1
+    brk
+# sp[0] = high
+# sp[1] = low
+    lds 0
+    sl
+    jcz no_offset
+    lds 1
+    addi 63
+    strs 1
+    lds 0
+    addi 0
+    strs 0
+no_offset:
+    lds 1
+    sl
+    wr dx
+    lds 0
+    slc
+    sw dx
+    sl
+    sw dx
+    slc
+    wr dy
+    lds 2
+    wr dx
+    lds 3
+    sw dy
+    isp 4
+    ja
+
+# args: acc, sp[0]
+# return: {sp[0], acc}
+mul8_ext:
+    isp -2
+    sw dx
+    strs 0
+    rd dy
+    strs 1
+    lds 2
+        # A is in DX, B is in ACC
+        # Interrupt-register reuse segment to save memory accesses
+    dint
+    iset
+    wr dx
+    rdi 0
+    wr dy
+    iclr
+    wr dy
+    rdi -8
+mul8_ext_loop:
+    brk
+    sw dy
+    sl
+    sw dy
+    iset
+    sw dy
+    slc
+    sw dy
+    sw dx
+    sl
+    sw dx
+    iclr
+    jcz mul8_ext_no_add
+    sw dy
+    add dx
+    sw dy
+    jcz mul8_ext_no_add
+    iset
+    sw dy
+    addi 0xFF
+    sw dy
+    iclr
+mul8_ext_no_add:
+    addi 1
+    jcz mul8_ext_loop
+    iset
+    rd dy
+    strs 2
+    iclr
+    rd dy
+    eint
+    sw dy
+    lds 0
+    wr dx
+    lds 1
+    sw dy
+    isp 2
+    ja
+
+@loc ISR
+    jri

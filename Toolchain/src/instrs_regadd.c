@@ -1,6 +1,7 @@
 #include "nandy_instr_defs.h"
 #include "nandy_parse_tools.h"
 #include "nandy_alufuncs.h"
+#include "shuntingyard.h"
 #include <stdio.h>
 
 static void exe__add(cpu_state_t* cpu) {

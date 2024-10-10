@@ -13,6 +13,7 @@ static bool resolveRda(asm_state_t* state, const char* text, addr_t pos, FILE* d
         }
         state->rom[pos+5] = (value >> 8) & 0xFF;
         state->rom[pos+2] = value & 0xFF;
+        printf("%lx %hhx %hhx\n", value, state->rom[pos+5], state->rom[pos+2]);
         return true;
     } else {
         if(debug) fprintf(debug, "Parse failed: %i\n", status);
@@ -81,4 +82,48 @@ static const char* asm_move(const instruction_t* instr, const char* text, asm_st
 const instruction_t i_move = {
     .mnemonic = "move",
     .assemble = asm_move
+};
+
+static const char* asm__isp(const instruction_t* instr, const char* text, asm_state_t* state) {
+    i_sw.assemble(&i_sw, regnames[REG_SP][0], state);
+    text = i__addi.assemble(&i__addi, text, state);
+    i_sw.assemble(&i_sw, regnames[REG_SP][0], state);
+    return text;
+}
+const instruction_t i__isp = {
+    .mnemonic = "_isp",
+    .assemble = asm__isp
+};
+
+static const char* asm_isp(const instruction_t* instr, const char* text, asm_state_t* state) {
+    i_sw.assemble(&i_sw, regnames[REG_SP][0], state);
+    text = i_addi.assemble(&i_addi, text, state);
+    i_sw.assemble(&i_sw, regnames[REG_SP][0], state);
+    return text;
+}
+const instruction_t i_isp = {
+    .mnemonic = "isp",
+    .assemble = asm_isp
+};
+
+static const char* asm__iisp(const instruction_t* instr, const char* text, asm_state_t* state) {
+    i_dint.assemble(&i_dint, "", state);
+    text = i__isp.assemble(&i__isp, text, state);
+    i_eint.assemble(&i_eint, "", state);
+    return text;
+}
+const instruction_t i__iisp = {
+    .mnemonic = "_iisp",
+    .assemble = asm__iisp,
+};
+
+static const char* asm_iisp(const instruction_t* instr, const char* text, asm_state_t* state) {
+    i_dint.assemble(&i_dint, "", state);
+    text = i_isp.assemble(&i_isp, text, state);
+    i_eint.assemble(&i_eint, "", state);
+    return text;
+}
+const instruction_t i_iisp = {
+    .mnemonic = "iisp",
+    .assemble = asm_iisp,
 };
