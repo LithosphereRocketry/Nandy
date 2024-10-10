@@ -1,7 +1,8 @@
 PY = python3
 
+PCBDIR = .
 FABS = oshpark jlcpcb
-PCBS = dualmux
+PCBS = dualmux test-fixture
 
 
 FABDIR = Output
@@ -20,16 +21,17 @@ $(DIRS): %:
 	mkdir -p $@
 
 $(FABDIR)/%-oshpark.zip: $(DRCDIR)/%.rpt | $(FABDIR) $(GRBDIR)/%
-	kikit fab oshpark $*/$*.kicad_pcb $(GRBDIR)$*/
-	cp $(GRBDIR)$*/gerbers.zip $@
+	kikit fab oshpark $(PCBDIR)/$*/$*.kicad_pcb $(GRBDIR)/$*/
+	mv $(GRBDIR)/$*/gerbers.zip $@
 
 $(FABDIR)/%-jlcpcb.zip: $(DRCDIR)/%.rpt | $(FABDIR) $(GRBDIR)/%
 	kikit fab jlcpcb $*/$*.kicad_pcb $(GRBDIR)/$*/
-	cp $(GRBDIR)$*/gerbers.zip $@
+	mv $(GRBDIR)/$*/gerbers.zip $@
 
+.SECONDARY:
 .SECONDEXPANSION:
-$(DRCDIR)/%.rpt: $(PCBDIR)$$*/$$*.kicad_pcb | $(FAILDIR) $(DRCDIR)
-	kikit drc run $< > $(FAILDIR)/$*.rpt
+$(DRCDIR)/%.rpt: $(PCBDIR)/$$*/$$*.kicad_pcb | $(FAILDIR) $(DRCDIR)
+	kikit drc run --ignoreExcluded $< > $(FAILDIR)/$*.rpt
 	mv $(FAILDIR)/$*.rpt $@
 
 $(FABS): %: $(patsubst %,$(FABDIR)/%-$$@.zip,$(PCBS))
