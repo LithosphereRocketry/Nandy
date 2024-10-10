@@ -15,12 +15,14 @@ TESTDIR = tests/
 COPTS = -Wall -Wextra -O2 -flto -Wno-unused-result -Wno-unused-parameter -Werror=implicit-function-declaration -Werror=int-conversion
 
 # if you just type "make", this happens
-.DEFAULT_GOAL: all
+.DEFAULT_GOAL: tools
 # these rules don't refer to real files, so they shouldn't get timestamp-checked
-.PHONY: all clean assemble
+.PHONY: tools clean assemble all
 
 # make all = make (all of the final targets given)
-all: $(TARGETS) $(RKT_TARGETS)
+tools: $(TARGETS) $(RKT_TARGETS)
+
+all: tools assemble
 
 # includes = everything in INCDIR with a .h file extension
 INC = $(wildcard $(INCDIR)*.h)

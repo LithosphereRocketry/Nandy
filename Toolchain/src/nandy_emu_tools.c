@@ -3,8 +3,7 @@
 #include <stdbool.h>
 
 #include "nandy_instructions.h"
-#include "stdin_avail.h"
-
+#include "nandy_ios.h"
 
 const instruction_t* ilookup(word_t word) {
     static bool instrs_cached = false;
@@ -26,21 +25,15 @@ const instruction_t* ilookup(word_t word) {
 }
 
 // Devices after 8 in this order won't get interrupt channels
+// TODO: what about devices that take up more than one interrupt channel?
 static const iorange_t iomap[] = {
-    {0, 1, io_step_intcontrol}
+    {0, 1, io_step_tty}
 };
 static const size_t n_ios = sizeof(iomap) / sizeof(iorange_t);
-static word_t ioints;
-
-bool io_step_intcontrol(cpu_state_t* cpu, bool active) {
-    if(active && cpu->io_rd) { cpu->ioin = ioints; }
-    return false;
-}
 
 // TODO: more flexibility
-#define COOLDOWN (1000000 / 1200)
-bool emu_step(cpu_state_t* state, FILE* outstream, iorange_t* iomap, size_t n_io) {
-    static size_t lastIOcycle = 0;
+bool emu_step(cpu_state_t* state, FILE* outstream) {
+    tty_outstream = outstream;
     // instruction execute phase (up clock)
     state->io_rd = false;
     state->io_wr = false;
@@ -51,32 +44,22 @@ bool emu_step(cpu_state_t* state, FILE* outstream, iorange_t* iomap, size_t n_io
     }
     instr->execute(state);
 
-    for(size_t i = 0; i < n_io; i++) {
-        bool inbounds = (state->ioaddr >= iomap[i].base 
-                       & state->ioaddr < iomap[i].base + iomap[i].bound);
-        bool interrupt = iomap[i].operation(state, inbounds);
-        if(i >= 0 && i < 9) {
-            
-        }
-    }
-    
-
     // I/O phase (down clock)
-    // TODO: this whole block should really be modularized
-    if(state->io_rd) {
-        // Experimenting with a new method of interrupt handling here
-        state->int_in = false;
-    }
-    if(state->io_wr) {
-        putc(state->ioout, outstream);
-    }
-    if(state->elapsed - lastIOcycle > COOLDOWN) {
-        if(stdinAvail()) {
-            state->ioin = getc(stdin);
-            state->int_in = true;
+    word_t ioints = 0;
+    state->ioin = 0;
+    for(size_t i = 0; i < n_ios; i++) {
+        bool inbounds = (state->ioaddr >= iomap[i].base 
+                      && state->ioaddr < iomap[i].base + iomap[i].bound);
+        bool interrupt = iomap[i].operation(state, inbounds);
+        if(i < 8 && interrupt) {
+            ioints |= 1 << i;
         }
-        lastIOcycle = state->elapsed;
     }
+    state->int_in = (ioints != 0);
+    if(state->ioaddr == 0x1f && state->io_rd) {
+        state->ioin |= ioints;
+    }
+
     // End of I/O block
     if(state->int_en && state->int_in && !state->int_active) {
         state->irx = state->pc & 0xFF;

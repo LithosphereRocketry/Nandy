@@ -15,6 +15,7 @@ extern const instruction_t i_nop, i_rd, i_wr, i_sw;
 extern const instruction_t i_ja, i_jar, i_jri, i_j, i_jcz;
 // flags
 extern const instruction_t i_brk, i_bell, i_csset, i_csclr, i_dint, i_eint, i_iclr, i_iset;
+extern const instruction_t i_ioa;
 // regbit
 extern const instruction_t i_or, i_and, i_xor;
 // regadd

@@ -10,6 +10,8 @@ static const instruction_t* default_instrs[] = {
     &i_macro_memloc,
     &i_macro_static,
     &i_macro_string,
+    &i__isp,
+    &i_isp,
 
     &i_rda,
     &i_call,
@@ -31,8 +33,7 @@ static const instruction_t* default_instrs[] = {
     &i_eint,
     &i_iclr,
     &i_iset,
-    &i__isp,
-    &i_isp,
+    &i_ioa,
     &i_or,
     &i_and,
     &i_xor,

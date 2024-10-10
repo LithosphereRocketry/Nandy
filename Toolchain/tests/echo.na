@@ -1,3 +1,4 @@
+    ioa 0
     eint
 idle:
     j idle

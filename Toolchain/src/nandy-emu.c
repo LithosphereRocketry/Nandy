@@ -111,8 +111,8 @@ Cycles 1234567890       SP> FF      nop
             state->ioin, state->ioout, peek(state, 0xFF00 + (uint8_t) state->sp + 3), linebuf[4]);
     printf("IE  %c       INT %c           %02hhx      %-40s\n",
             state->int_en ? '1' : '0', state->int_active ? '1' : '0', peek(state, 0xFF00 + (uint8_t) state->sp + 2), linebuf[5]);
-    printf("CS  %c       IOS %c%c          %02hhx      %-40s\n",
-            state->cs ? '1' : '0', state->io_rd ? 'R' : '-', state->io_wr ? 'W' : '-',
+    printf("IOA 0x%02hhx    IOS %c%c          %02hhx      %-40s\n",
+            state->ioaddr, state->io_rd ? 'R' : '-', state->io_wr ? 'W' : '-',
             peek(state, 0xFF00 + (uint8_t) state->sp + 1), linebuf[6]);
     char cyclesbuf[17];
     snprintf(cyclesbuf, 17, "%lu", state->elapsed);
