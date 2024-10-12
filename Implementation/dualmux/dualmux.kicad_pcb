@@ -4249,7 +4249,7 @@
 		(descr "Resistor, Axial_DIN0207 series, Axial, Horizontal, pin pitch=10.16mm, 0.25W = 1/4W, length*diameter=6.3*2.5mm^2, http://cdn-reichelt.de/documents/datenblatt/B400/1_4W%23YAG.pdf")
 		(tags "Resistor Axial_DIN0207 series Axial Horizontal pin pitch 10.16mm 0.25W = 1/4W length 6.3mm diameter 2.5mm")
 		(property "Reference" "R1"
-			(at 5.08 0 360)
+			(at 5.08 0 0)
 			(layer "F.SilkS")
 			(uuid "ed0399a1-0a58-4e04-a401-4c58010a5de7")
 			(effects
@@ -4260,7 +4260,7 @@
 			)
 		)
 		(property "Value" "1k"
-			(at 5.08 2.37 360)
+			(at 5.08 2.37 0)
 			(layer "F.Fab")
 			(uuid "833c313b-327b-4016-926b-f1eae7e3ff0b")
 			(effects
@@ -4475,7 +4475,7 @@
 			(uuid "dad6aa90-4412-40ee-bbb1-e72b461795b3")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 5.08 0 360)
+			(at 5.08 0 0)
 			(layer "F.Fab")
 			(uuid "d519bbcc-23f0-41c3-b9bc-8e3f517a5c18")
 			(effects
@@ -5493,7 +5493,7 @@
 		(descr "Resistor, Axial_DIN0207 series, Axial, Horizontal, pin pitch=10.16mm, 0.25W = 1/4W, length*diameter=6.3*2.5mm^2, http://cdn-reichelt.de/documents/datenblatt/B400/1_4W%23YAG.pdf")
 		(tags "Resistor Axial_DIN0207 series Axial Horizontal pin pitch 10.16mm 0.25W = 1/4W length 6.3mm diameter 2.5mm")
 		(property "Reference" "R2"
-			(at 5.08 0 360)
+			(at 5.08 0 0)
 			(layer "F.SilkS")
 			(uuid "73207db1-51a8-4a58-9081-513f28350226")
 			(effects
@@ -5504,7 +5504,7 @@
 			)
 		)
 		(property "Value" "1k"
-			(at 5.08 2.37 360)
+			(at 5.08 2.37 0)
 			(layer "F.Fab")
 			(uuid "74287a7c-8e87-4b71-ba51-7cc191ee64ce")
 			(effects
@@ -5719,7 +5719,7 @@
 			(uuid "50bed14e-8173-4920-b853-9e520fa1868a")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 5.08 0 360)
+			(at 5.08 0 0)
 			(layer "F.Fab")
 			(uuid "c93f0736-9f45-42db-98ba-5ae989907d61")
 			(effects
@@ -11042,7 +11042,7 @@
 		(descr "Resistor, Axial_DIN0207 series, Axial, Horizontal, pin pitch=10.16mm, 0.25W = 1/4W, length*diameter=6.3*2.5mm^2, http://cdn-reichelt.de/documents/datenblatt/B400/1_4W%23YAG.pdf")
 		(tags "Resistor Axial_DIN0207 series Axial Horizontal pin pitch 10.16mm 0.25W = 1/4W length 6.3mm diameter 2.5mm")
 		(property "Reference" "R4"
-			(at 5.08 0 360)
+			(at 5.08 0 0)
 			(layer "F.SilkS")
 			(uuid "e53591a4-5518-4125-a2f3-51b446d1ca97")
 			(effects
@@ -11053,7 +11053,7 @@
 			)
 		)
 		(property "Value" "1k"
-			(at 5.08 2.37 360)
+			(at 5.08 2.37 0)
 			(layer "F.Fab")
 			(uuid "0d8014f0-9d7d-4768-a3e2-a5c11497911a")
 			(effects
@@ -11268,7 +11268,7 @@
 			(uuid "33e0a75a-d2de-4588-a623-bbf0722728fb")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 5.08 0 360)
+			(at 5.08 0 0)
 			(layer "F.Fab")
 			(uuid "136494c9-952e-4ba1-a28c-b33fdff6d683")
 			(effects

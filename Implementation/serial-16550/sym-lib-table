@@ -1,0 +1,6 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "Interface_UART_Custom")(type "KiCad")(uri "${KIPRJMOD}/Libraries/symbols/Interface_UART_Custom.kicad_sym")(options "")(descr ""))
+  (lib (name "LT1133ACN")(type "KiCad")(uri "${KIPRJMOD}/Libraries/symbols/LT1133ACN.kicad_sym")(options "")(descr ""))
+  (lib (name "Connector_Nandy")(type "KiCad")(uri "/home/bry/comparch/Nandy/Implementation/Libraries/symbols/Connector_Nandy.kicad_sym")(options "")(descr ""))
+)

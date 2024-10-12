@@ -2,7 +2,7 @@ PY = python3
 
 PCBDIR = .
 FABS = oshpark jlcpcb
-PCBS = dualmux test-fixture
+PCBS = dualmux test-fixture serial-16550
 
 
 FABDIR = Output

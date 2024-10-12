@@ -1,0 +1,4 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "Connector_Nandy")(type "KiCad")(uri "/home/bry/comparch/Nandy/Implementation/Libraries/footprints/Connector_Nandy.pretty")(options "")(descr ""))
+)

@@ -5184,10 +5184,10 @@
 			(justify left top)
 		)
 	)
-	(gr_text "NANDy Logic Module Tester"
-		(at 168.656 101.854 0)
+	(gr_text "Keyed pins go here ^ ^ ^"
+		(at 195.58 104.14 180)
 		(layer "F.SilkS")
-		(uuid "fe8811a4-4581-44fb-be32-4d8380822680")
+		(uuid "756a5f98-463e-49a1-ab70-4f888387c992")
 		(effects
 			(font
 				(size 1.5 1.5)
@@ -5195,6 +5195,17 @@
 				(bold yes)
 			)
 			(justify left top)
+		)
+	)
+	(gr_text "NANDy Logic Module Tester\nrev. 1    JLCJLCJLCJLC"
+		(at 170.18 116.84 0)
+		(layer "F.SilkS")
+		(uuid "875656ae-9088-47bf-b986-7ea959e5616f")
+		(effects
+			(font
+				(size 1.524 1.524)
+				(thickness 0.254)
+			)
 		)
 	)
 	(segment
