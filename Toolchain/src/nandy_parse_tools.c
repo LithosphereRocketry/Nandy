@@ -3,6 +3,7 @@
 #include <ctype.h>
 
 #include "nandy_parse_tools.h"
+#include "nandy_check_tools.h"
 #include "shuntingyard.h"
 
 
@@ -134,6 +135,15 @@ const char* asm_register(const instruction_t* instr, const char* text, asm_state
     if(reg == REG_ACC) {
         printf("Cannot move accumulator to/from itself\n");
         return NULL;
+    }
+    if(reg == REG_SP && (instr->opcode & WR_MASK)) {
+        static_interrupt_status_t status = checkStaticInterruptStatus();
+        if(status == STATIC_INTERRUPT_ENABLED) {
+            printf("Interrupts must be disabled before writing to %s\n", regnames[reg][0]);
+            return NULL;
+        } else if (status == STATIC_INTERRUPT_UNKNOWN) {
+            printf("Warning: Writing to %s with interrupts enabled is undefined behavior\n", regnames[reg][0]);
+        }
     }
     state->rom[state->rom_loc] = instr->opcode | reg;
     state->rom_loc ++;
