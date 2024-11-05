@@ -71,7 +71,7 @@ static const char* asm_reljump(const instruction_t *instr, const char *text, asm
     return endptr;
 }
 
-void dis_reljump(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* buf, size_t len) {
+static void dis_reljump(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* buf, size_t len) {
     int64_t offset = signExtend((((int) peek(cpu, addr)) << 8) | peek(cpu, addr+1), 12);
     snprintf(buf, len, "%s %04lx", instr->mnemonic, addr + offset + 1);
 }

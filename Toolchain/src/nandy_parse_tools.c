@@ -137,11 +137,11 @@ const char* asm_register(const instruction_t* instr, const char* text, asm_state
         return NULL;
     }
     if(reg == REG_SP && (instr->opcode & WR_MASK)) {
-        static_interrupt_status_t status = checkStaticInterruptStatus();
-        if(status == STATIC_INTERRUPT_ENABLED) {
+        int_state_t status = checkIntState(state);
+        if(status == INT_STATE_ENABLED) {
             printf("Interrupts must be disabled before writing to %s\n", regnames[reg][0]);
             return NULL;
-        } else if (status == STATIC_INTERRUPT_UNKNOWN) {
+        } else if (status == INT_STATE_UNKNOWN) {
             printf("Warning: Writing to %s with interrupts enabled is undefined behavior\n", regnames[reg][0]);
         }
     }

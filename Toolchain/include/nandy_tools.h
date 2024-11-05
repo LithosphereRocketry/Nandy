@@ -43,9 +43,15 @@ typedef struct ilist {
     const instruction_t** list;
 } ilist_t;
 
+typedef struct ctrl_graph {
+    
+} ctrl_graph_t;
+
 typedef struct unresolved unresolved_t;
 typedef struct asm_state {
     const ilist_t* instrs;
+
+    const ctrl_graph_t* ctrl_graph;
 
     word_t rom[ROM_SIZE];
     addr_t rom_loc;

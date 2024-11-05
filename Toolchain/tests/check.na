@@ -1,0 +1,12 @@
+    ioa 0
+    rdi 0
+    wr sp
+    eint
+
+idle:
+    j idle
+
+@loc ISR
+    rd io
+    wr io
+    jri

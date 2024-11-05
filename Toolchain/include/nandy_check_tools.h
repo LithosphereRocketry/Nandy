@@ -3,12 +3,12 @@
 
 #include "nandy_tools.h"
 
-typedef enum static_interrupt_status {
-    STATIC_INTERRUPT_UNKNOWN,
-    STATIC_INTERRUPT_ENABLED,
-    STATIC_INTERRUPT_DISABLED
-} static_interrupt_status_t;
+typedef enum int_state {
+    INT_STATE_UNKNOWN,
+    INT_STATE_ENABLED,
+    INT_STATE_DISABLED
+} int_state_t;
 
-static_interrupt_status_t checkStaticInterruptStatus();
+int_state_t checkIntState();
 
 #endif
