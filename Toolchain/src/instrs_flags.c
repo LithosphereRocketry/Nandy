@@ -1,6 +1,13 @@
 #include "nandy_instr_defs.h"
 #include "nandy_parse_tools.h"
+#include "nandy_check_tools.h"
 #include "stdio.h"
+
+static const char* asm_brk(const instruction_t *instr, const char *text, asm_state_t *state) {
+    const char* retval = asm_basic(instr, text, state);
+    addNextCtrlBlock(&state->ctrl_graph, state->rom_loc, 0);
+    return retval;
+}
 
 static void exe_brk(cpu_state_t* cpu) {
     cpu->idbg = true;
@@ -11,7 +18,7 @@ const instruction_t i_brk = {
     .mnemonic = "brk",
     .opcode_mask = 0,
     .opcode = PROGFLOW_MASK | SIG_MASK | SIG_BRK,
-    .assemble = asm_basic,
+    .assemble = asm_brk,
     .disassemble = dis_basic,
     .execute = exe_brk
 };

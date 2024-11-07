@@ -114,6 +114,7 @@ void addNextCtrlBlock(ctrl_graph_t* graph, addr_t pc, int is_linked) {
     maybeInitCtrlGraph(graph);
     size_t block_idx = findOrAddCtrlBlock(graph, pc, NULL);
     updateNextCtrlLink(graph, pc, is_linked ? block_idx : 0);
+    graph->current_idx = block_idx;
 }
 
 void addBranchCtrlBlock(ctrl_graph_t* graph, addr_t origin_pc, addr_t target_pc) {
@@ -146,7 +147,7 @@ void addBranchCtrlBlock(ctrl_graph_t* graph, addr_t origin_pc, addr_t target_pc)
         
         for(size_t i = 0; i < graph->block_sz; i++) {
             ctrl_block_t* block = &graph->blocks[i];
-            printf("[Block %ld -- %d bytes (refcount %d)", i, block->block_loc, block->refcount);
+            printf("[Block %ld -- %04X (%d bytes) (refcount %d)", i, block->block_pc, block->block_loc, block->refcount);
             if(block->next_idx)
                 printf(" :: Next -> %ld", block->next_idx);
             if(block->branch_idx)
