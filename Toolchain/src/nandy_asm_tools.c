@@ -98,7 +98,7 @@ int assemble_helper(const char* str, asm_state_t* dest, bool inst_line) {
     return assemble_helper(nextToken, dest, inst_line);
 }
 int assemble(const char* str, asm_state_t* dest) {
-    addNextCtrlBlock(&dest->ctrl_graph, 0);
+    addNextCtrlBlock(&dest->ctrl_graph, 0, 0);
     
     addLabel(dest, strdup("ISR"), ISR_ADDR);
     int asmstatus = assemble_helper(str, dest, true);
@@ -114,11 +114,10 @@ int assemble(const char* str, asm_state_t* dest) {
         }
     }
     
-    updateCurrentCtrlBlock(&dest->ctrl_graph, dest->rom_loc, 0);
+    updateNextCtrlLink(&dest->ctrl_graph, dest->rom_loc, 0);
     
-    #if DEBUG_PRINT_CTRL_GRAPH
-        debugPrintCtrlGraph(dest);
-    #endif
+    int checkstatus = staticCheck(dest);
+    if (checkstatus != 0) { return checkstatus; }
     
     return 0;
 }

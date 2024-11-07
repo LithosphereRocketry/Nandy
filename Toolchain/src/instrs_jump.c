@@ -4,6 +4,12 @@
 #include "stdio.h"
 #include "shuntingyard.h"
 
+static const char* asm_dynjump(const instruction_t *instr, const char *text, asm_state_t *state) {
+    const char* retval = asm_basic(instr, text, state);
+    addNextCtrlBlock(&state->ctrl_graph, state->rom_loc, 0);
+    return retval;
+}
+
 static void exe_ja(cpu_state_t* cpu) {
     cpu->pc = getXYAddr(cpu);
     cpu->elapsed ++;
@@ -12,7 +18,7 @@ const instruction_t i_ja = {
     .mnemonic = "ja",
     .opcode_mask = 0b1,
     .opcode = PROGFLOW_MASK,
-    .assemble = asm_basic,
+    .assemble = asm_dynjump,
     .disassemble = dis_basic,
     .execute = exe_ja
 };
@@ -26,7 +32,7 @@ const instruction_t i_jri = {
     .mnemonic = "jri",
     .opcode_mask = 0b1,
     .opcode = PROGFLOW_MASK | CI_MASK,
-    .assemble = asm_basic,
+    .assemble = asm_dynjump,
     .disassemble = dis_basic,
     .execute = exe_jri
 };
@@ -42,7 +48,7 @@ const instruction_t i_jar = {
     .mnemonic = "jar",
     .opcode_mask = 0b1,
     .opcode = PROGFLOW_MASK | RET_MASK,
-    .assemble = asm_basic,
+    .assemble = asm_dynjump,
     .disassemble = dis_basic,
     .execute = exe_jar
 };
@@ -71,14 +77,7 @@ static bool resolveReljump(asm_state_t* state, const char* text, addr_t pos, FIL
 static const char* asm_reljump(const instruction_t *instr, const char *text, asm_state_t *state) {
     state->rom[state->rom_loc] = instr->opcode;
     
-    if(instr->opcode & COND_MASK) {
-        addNextCtrlBlock(&state->ctrl_graph, state->rom_loc + 2);
-    } else {
-        // 'j' will always branch, so there isn't any 'next' block afterward
-        updateCurrentCtrlBlock(&state->ctrl_graph, state->rom_loc + 2, 0);
-        addNextCtrlBlock(&state->ctrl_graph, state->rom_loc + 2);
-    }
-    
+    addNextCtrlBlock(&state->ctrl_graph, state->rom_loc + 2, instr->opcode & COND_MASK);
     const char* endptr = addUnresolved(state, text, resolveReljump);
     state->rom_loc += 2;
     

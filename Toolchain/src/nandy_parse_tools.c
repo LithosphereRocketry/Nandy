@@ -136,15 +136,6 @@ const char* asm_register(const instruction_t* instr, const char* text, asm_state
         printf("Cannot move accumulator to/from itself\n");
         return NULL;
     }
-    if(reg == REG_SP && (instr->opcode & WR_MASK)) {
-        int_state_t status = checkIntState(state);
-        if(status == INT_STATE_ENABLED) {
-            printf("Interrupts must be disabled before writing to %s\n", regnames[reg][0]);
-            return NULL;
-        } else if (status == INT_STATE_UNKNOWN) {
-            printf("Warning: Writing to %s with interrupts enabled is undefined behavior\n", regnames[reg][0]);
-        }
-    }
     state->rom[state->rom_loc] = instr->opcode | reg;
     state->rom_loc ++;
     return after;

@@ -51,10 +51,10 @@ typedef enum int_state {
 } int_state_t;
 
 typedef struct ctrl_block {
+    int refcount;
+    
     addr_t block_pc;
     addr_t block_loc;
-    
-    int_state_t int_state;
     
     size_t next_idx;
     size_t branch_idx;
@@ -127,7 +127,5 @@ typedef struct unresolved {
 } unresolved_t;
 
 const char* addUnresolved(asm_state_t* state, const char* arg, inst_resolve_t func);
-
-#define DEBUG_PRINT_CTRL_GRAPH 1
 
 #endif

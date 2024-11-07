@@ -1,12 +1,12 @@
-    ioa 0
-    rdi 0
-    wr sp
     eint
-
-idle:
-    j idle
-
+loop:
+    j loop
+func:
+    ja
 @loc ISR
-    rd io
-    wr io
+    jcz cond
+    j done
+cond:
+    call func
+done:
     jri

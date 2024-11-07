@@ -91,27 +91,29 @@ static size_t findOrAddCtrlBlock(ctrl_graph_t* graph, addr_t pc, ctrl_block_op_t
         block->branch_idx = prev->branch_idx;
         prev->next_idx = block_idx;
         prev->branch_idx = 0;
+        block->refcount++;
     }
     
     return block_idx;
 }
 
-void updateCurrentCtrlBlock(ctrl_graph_t* graph, addr_t end_pc, size_t next_idx) {
+void updateNextCtrlLink(ctrl_graph_t* graph, addr_t end_pc, size_t next_idx) {
     maybeInitCtrlGraph(graph);
-    
     if(graph->current_idx) {
         ctrl_block_t* current = &graph->blocks[graph->current_idx];
         current->block_loc = end_pc - current->block_pc;
+        if(!current->next_idx && next_idx) {
+            graph->blocks[next_idx].refcount++;
+        }
         current->next_idx = next_idx;
     }
-    
     graph->current_idx = next_idx;
 }
 
-void addNextCtrlBlock(ctrl_graph_t* graph, addr_t pc) {
+void addNextCtrlBlock(ctrl_graph_t* graph, addr_t pc, int is_linked) {
     maybeInitCtrlGraph(graph);
     size_t block_idx = findOrAddCtrlBlock(graph, pc, NULL);
-    updateCurrentCtrlBlock(graph, pc, block_idx);
+    updateNextCtrlLink(graph, pc, is_linked ? block_idx : 0);
 }
 
 void addBranchCtrlBlock(ctrl_graph_t* graph, addr_t origin_pc, addr_t target_pc) {
@@ -127,10 +129,7 @@ void addBranchCtrlBlock(ctrl_graph_t* graph, addr_t origin_pc, addr_t target_pc)
     }
     
     graph->blocks[origin_idx].branch_idx = target_idx;
-}
-
-int_state_t checkIntState(asm_state_t *state) {
-    return INT_STATE_DISABLED;
+    graph->blocks[target_idx].refcount++;
 }
 
 #if DEBUG_PRINT_CTRL_GRAPH
@@ -147,7 +146,7 @@ int_state_t checkIntState(asm_state_t *state) {
         
         for(size_t i = 0; i < graph->block_sz; i++) {
             ctrl_block_t* block = &graph->blocks[i];
-            printf("[Block %ld -- %d bytes", i, block->block_loc);
+            printf("[Block %ld -- %d bytes (refcount %d)", i, block->block_loc, block->refcount);
             if(block->next_idx)
                 printf(" :: Next -> %ld", block->next_idx);
             if(block->branch_idx)
@@ -179,3 +178,33 @@ int_state_t checkIntState(asm_state_t *state) {
         printf("[Control Graph End]\n\n");
     }
 #endif
+
+static int floatingStaticCheck(static_state_t* state, size_t block_idx) {
+    return 0;
+}
+
+int staticCheck(asm_state_t* code) {
+    #if DEBUG_PRINT_CTRL_GRAPH
+        debugPrintCtrlGraph(code);
+    #endif
+    
+    ctrl_graph_t* graph = &code->ctrl_graph;
+    static_state_t* states = malloc(graph->block_sz * sizeof(static_state_t));
+    for(size_t i = 1; i < graph->block_sz; i++) {
+        states[i] = (static_state_t){0};
+        states[i].code = code;
+        
+        // Interrupts are enabled at the entry point
+        if(graph->blocks[i].block_pc == 0) {
+            states[i].flags |= STATIC_INT_EN_VAL;
+            states[i].cpu.int_en = 1;
+        }
+        
+        if(!graph->blocks[i].refcount) {
+            int status = floatingStaticCheck(&states[i], i);
+            if(status) return status;
+        }
+    }
+    
+    return 0;
+}
