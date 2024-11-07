@@ -114,15 +114,16 @@ void addNextCtrlBlock(ctrl_graph_t* graph, addr_t pc) {
     updateCurrentCtrlBlock(graph, pc, block_idx);
 }
 
-// NOTE: origin_pc must be no less than graph->blocks[0].block_pc
 void addBranchCtrlBlock(ctrl_graph_t* graph, addr_t origin_pc, addr_t target_pc) {
+    // NOTE: This must be called only after the origin block has been added
+    if(origin_pc < graph->blocks[1].block_pc) return;
     maybeInitCtrlGraph(graph);
-    size_t origin_idx = findCtrlBlockSlot(graph, origin_pc);
     
-    ctrl_block_op_t op;
-    size_t target_idx = findOrAddCtrlBlock(graph, target_pc, &op);
-    if(op == CTRL_BLOCK_INSERTED && origin_idx >= target_idx) {
-        origin_idx++;
+    size_t target_idx = findOrAddCtrlBlock(graph, target_pc, NULL);
+    size_t origin_idx = findCtrlBlockSlot(graph, origin_pc);
+    // We want the block at or before origin_pc
+    if(origin_pc < graph->blocks[origin_idx].block_pc) {
+        origin_idx--;
     }
     
     graph->blocks[origin_idx].branch_idx = target_idx;
@@ -146,7 +147,7 @@ int_state_t checkIntState(asm_state_t *state) {
         
         for(size_t i = 0; i < graph->block_sz; i++) {
             ctrl_block_t* block = &graph->blocks[i];
-            printf("[Block %ld -- PC %d (%d bytes)", i, block->block_pc, block->block_loc);
+            printf("[Block %ld -- %d bytes", i, block->block_loc);
             if(block->next_idx)
                 printf(" :: Next -> %ld", block->next_idx);
             if(block->branch_idx)

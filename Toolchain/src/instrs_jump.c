@@ -70,15 +70,17 @@ static bool resolveReljump(asm_state_t* state, const char* text, addr_t pos, FIL
 
 static const char* asm_reljump(const instruction_t *instr, const char *text, asm_state_t *state) {
     state->rom[state->rom_loc] = instr->opcode;
-    const char* endptr = addUnresolved(state, text, resolveReljump);
-    state->rom_loc += 2;
     
     if(instr->opcode & COND_MASK) {
-        addNextCtrlBlock(&state->ctrl_graph, state->rom_loc);
+        addNextCtrlBlock(&state->ctrl_graph, state->rom_loc + 2);
     } else {
         // 'j' will always branch, so there isn't any 'next' block afterward
-        updateCurrentCtrlBlock(&state->ctrl_graph, state->rom_loc, 0);
+        updateCurrentCtrlBlock(&state->ctrl_graph, state->rom_loc + 2, 0);
+        addNextCtrlBlock(&state->ctrl_graph, state->rom_loc + 2);
     }
+    
+    const char* endptr = addUnresolved(state, text, resolveReljump);
+    state->rom_loc += 2;
     
     return endptr;
 }
