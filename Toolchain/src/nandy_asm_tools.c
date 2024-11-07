@@ -5,7 +5,9 @@
 #include <string.h>
 
 #include "nandy_parse_tools.h"
+#include "nandy_check_tools.h"
 #include "iotools.h"
+
 
 bool isValidLabel(char c, bool isfirst) {
     return isalpha(c) || c == '_' || (!isfirst && isalnum(c));
@@ -96,6 +98,8 @@ int assemble_helper(const char* str, asm_state_t* dest, bool inst_line) {
     return assemble_helper(nextToken, dest, inst_line);
 }
 int assemble(const char* str, asm_state_t* dest) {
+    addNextCtrlBlock(&dest->ctrl_graph, 0);
+    
     addLabel(dest, strdup("ISR"), ISR_ADDR);
     int asmstatus = assemble_helper(str, dest, true);
     addLabel(dest, strdup("FREE_MEM"), dest->ram_loc);
@@ -109,5 +113,12 @@ int assemble(const char* str, asm_state_t* dest) {
             return -7;
         }
     }
+    
+    updateCurrentCtrlBlock(&dest->ctrl_graph, dest->rom_loc, 0);
+    
+    #if DEBUG_PRINT_CTRL_GRAPH
+        debugPrintCtrlGraph(dest);
+    #endif
+    
     return 0;
 }

@@ -128,4 +128,6 @@ typedef struct unresolved {
 
 const char* addUnresolved(asm_state_t* state, const char* arg, inst_resolve_t func);
 
+#define DEBUG_PRINT_CTRL_GRAPH 1
+
 #endif

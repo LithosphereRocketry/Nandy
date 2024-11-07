@@ -9,6 +9,10 @@ void addBranchCtrlBlock(ctrl_graph_t* graph, addr_t origin_pc, addr_t target_pc)
 
 int_state_t checkIntState();
 
+#if DEBUG_PRINT_CTRL_GRAPH
+    void debugPrintCtrlGraph(asm_state_t* state);
+#endif
+
 typedef enum ctrl_block_op {
     CTRL_BLOCK_FOUND,
     CTRL_BLOCK_APPENDED,
