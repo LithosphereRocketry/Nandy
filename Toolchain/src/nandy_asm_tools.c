@@ -55,7 +55,7 @@ int assemble_helper(const char* str, asm_state_t* dest, bool inst_line) {
     if(!str) {
         printf("No string provided, or previous parse failed to give status\n");
         return -1;
-    }
+    }   
     if(*str == '\0') return 0;
     if(*str == '\n') return assemble_helper(str+1, dest, true);
     if(isspace(*str)) return assemble_helper(str+1, dest, inst_line);

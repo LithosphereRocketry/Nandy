@@ -25,6 +25,7 @@ const asm_state_t INIT_ASM = {
 
 void asm_state_destroy(asm_state_t* state) {
     symtab_destroy(&state->resolved);
+    free(state->ctrl_graph.blocks);
     if(state->unresolved) {
         for(size_t i = 0; i < state->unresolved_sz; i++) {
             free(state->unresolved[i].str);
@@ -42,6 +43,10 @@ word_t peek(const cpu_state_t* cpu, addr_t addr) {
 void poke(cpu_state_t* cpu, addr_t addr, word_t value) {
     // Properly emulates real CPU's behavior on trying to write ROM
     cpu->ram[addr & ~ADDR_RAM_MASK] = value;
+}
+
+addr_t getImm12(word_t opcode, word_t imm8) {
+    return signExtend((((addr_t) opcode) << 8) | imm8, 12);
 }
 
 addr_t nbytes(word_t inst) {

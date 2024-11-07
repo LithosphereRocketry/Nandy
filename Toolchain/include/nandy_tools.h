@@ -43,15 +43,36 @@ typedef struct ilist {
     const instruction_t** list;
 } ilist_t;
 
-typedef struct ctrl_graph {
+typedef enum int_state {
+    // The default state upon init must be 0
+    INT_STATE_DISABLED = 0,
+    INT_STATE_ENABLED,
+    INT_STATE_UNKNOWN,
+} int_state_t;
+
+typedef struct ctrl_block {
+    addr_t block_pc;
+    addr_t block_loc;
     
+    int_state_t int_state;
+    
+    size_t next_idx;
+    size_t branch_idx;
+} ctrl_block_t;
+
+typedef struct ctrl_graph {
+    size_t block_sz;
+    size_t block_cap;
+    size_t current_idx;
+    // An ordered, array-backed linked list of ctrl blocks
+    ctrl_block_t* blocks;
 } ctrl_graph_t;
 
 typedef struct unresolved unresolved_t;
 typedef struct asm_state {
     const ilist_t* instrs;
 
-    const ctrl_graph_t* ctrl_graph;
+    ctrl_graph_t ctrl_graph;
 
     word_t rom[ROM_SIZE];
     addr_t rom_loc;
@@ -69,6 +90,8 @@ void asm_state_destroy(asm_state_t* state);
 
 word_t peek(const cpu_state_t* cpu, addr_t addr);
 void poke(cpu_state_t* cpu, addr_t addr, word_t value);
+
+addr_t getImm12(word_t opcode, word_t imm8);
 
 addr_t nbytes(word_t inst);
 size_t nclocks(word_t inst);

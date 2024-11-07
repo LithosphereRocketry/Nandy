@@ -1,5 +1,6 @@
 #include "nandy_instr_defs.h"
 #include "nandy_parse_tools.h"
+#include "nandy_check_tools.h"
 #include "stdio.h"
 #include "shuntingyard.h"
 
@@ -57,6 +58,9 @@ static bool resolveReljump(asm_state_t* state, const char* text, addr_t pos, FIL
         }
         state->rom[pos] |= (offset >> 8) & IMM4_MASK;
         state->rom[pos+1] = offset & 0xFF;
+        
+        addBranchCtrlBlock(&state->ctrl_graph, pos, value);
+        
         return true;
     } else {
         if(debug) fprintf(debug, "Parse failed: %i\n", status);
@@ -68,11 +72,19 @@ static const char* asm_reljump(const instruction_t *instr, const char *text, asm
     state->rom[state->rom_loc] = instr->opcode;
     const char* endptr = addUnresolved(state, text, resolveReljump);
     state->rom_loc += 2;
+    
+    if(instr->opcode & COND_MASK) {
+        addNextCtrlBlock(&state->ctrl_graph, state->rom_loc);
+    } else {
+        // 'j' will always branch, so there isn't any 'next' block afterward
+        updateCurrentCtrlBlock(&state->ctrl_graph, state->rom_loc, 0);
+    }
+    
     return endptr;
 }
 
 static void dis_reljump(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* buf, size_t len) {
-    int64_t offset = signExtend((((int) peek(cpu, addr)) << 8) | peek(cpu, addr+1), 12);
+    int64_t offset = getImm12(peek(cpu, addr), peek(cpu, addr+1));
     snprintf(buf, len, "%s %04lx", instr->mnemonic, addr + offset + 1);
 }
 
