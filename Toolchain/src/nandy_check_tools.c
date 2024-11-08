@@ -221,31 +221,24 @@ static void staticCheckBlock(asm_state_t* code, static_state_t* state) {
     }
 }
 
-static void mergeStaticCpus(cpu_state_t* child, cpu_state_t* parent) {
-    if(!child || !parent) return;
+static void mergeStaticStates(static_state_t* child, static_state_t* parent) {
+    if(parent == child) return;
+    
+    memcpy(&child->cpu, &parent->cpu, sizeof(cpu_state_t));
+    child->flags = parent->flags;
 }
 
-static void staticCheckHelper(asm_state_t* code, static_state_t* states, cpu_state_t* parent_cpu, size_t idx) {
+static void staticCheckHelper(asm_state_t* code, static_state_t* states, size_t idx, size_t parent_idx) {
     static_state_t* state = &states[idx];
     
     if(!idx || state->iters >= MAX_CHECK_ITERS) return;
     state->iters++;
     
-    mergeStaticCpus(&state->cpu, parent_cpu);
-    staticCheckBlock(code, state);
-    staticCheckHelper(code, states, &state->cpu, state->block->next_idx);
-    staticCheckHelper(code, states, &state->cpu, state->block->branch_idx);
-}
-
-static void clearStates(asm_state_t* code, static_state_t* states) {
-    // TODO: Static ram
+    mergeStaticStates(&states[idx], &states[parent_idx]);
     
-    for(size_t i = 1; i < code->ctrl_graph.block_sz; i++) {
-        memset(&states[i].cpu, 0, offsetof(cpu_state_t, rom));
-        memset(states[i].cpu.ram, 0, sizeof(states[i].cpu.ram));
-        states[i].flags = 0;
-        states[i].iters = 0;
-    }
+    staticCheckBlock(code, state);
+    staticCheckHelper(code, states, state->block->next_idx, idx);
+    staticCheckHelper(code, states, state->block->branch_idx, idx);
 }
 
 int staticCheck(asm_state_t* code) {
@@ -257,15 +250,19 @@ int staticCheck(asm_state_t* code) {
     
     ctrl_graph_t* graph = &code->ctrl_graph;
     static_state_t* states = malloc(graph->block_sz * sizeof(static_state_t));
+    memset(states, 0, graph->block_sz * sizeof(static_state_t));
     
+    memcpy(states[0].cpu.rom, code->rom, sizeof(code->rom));
     for(size_t i = 1; i < graph->block_sz; i++) {
         states[i].block = &graph->blocks[i];
-        memcpy(states[i].cpu.rom, code->rom, sizeof(code->rom));
     }
     
     for(size_t i = 1; i < graph->block_sz; i++) {
         if(!graph->blocks[i].refcount) {
-            clearStates(code, states);
+            // Reset iter counts
+            for(size_t i = 1; i < graph->block_sz; i++) {
+                states[i].iters = 0;
+            }
             
             // Interrupts are disabled at the entry point and ISR
             if(graph->blocks[i].block_pc == 0 || graph->blocks[i].block_pc == ISR_ADDR) {
@@ -273,7 +270,7 @@ int staticCheck(asm_state_t* code) {
                 states[i].cpu.int_en = false;
             }
             
-            staticCheckHelper(code, states, NULL, i);
+            staticCheckHelper(code, states, i, 0);
         }
     }
     
@@ -282,7 +279,7 @@ int staticCheck(asm_state_t* code) {
             printf("Error in block %ld: Interrupts cannot be enabled while writing SP!\n", i);
             failed = true;
         } else if (states[i].results & SP_INT_CHECK_WARN) {
-           printf("Warning in block %ld: Cannot determine if interrupts are enabled\n", i);
+           printf("Warning in block %ld: Cannot determine whether interrupts are enabled\n", i);
         }
     }
     
