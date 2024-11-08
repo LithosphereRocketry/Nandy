@@ -180,10 +180,6 @@ void addBranchCtrlBlock(ctrl_graph_t* graph, addr_t origin_pc, addr_t target_pc)
     }
 #endif
 
-static int floatingStaticCheck(static_state_t* state, size_t block_idx) {
-    return 0;
-}
-
 int staticCheck(asm_state_t* code) {
     #if DEBUG_PRINT_CTRL_GRAPH
         debugPrintCtrlGraph(code);
@@ -191,9 +187,17 @@ int staticCheck(asm_state_t* code) {
     
     ctrl_graph_t* graph = &code->ctrl_graph;
     static_state_t* states = malloc(graph->block_sz * sizeof(static_state_t));
+    
+    size_t queue_sz = 0;
+    size_t queue_idx = 0;
+    static_state_t** queue = malloc(graph->block_sz * sizeof(static_state_t*));
+    
     for(size_t i = 1; i < graph->block_sz; i++) {
         states[i] = (static_state_t){0};
-        states[i].code = code;
+        states[i].block = &graph->blocks[i];
+        memset(&states[i].cpu, 0, sizeof(cpu_state_t));
+        memcpy(states[i].cpu.rom, code->rom, sizeof(code->rom));
+        // TODO: Static ram
         
         // Interrupts are enabled at the entry point
         if(graph->blocks[i].block_pc == 0) {
@@ -202,10 +206,28 @@ int staticCheck(asm_state_t* code) {
         }
         
         if(!graph->blocks[i].refcount) {
-            int status = floatingStaticCheck(&states[i], i);
-            if(status) return status;
+            queue[queue_sz++] = &states[i];
         }
     }
+    
+    // while(queue_idx < queue_sz) {
+    //     static_state_t* state = queue[queue_idx++];
+    //     if(state->block->next_idx)
+    //         queue[queue_sz++] = &states[state->block->next_idx];
+    //     if(state->block->branch_idx)
+    //         queue[queue_sz++] = &states[state->block->branch_idx];
+    //     
+    //     for(int i = 0; i < state->block->block_loc;) {
+    //         addr_t pc = state->block->block_pc + i;
+    //         // const instruction_t* instr = ilookup(peek(&state->cpu, pc))
+    //         
+    //         
+    //         i += nbytes(peek(&state->cpu, pc));
+    //     }
+    // }
+    
+    free(queue);
+    free(states);
     
     return 0;
 }

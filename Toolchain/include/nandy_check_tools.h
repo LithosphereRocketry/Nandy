@@ -21,7 +21,8 @@ typedef enum ctrl_block_op {
 } ctrl_block_op_t;
 
 typedef struct static_state {
-    asm_state_t* code;
+    ctrl_block_t* block;
+    
     cpu_state_t cpu;
     enum {
         STATIC_ACC_VAL    = 0x01,
