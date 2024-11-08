@@ -8,6 +8,7 @@ void addFloatingCtrlBlock(ctrl_graph_t* graph, addr_t pc);
 void addNextCtrlBlock(ctrl_graph_t* graph, addr_t pc, bool is_linked);
 void addBranchCtrlBlock(ctrl_graph_t* graph, addr_t origin_pc, addr_t target_pc);
 
+#define MAX_CHECK_ITERS 2
 int staticCheck(asm_state_t* code);
 
 #define DEBUG_PRINT_CTRL_GRAPH 1
@@ -31,7 +32,12 @@ typedef struct static_state {
         STATIC_INT_EN_VAL = 0x04,
     } flags;
     
-    bool queued;
+    enum {
+        SP_INT_CHECK_FAIL = 0x01,
+        SP_INT_CHECK_WARN = 0x02,
+    } results;
+    
+    int iters;
 } static_state_t;
 
 #endif

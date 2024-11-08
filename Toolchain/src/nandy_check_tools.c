@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stddef.h>
 
 #include "nandy_parse_tools.h"
 #include "nandy_check_tools.h"
@@ -191,6 +192,62 @@ static bool isRegWr(word_t opcode, regid_t regid) {
         && (opcode & instr->opcode_mask) == (int) regid;
 }
 
+static void staticCheckBlock(asm_state_t* code, static_state_t* state) {
+    ctrl_block_t* block = state->block;
+    for(int i = 0; i < block->block_loc;) {
+        addr_t pc = block->block_pc + i;
+        word_t opcode = code->rom[pc];
+        const instruction_t* instr = ilookup(opcode);
+        
+        if(instr->opcode == i_eint.opcode) {
+            state->flags |= STATIC_INT_EN_VAL;
+            state->cpu.int_en = true;
+        } else if(instr->opcode == i_dint.opcode) {
+            state->flags |= STATIC_INT_EN_VAL;
+            state->cpu.int_en = false;
+        } else if(isRegWr(opcode, REG_SP)) {
+            state->flags |= CTRL_BLOCK_WR_SP;
+            
+            if((state->flags & STATIC_INT_EN_VAL)) {
+                if(state->cpu.int_en) {
+                    state->results |= SP_INT_CHECK_FAIL;
+                }
+            } else {
+                state->results |= SP_INT_CHECK_WARN;
+            }
+        }
+        
+        i += nbytes(peek(&state->cpu, pc));
+    }
+}
+
+static void mergeStaticCpus(cpu_state_t* child, cpu_state_t* parent) {
+    if(!child || !parent) return;
+}
+
+static void staticCheckHelper(asm_state_t* code, static_state_t* states, cpu_state_t* parent_cpu, size_t idx) {
+    static_state_t* state = &states[idx];
+    
+    if(!idx || state->iters >= MAX_CHECK_ITERS) return;
+    state->iters++;
+    
+    mergeStaticCpus(&state->cpu, parent_cpu);
+    staticCheckBlock(code, state);
+    staticCheckHelper(code, states, &state->cpu, state->block->next_idx);
+    staticCheckHelper(code, states, &state->cpu, state->block->branch_idx);
+}
+
+static void clearStates(asm_state_t* code, static_state_t* states) {
+    // TODO: Static ram
+    
+    for(size_t i = 1; i < code->ctrl_graph.block_sz; i++) {
+        memset(&states[i].cpu, 0, offsetof(cpu_state_t, rom));
+        memset(states[i].cpu.ram, 0, sizeof(states[i].cpu.ram));
+        states[i].flags = 0;
+        states[i].iters = 0;
+    }
+}
+
 int staticCheck(asm_state_t* code) {
     #if DEBUG_PRINT_CTRL_GRAPH
         debugPrintCtrlGraph(code);
@@ -201,79 +258,34 @@ int staticCheck(asm_state_t* code) {
     ctrl_graph_t* graph = &code->ctrl_graph;
     static_state_t* states = malloc(graph->block_sz * sizeof(static_state_t));
     
-    size_t queue_sz = 0;
-    size_t queue_idx = 0;
-    static_state_t** queue = malloc(graph->block_sz * sizeof(static_state_t*));
+    for(size_t i = 1; i < graph->block_sz; i++) {
+        states[i].block = &graph->blocks[i];
+        memcpy(states[i].cpu.rom, code->rom, sizeof(code->rom));
+    }
     
     for(size_t i = 1; i < graph->block_sz; i++) {
-        states[i] = (static_state_t){0};
-        states[i].block = &graph->blocks[i];
-        memset(&states[i].cpu, 0, sizeof(cpu_state_t));
-        memcpy(states[i].cpu.rom, code->rom, sizeof(code->rom));
-        // TODO: Static ram
-        
-        // Interrupts are enabled at the entry point
-        if(graph->blocks[i].block_pc == 0) {
-            states[i].flags |= STATIC_INT_EN_VAL;
-            states[i].cpu.int_en = false;
-        }
-        
-        // Interrupts are disabled in the ISR
-        if(graph->blocks[i].block_pc == ISR_ADDR) {
-            states[i].flags |= STATIC_INT_EN_VAL;
-            states[i].cpu.int_en = false;
-        }
-        
         if(!graph->blocks[i].refcount) {
-            queue[queue_sz++] = &states[i];
-            states[i].flags |= CTRL_BLOCK_QUEUED;
-        }
-    }
-    
-    while(queue_idx < queue_sz) {
-        static_state_t* state = queue[queue_idx++];
-        ctrl_block_t* block = state->block;
-        
-        if(block->next_idx && !(states[block->next_idx].flags & CTRL_BLOCK_QUEUED)) {
-            queue[queue_sz++] = &states[block->next_idx];
-            states[block->next_idx].flags |= CTRL_BLOCK_QUEUED;
-        }
-        if(block->branch_idx && !(states[block->branch_idx].flags & CTRL_BLOCK_QUEUED)) {
-            queue[queue_sz++] = &states[block->branch_idx];
-            states[block->branch_idx].flags |= CTRL_BLOCK_QUEUED;
-        }
-        
-        for(int i = 0; i < block->block_loc;) {
-            addr_t pc = block->block_pc + i;
-            word_t opcode = code->rom[pc];
-            const instruction_t* instr = ilookup(opcode);
-            char buf[32];
-            instr->disassemble(instr, &state->cpu, pc, buf, sizeof(buf));
+            clearStates(code, states);
             
-            if(instr->opcode == i_eint.opcode) {
-                state->flags |= STATIC_INT_EN_VAL;
-                state->cpu.int_en = true;
-            } else if(instr->opcode == i_dint.opcode) {
-                state->flags |= STATIC_INT_EN_VAL;
-                state->cpu.int_en = false;
-            } else if(isRegWr(opcode, REG_SP)) {
-                state->flags |= CTRL_BLOCK_WR_SP;
-                
-                if((state->flags & STATIC_INT_EN_VAL)) {
-                    if(state->cpu.int_en) {
-                        printf("Error at [%04X: %s]: Interrupts cannot be enabled while writing SP!\n", pc, buf);
-                        failed = true;
-                    }
-                } else {
-                    printf("Warning at [%04X: %s]: Cannot determine if interrupts are enabled\n", pc, buf);
-                }
+            // Interrupts are disabled at the entry point and ISR
+            if(graph->blocks[i].block_pc == 0 || graph->blocks[i].block_pc == ISR_ADDR) {
+                states[i].flags |= STATIC_INT_EN_VAL;
+                states[i].cpu.int_en = false;
             }
             
-            i += nbytes(peek(&state->cpu, pc));
+            staticCheckHelper(code, states, NULL, i);
         }
     }
     
-    free(queue);
+    for(size_t i = 1; i < graph->block_sz; i++) {
+        if(states[i].results & SP_INT_CHECK_FAIL) {
+            printf("Error in block %ld: Interrupts cannot be enabled while writing SP!\n", i);
+            failed = true;
+        } else if (states[i].results & SP_INT_CHECK_WARN) {
+           printf("Warning in block %ld: Cannot determine if interrupts are enabled\n", i);
+        }
+    }
+    
     free(states);
     
     if(failed)
