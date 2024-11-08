@@ -4,7 +4,8 @@
 #include "nandy_tools.h"
 
 void updateNextCtrlLink(ctrl_graph_t* graph, addr_t end_pc, size_t next_idx);
-void addNextCtrlBlock(ctrl_graph_t* graph, addr_t pc, int is_linked);
+void addFloatingCtrlBlock(ctrl_graph_t* graph, addr_t pc);
+void addNextCtrlBlock(ctrl_graph_t* graph, addr_t pc, bool is_linked);
 void addBranchCtrlBlock(ctrl_graph_t* graph, addr_t origin_pc, addr_t target_pc);
 
 int staticCheck(asm_state_t* code);

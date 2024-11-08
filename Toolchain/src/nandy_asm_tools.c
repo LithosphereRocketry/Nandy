@@ -115,6 +115,7 @@ int assemble(const char* str, asm_state_t* dest) {
     }
     
     updateNextCtrlLink(&dest->ctrl_graph, dest->rom_loc, 0);
+    addFloatingCtrlBlock(&dest->ctrl_graph, ISR_ADDR);
     
     int checkstatus = staticCheck(dest);
     if (checkstatus != 0) { return checkstatus; }

@@ -110,7 +110,12 @@ void updateNextCtrlLink(ctrl_graph_t* graph, addr_t end_pc, size_t next_idx) {
     graph->current_idx = next_idx;
 }
 
-void addNextCtrlBlock(ctrl_graph_t* graph, addr_t pc, int is_linked) {
+void addFloatingCtrlBlock(ctrl_graph_t* graph, addr_t pc) {
+    maybeInitCtrlGraph(graph);
+    findOrAddCtrlBlock(graph, pc, NULL);
+}
+
+void addNextCtrlBlock(ctrl_graph_t* graph, addr_t pc, bool is_linked) {
     maybeInitCtrlGraph(graph);
     size_t block_idx = findOrAddCtrlBlock(graph, pc, NULL);
     updateNextCtrlLink(graph, pc, is_linked ? block_idx : 0);
@@ -210,7 +215,13 @@ int staticCheck(asm_state_t* code) {
         // Interrupts are enabled at the entry point
         if(graph->blocks[i].block_pc == 0) {
             states[i].flags |= STATIC_INT_EN_VAL;
-            states[i].cpu.int_en = 1;
+            states[i].cpu.int_en = false;
+        }
+        
+        // Interrupts are disabled in the ISR
+        if(graph->blocks[i].block_pc == ISR_ADDR) {
+            states[i].flags |= STATIC_INT_EN_VAL;
+            states[i].cpu.int_en = false;
         }
         
         if(!graph->blocks[i].refcount) {
@@ -235,20 +246,26 @@ int staticCheck(asm_state_t* code) {
         for(int i = 0; i < block->block_loc;) {
             addr_t pc = block->block_pc + i;
             word_t opcode = code->rom[pc];
+            const instruction_t* instr = ilookup(opcode);
+            char buf[32];
+            instr->disassemble(instr, &state->cpu, pc, buf, sizeof(buf));
             
-            if(isRegWr(opcode, REG_SP)) {
+            if(instr->opcode == i_eint.opcode) {
+                state->flags |= STATIC_INT_EN_VAL;
+                state->cpu.int_en = true;
+            } else if(instr->opcode == i_dint.opcode) {
+                state->flags |= STATIC_INT_EN_VAL;
+                state->cpu.int_en = false;
+            } else if(isRegWr(opcode, REG_SP)) {
                 state->flags |= CTRL_BLOCK_WR_SP;
                 
                 if((state->flags & STATIC_INT_EN_VAL)) {
-                    if(state->cpu.int_in) {
-                        printf("Error: Interrupts cannot be enabled while writing SP!\n");
+                    if(state->cpu.int_en) {
+                        printf("Error at [%04X: %s]: Interrupts cannot be enabled while writing SP!\n", pc, buf);
                         failed = true;
                     }
                 } else {
-                    char buf[32];
-                    const instruction_t* instr = ilookup(opcode);
-                    instr->disassemble(instr, &state->cpu, pc, buf, sizeof(buf));
-                    printf("Warning: Cannot determine if interrupts are enabled at %04X: %s\n", pc, buf);
+                    printf("Warning at [%04X: %s]: Cannot determine if interrupts are enabled\n", pc, buf);
                 }
             }
             
