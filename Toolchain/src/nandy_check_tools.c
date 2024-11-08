@@ -180,10 +180,18 @@ void addBranchCtrlBlock(ctrl_graph_t* graph, addr_t origin_pc, addr_t target_pc)
     }
 #endif
 
+static bool isRegWr(word_t opcode, regid_t regid) {
+    const instruction_t* instr = ilookup(opcode);
+    return (instr->opcode == i_wr.opcode || instr->opcode == i_sw.opcode)
+        && (opcode & instr->opcode_mask) == (int) regid;
+}
+
 int staticCheck(asm_state_t* code) {
     #if DEBUG_PRINT_CTRL_GRAPH
         debugPrintCtrlGraph(code);
     #endif
+    
+    bool failed = false;
     
     ctrl_graph_t* graph = &code->ctrl_graph;
     static_state_t* states = malloc(graph->block_sz * sizeof(static_state_t));
@@ -207,27 +215,52 @@ int staticCheck(asm_state_t* code) {
         
         if(!graph->blocks[i].refcount) {
             queue[queue_sz++] = &states[i];
+            states[i].flags |= CTRL_BLOCK_QUEUED;
         }
     }
     
-    // while(queue_idx < queue_sz) {
-    //     static_state_t* state = queue[queue_idx++];
-    //     if(state->block->next_idx)
-    //         queue[queue_sz++] = &states[state->block->next_idx];
-    //     if(state->block->branch_idx)
-    //         queue[queue_sz++] = &states[state->block->branch_idx];
-    //     
-    //     for(int i = 0; i < state->block->block_loc;) {
-    //         addr_t pc = state->block->block_pc + i;
-    //         // const instruction_t* instr = ilookup(peek(&state->cpu, pc))
-    //         
-    //         
-    //         i += nbytes(peek(&state->cpu, pc));
-    //     }
-    // }
+    while(queue_idx < queue_sz) {
+        static_state_t* state = queue[queue_idx++];
+        ctrl_block_t* block = state->block;
+        
+        if(block->next_idx && !(states[block->next_idx].flags & CTRL_BLOCK_QUEUED)) {
+            queue[queue_sz++] = &states[block->next_idx];
+            states[block->next_idx].flags |= CTRL_BLOCK_QUEUED;
+        }
+        if(block->branch_idx && !(states[block->branch_idx].flags & CTRL_BLOCK_QUEUED)) {
+            queue[queue_sz++] = &states[block->branch_idx];
+            states[block->branch_idx].flags |= CTRL_BLOCK_QUEUED;
+        }
+        
+        for(int i = 0; i < block->block_loc;) {
+            addr_t pc = block->block_pc + i;
+            word_t opcode = code->rom[pc];
+            
+            if(isRegWr(opcode, REG_SP)) {
+                state->flags |= CTRL_BLOCK_WR_SP;
+                
+                if((state->flags & STATIC_INT_EN_VAL)) {
+                    if(state->cpu.int_in) {
+                        printf("Error: Interrupts cannot be enabled while writing SP!\n");
+                        failed = true;
+                    }
+                } else {
+                    char buf[32];
+                    const instruction_t* instr = ilookup(opcode);
+                    instr->disassemble(instr, &state->cpu, pc, buf, sizeof(buf));
+                    printf("Warning: Cannot determine if interrupts are enabled at %04X: %s\n", pc, buf);
+                }
+            }
+            
+            i += nbytes(peek(&state->cpu, pc));
+        }
+    }
     
     free(queue);
     free(states);
+    
+    if(failed)
+        return -8;
     
     return 0;
 }

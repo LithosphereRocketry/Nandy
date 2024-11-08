@@ -43,13 +43,6 @@ typedef struct ilist {
     const instruction_t** list;
 } ilist_t;
 
-typedef enum int_state {
-    // The default state upon init must be 0
-    INT_STATE_DISABLED = 0,
-    INT_STATE_ENABLED,
-    INT_STATE_UNKNOWN,
-} int_state_t;
-
 typedef struct ctrl_block {
     int refcount;
     

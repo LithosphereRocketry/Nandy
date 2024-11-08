@@ -25,12 +25,12 @@ typedef struct static_state {
     
     cpu_state_t cpu;
     enum {
-        STATIC_ACC_VAL    = 0x01,
-        STATIC_SP_VAL     = 0x02,
-        STATIC_DX_VAL     = 0x04,
-        STATIC_DY_VAL     = 0x08,
-        STATIC_INT_EN_VAL = 0x10,
+        CTRL_BLOCK_QUEUED = 0x01,
+        CTRL_BLOCK_WR_SP  = 0x02,
+        STATIC_INT_EN_VAL = 0x04,
     } flags;
+    
+    bool queued;
 } static_state_t;
 
 #endif
