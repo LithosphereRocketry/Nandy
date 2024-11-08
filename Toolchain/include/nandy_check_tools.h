@@ -27,14 +27,13 @@ typedef struct static_state {
     
     cpu_state_t cpu;
     enum {
-        CTRL_BLOCK_QUEUED = 0x01,
-        CTRL_BLOCK_WR_SP  = 0x02,
-        STATIC_INT_EN_VAL = 0x04,
+        STATIC_INT_EN_VAL = 0x01,
     } flags;
     
     enum {
         SP_INT_CHECK_FAIL = 0x01,
         SP_INT_CHECK_WARN = 0x02,
+        SP_INT_CHECK_MASK = 0x03,
     } results;
     
     int iters;

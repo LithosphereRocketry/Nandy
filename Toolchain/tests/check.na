@@ -1,12 +1,4 @@
-    eint
-loop:
-    j loop
-func:
-    ja
-@loc ISR
-    jcz cond
-    j done
-cond:
-    call func
-done:
-    jri
+idle:
+    j idle
+e:
+    wr sp

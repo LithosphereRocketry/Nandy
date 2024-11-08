@@ -104,6 +104,10 @@ int assemble(const char* str, asm_state_t* dest) {
     int asmstatus = assemble_helper(str, dest, true);
     addLabel(dest, strdup("FREE_MEM"), dest->ram_loc);
     if(asmstatus != 0) { return asmstatus; }; // TODO: memory leak
+    
+    updateNextCtrlLink(&dest->ctrl_graph, dest->rom_loc, 0);
+    addFloatingCtrlBlock(&dest->ctrl_graph, ISR_ADDR);
+    
     for(size_t i = 0; i < dest->unresolved_sz; i++) {
         if(!dest->unresolved[i].func(dest, 
             dest->unresolved[i].str,
@@ -113,9 +117,6 @@ int assemble(const char* str, asm_state_t* dest) {
             return -7;
         }
     }
-    
-    updateNextCtrlLink(&dest->ctrl_graph, dest->rom_loc, 0);
-    addFloatingCtrlBlock(&dest->ctrl_graph, ISR_ADDR);
     
     int checkstatus = staticCheck(dest);
     if (checkstatus != 0) { return checkstatus; }

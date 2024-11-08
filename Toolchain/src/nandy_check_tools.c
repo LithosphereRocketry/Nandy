@@ -194,6 +194,7 @@ static bool isRegWr(word_t opcode, regid_t regid) {
 
 static void staticCheckBlock(asm_state_t* code, static_state_t* state) {
     ctrl_block_t* block = state->block;
+    
     for(int i = 0; i < block->block_loc;) {
         addr_t pc = block->block_pc + i;
         word_t opcode = code->rom[pc];
@@ -206,8 +207,6 @@ static void staticCheckBlock(asm_state_t* code, static_state_t* state) {
             state->flags |= STATIC_INT_EN_VAL;
             state->cpu.int_en = false;
         } else if(isRegWr(opcode, REG_SP)) {
-            state->flags |= CTRL_BLOCK_WR_SP;
-            
             if((state->flags & STATIC_INT_EN_VAL)) {
                 if(state->cpu.int_en) {
                     state->results |= SP_INT_CHECK_FAIL;
@@ -258,20 +257,20 @@ int staticCheck(asm_state_t* code) {
     }
     
     for(size_t i = 1; i < graph->block_sz; i++) {
-        if(!graph->blocks[i].refcount) {
-            // Reset iter counts
-            for(size_t i = 1; i < graph->block_sz; i++) {
-                states[i].iters = 0;
-            }
-            
-            // Interrupts are disabled at the entry point and ISR
-            if(graph->blocks[i].block_pc == 0 || graph->blocks[i].block_pc == ISR_ADDR) {
-                states[i].flags |= STATIC_INT_EN_VAL;
-                states[i].cpu.int_en = false;
-            }
-            
-            staticCheckHelper(code, states, i, 0);
+        // Reset iter counts
+        for(size_t i = 1; i < graph->block_sz; i++) {
+            states[i].iters = 0;
         }
+        
+        // Interrupts are disabled at the entry point and ISR
+        if(graph->blocks[i].block_pc == 0 || graph->blocks[i].block_pc == ISR_ADDR) {
+            states[0].flags |= STATIC_INT_EN_VAL;
+            states[0].cpu.int_en = false;
+        } else {
+            states[0].flags = 0;
+        }
+        
+        staticCheckHelper(code, states, i, 0);
     }
     
     for(size_t i = 1; i < graph->block_sz; i++) {
