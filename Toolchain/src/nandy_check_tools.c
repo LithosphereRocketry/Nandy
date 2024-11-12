@@ -201,15 +201,15 @@ static void staticCheckBlock(asm_state_t* code, static_state_t* state) {
         const instruction_t* instr = ilookup(opcode);
         
         if(instr->opcode == i_eint.opcode) {
-            state->flags |= STATIC_INT_EN_VAL;
+            state->flags_values |= STATIC_INT_EN;
             state->cpu.int_en = true;
         } else if(instr->opcode == i_dint.opcode) {
-            state->flags |= STATIC_INT_EN_VAL;
+            state->flags_values |= STATIC_INT_EN;
             state->cpu.int_en = false;
         } else if(isRegWr(opcode, REG_SP)) {
-            if((state->flags & STATIC_INT_EN_CONFLICT)) {
+            if((state->flags_conflicts & STATIC_INT_EN)) {
                 state->results |= SP_INT_CHECK_CONFLICT;
-            } if((state->flags & STATIC_INT_EN_VAL)) {
+            } if((state->flags_values & STATIC_INT_EN)) {
                 if(state->cpu.int_en) {
                     state->results |= SP_INT_CHECK_FAIL;
                 }
@@ -225,13 +225,15 @@ static void staticCheckBlock(asm_state_t* code, static_state_t* state) {
 static void mergeStaticStates(static_state_t* child, static_state_t* parent) {
     if(parent == child) return;
     
-    if((parent->flags & STATIC_INT_EN_VAL)
-       && (child->flags & STATIC_INT_EN_VAL)
-       && (parent->cpu.int_en != child->cpu.int_en)) {
-        child->flags = parent->flags | STATIC_INT_EN_CONFLICT;
-    } else {
-        child->flags = parent->flags;
+    static_param_type_t possible_conflicts =
+            parent->flags_values & child->flags_values;
+    child->flags_conflicts = parent->flags_conflicts;
+    if((possible_conflicts & STATIC_INT_EN)
+        && (parent->cpu.int_en != child->cpu.int_en)) {
+        child->flags_conflicts |= STATIC_INT_EN;     
     }
+    
+    child->flags_values = parent->flags_values;
     memcpy(&child->cpu, &parent->cpu, sizeof(cpu_state_t));
 }
 
@@ -272,11 +274,12 @@ int staticCheck(asm_state_t* code) {
         
         // Interrupts are disabled at the entry point and ISR
         if(graph->blocks[i].block_pc == 0 || graph->blocks[i].block_pc == ISR_ADDR) {
-            states[0].flags |= STATIC_INT_EN_VAL;
+            states[0].flags_values |= STATIC_INT_EN;
             states[0].cpu.int_en = false;
         } else {
-            states[0].flags = 0;
+            states[0].flags_values = 0;
         }
+        states[0].flags_conflicts = 0;
         
         // If the reference count is 0, this is an entry point or a call we
         // can't analyze, so it should be treated as a fresh start; otherwise,

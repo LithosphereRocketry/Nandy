@@ -22,14 +22,17 @@ typedef enum ctrl_block_op {
     CTRL_BLOCK_INSERTED
 } ctrl_block_op_t;
 
+typedef enum static_param_type {
+    STATIC_INT_EN = 0x01
+} static_param_type_t;
+
 typedef struct static_state {
     ctrl_block_t* block;
     
     cpu_state_t cpu;
-    enum {
-        STATIC_INT_EN_VAL = 0x01,
-        STATIC_INT_EN_CONFLICT = 0x02,
-    } flags;
+    
+    static_param_type_t flags_values;
+    static_param_type_t flags_conflicts;
     
     enum {
         SP_INT_CHECK_FAIL = 0x01,
