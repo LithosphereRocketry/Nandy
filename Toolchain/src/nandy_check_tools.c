@@ -207,7 +207,9 @@ static void staticCheckBlock(asm_state_t* code, static_state_t* state) {
             state->flags |= STATIC_INT_EN_VAL;
             state->cpu.int_en = false;
         } else if(isRegWr(opcode, REG_SP)) {
-            if((state->flags & STATIC_INT_EN_VAL)) {
+            if((state->flags & STATIC_INT_EN_CONFLICT)) {
+                state->results |= SP_INT_CHECK_CONFLICT;
+            } if((state->flags & STATIC_INT_EN_VAL)) {
                 if(state->cpu.int_en) {
                     state->results |= SP_INT_CHECK_FAIL;
                 }
@@ -223,8 +225,14 @@ static void staticCheckBlock(asm_state_t* code, static_state_t* state) {
 static void mergeStaticStates(static_state_t* child, static_state_t* parent) {
     if(parent == child) return;
     
+    if((parent->flags & STATIC_INT_EN_VAL)
+       && (child->flags & STATIC_INT_EN_VAL)
+       && (parent->cpu.int_en != child->cpu.int_en)) {
+        child->flags = parent->flags | STATIC_INT_EN_CONFLICT;
+    } else {
+        child->flags = parent->flags;
+    }
     memcpy(&child->cpu, &parent->cpu, sizeof(cpu_state_t));
-    child->flags = parent->flags;
 }
 
 static void staticCheckHelper(asm_state_t* code, static_state_t* states, size_t idx, size_t parent_idx) {
@@ -270,11 +278,16 @@ int staticCheck(asm_state_t* code) {
             states[0].flags = 0;
         }
         
-        staticCheckHelper(code, states, i, 0);
+        // If the reference count is 0, this is an entry point or a call we
+        // can't analyze, so it should be treated as a fresh start; otherwise,
+        // it's reachable, so we can analyze it starting from other blocks
+        if(states[i].block->refcount == 0) staticCheckHelper(code, states, i, 0);
     }
     
     for(size_t i = 1; i < graph->block_sz; i++) {
-        if(states[i].results & SP_INT_CHECK_FAIL) {
+        if(states[i].results & SP_INT_CHECK_CONFLICT) {
+            printf("Error in block %ld: SP write accessible with inconsistent interrupt status!\n", i);
+        } else if(states[i].results & SP_INT_CHECK_FAIL) {
             printf("Error in block %ld: Interrupts cannot be enabled while writing SP!\n", i);
             failed = true;
         } else if (states[i].results & SP_INT_CHECK_WARN) {

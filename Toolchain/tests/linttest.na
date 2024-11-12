@@ -1,0 +1,9 @@
+    wr sp
+    eint
+    j later
+now:
+    dint
+
+later:
+    wr sp # this is always safe
+    j now
