@@ -1,4 +1,6 @@
+    rdi 0
     wr sp
+    rd dx
     eint
     j later
 now:

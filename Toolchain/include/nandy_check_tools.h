@@ -23,7 +23,11 @@ typedef enum ctrl_block_op {
 } ctrl_block_op_t;
 
 typedef enum static_param_type {
-    STATIC_INT_EN = 0x01
+    STATIC_INT_EN = 1<<0,
+    STATIC_ACC = 1<<1,
+    STATIC_SP = 1<<2,
+    STATIC_DX = 1<<3,
+    STATIC_DY = 1<<4
 } static_param_type_t;
 
 typedef struct static_state {

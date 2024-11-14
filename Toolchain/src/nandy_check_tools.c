@@ -186,10 +186,106 @@ void addBranchCtrlBlock(ctrl_graph_t* graph, addr_t origin_pc, addr_t target_pc)
     }
 #endif
 
-static bool isRegWr(word_t opcode, regid_t regid) {
-    const instruction_t* instr = ilookup(opcode);
-    return (instr->opcode == i_wr.opcode || instr->opcode == i_sw.opcode)
-        && (opcode & instr->opcode_mask) == (int) regid;
+// static bool isRegWr(word_t opcode, regid_t regid) {
+//     const instruction_t* instr = ilookup(opcode);
+//     return (instr->opcode == i_wr.opcode || instr->opcode == i_sw.opcode)
+//         && (opcode & instr->opcode_mask) == (int) regid;
+// }
+
+static bool regIsKnown(const static_state_t* state, regid_t reg) {
+    switch(reg) {
+        case REG_ACC: return state->flags_values & STATIC_ACC;
+        case REG_SP: return state->flags_values & STATIC_SP;
+        case REG_DX: return state->flags_values & STATIC_DX;
+        case REG_DY: return state->flags_values & STATIC_DY;
+        case REG_IO: return false;
+    }
+    return false; // unreachable unless you feed it garbage
+}
+
+static void regSetKnown(static_state_t* state, regid_t reg) {
+    switch(reg) {
+        case REG_ACC: state->flags_values |= STATIC_ACC; break;
+        case REG_SP: state->flags_values |= STATIC_SP; break;
+        case REG_DX: state->flags_values |= STATIC_DX; break;
+        case REG_DY: state->flags_values |= STATIC_DY; break;
+        case REG_IO: break;
+    }
+}
+static void regSetUnknown(static_state_t* state, regid_t reg) {
+    switch(reg) {
+        case REG_ACC: state->flags_values &= ~STATIC_ACC; break;
+        case REG_SP: state->flags_values &= ~STATIC_SP; break;
+        case REG_DX: state->flags_values &= ~STATIC_DX; break;
+        case REG_DY: state->flags_values &= ~STATIC_DY; break;
+        case REG_IO: break;
+    }
+}
+
+static void moveReg(static_state_t* state, regid_t src, regid_t dst) {
+    printf("%s -> %s\n", regnames[src][0], regnames[dst][0]);
+    if(regIsKnown(state, src)) {
+        regSetKnown(state, dst);
+        word_t value;
+        switch(src) {
+            case REG_ACC: value = state->cpu.acc; break;
+            case REG_SP: value = state->cpu.sp; break;
+            case REG_DX: value = state->cpu.dx; break;
+            case REG_DY: value = state->cpu.dy; break;
+            case REG_IO: default: value = 0; break;
+        }
+        switch(dst) {
+            case REG_ACC: state->cpu.acc = value; break;
+            case REG_SP: state->cpu.sp = value; break;
+            case REG_DX: state->cpu.dx = value; break;
+            case REG_DY: state->cpu.dy = value; break;
+            case REG_IO: break;
+        }
+    } else regSetUnknown(state, dst);
+}
+
+static void swapReg(static_state_t* state, regid_t src, regid_t dst) {
+    bool srcKnown = regIsKnown(state, src);
+    word_t srcValue;
+    switch(src) {
+        case REG_ACC: srcValue = state->cpu.acc; break;
+        case REG_SP: srcValue = state->cpu.sp; break;
+        case REG_DX: srcValue = state->cpu.dx; break;
+        case REG_DY: srcValue = state->cpu.dy; break;
+        case REG_IO: default: srcValue = 0; break;
+    }
+
+    bool dstKnown = regIsKnown(state, dst);
+    word_t dstValue;
+    switch(dst) {
+        case REG_ACC: dstValue = state->cpu.acc; break;
+        case REG_SP: dstValue = state->cpu.sp; break;
+        case REG_DX: dstValue = state->cpu.dx; break;
+        case REG_DY: dstValue = state->cpu.dy; break;
+        case REG_IO: default: dstValue = 0; break;
+    }
+
+    if(srcKnown) {
+        regSetKnown(state, dst);
+        switch(dst) {
+            case REG_ACC: state->cpu.acc = srcValue; break;
+            case REG_SP: state->cpu.sp = srcValue; break;
+            case REG_DX: state->cpu.dx = srcValue; break;
+            case REG_DY: state->cpu.dy = srcValue; break;
+            case REG_IO: break;
+        }
+    } else regSetUnknown(state, dst);
+
+    if(dstKnown) {
+        regSetKnown(state, src);
+        switch(src) {
+            case REG_ACC: state->cpu.acc = dstValue; break;
+            case REG_SP: state->cpu.sp = dstValue; break;
+            case REG_DX: state->cpu.dx = dstValue; break;
+            case REG_DY: state->cpu.dy = dstValue; break;
+            case REG_IO: break;
+        }
+    } else regSetUnknown(state, src);
 }
 
 static void staticCheckBlock(asm_state_t* code, static_state_t* state) {
@@ -200,16 +296,26 @@ static void staticCheckBlock(asm_state_t* code, static_state_t* state) {
         word_t opcode = code->rom[pc];
         const instruction_t* instr = ilookup(opcode);
         
-        if(instr->opcode == i_eint.opcode) {
+        if(instr == &i_eint) {
             state->flags_values |= STATIC_INT_EN;
             state->cpu.int_en = true;
-        } else if(instr->opcode == i_dint.opcode) {
+        } else if(instr == &i_dint) {
             state->flags_values |= STATIC_INT_EN;
             state->cpu.int_en = false;
-        } else if(isRegWr(opcode, REG_SP)) {
-            if((state->flags_conflicts & STATIC_INT_EN)) {
-                state->results |= SP_INT_CHECK_CONFLICT;
-            } if((state->flags_values & STATIC_INT_EN)) {
+        } else if(instr == &i_rdi) {
+            state->cpu.acc = code->rom[pc+1];
+            state->flags_values |= STATIC_ACC;
+        } else if(instr == &i_rd) {
+            moveReg(state, opcode & i_rd.opcode_mask, REG_ACC);
+        } else if(instr == &i_wr) {
+            moveReg(state, REG_ACC, opcode & i_wr.opcode_mask);
+        } else if(instr == &i_sw) {
+            swapReg(state, opcode & i_sw.opcode_mask, REG_ACC);
+        }
+        // TODO: basically every instruction deletes ACC
+
+        if(!(state->flags_values & STATIC_SP)) {
+            if(state->flags_values & STATIC_INT_EN) {
                 if(state->cpu.int_en) {
                     state->results |= SP_INT_CHECK_FAIL;
                 }
@@ -217,6 +323,17 @@ static void staticCheckBlock(asm_state_t* code, static_state_t* state) {
                 state->results |= SP_INT_CHECK_WARN;
             }
         }
+        // } else if(isRegWr(opcode, REG_SP)) {
+        //     if((state->flags_conflicts & STATIC_INT_EN)) {
+        //         state->results |= SP_INT_CHECK_CONFLICT;
+        //     } if((state->flags_values & STATIC_INT_EN)) {
+        //         if(state->cpu.int_en) {
+        //             state->results |= SP_INT_CHECK_FAIL;
+        //         }
+        //     } else {
+        //         state->results |= SP_INT_CHECK_WARN;
+        //     }
+        // }
         
         i += nbytes(peek(&state->cpu, pc));
     }
@@ -289,9 +406,10 @@ int staticCheck(asm_state_t* code) {
     
     for(size_t i = 1; i < graph->block_sz; i++) {
         if(states[i].results & SP_INT_CHECK_CONFLICT) {
+            // currently not enabled
             printf("Error in block %ld: SP write accessible with inconsistent interrupt status!\n", i);
         } else if(states[i].results & SP_INT_CHECK_FAIL) {
-            printf("Error in block %ld: Interrupts cannot be enabled while writing SP!\n", i);
+            printf("Error in block %ld: Interrupts cannot be enabled while value of SP is unknown\n", i);
             failed = true;
         } else if (states[i].results & SP_INT_CHECK_WARN) {
            printf("Warning in block %ld: Cannot determine whether interrupts are enabled\n", i);
