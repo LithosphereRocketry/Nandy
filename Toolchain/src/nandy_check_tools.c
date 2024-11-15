@@ -223,7 +223,6 @@ static void regSetUnknown(static_state_t* state, regid_t reg) {
 }
 
 static void moveReg(static_state_t* state, regid_t src, regid_t dst) {
-    printf("%s -> %s\n", regnames[src][0], regnames[dst][0]);
     if(regIsKnown(state, src)) {
         regSetKnown(state, dst);
         word_t value;
@@ -288,8 +287,10 @@ static void swapReg(static_state_t* state, regid_t src, regid_t dst) {
     } else regSetUnknown(state, src);
 }
 
-static void staticCheckBlock(asm_state_t* code, static_state_t* state) {
+static bool staticCheckBlock(asm_state_t* code, static_state_t* state, addr_t* deduced_jump) {
     ctrl_block_t* block = state->block;
+
+    bool is_deduced = false;
     
     for(int i = 0; i < block->block_loc;) {
         addr_t pc = block->block_pc + i;
@@ -311,6 +312,11 @@ static void staticCheckBlock(asm_state_t* code, static_state_t* state) {
             moveReg(state, REG_ACC, opcode & i_wr.opcode_mask);
         } else if(instr == &i_sw) {
             swapReg(state, opcode & i_sw.opcode_mask, REG_ACC);
+        } else if(instr == &i_jar || instr == &i_ja || instr == &i_jri) {
+            if(regIsKnown(state, REG_DX) && regIsKnown(state, REG_DY)) {
+                is_deduced = true;
+                *deduced_jump = ((addr_t) state->cpu.dy) << 8 | state->cpu.dx;
+            }
         }
         // TODO: basically every instruction deletes ACC
 
@@ -337,6 +343,8 @@ static void staticCheckBlock(asm_state_t* code, static_state_t* state) {
         
         i += nbytes(peek(&state->cpu, pc));
     }
+
+    return is_deduced;
 }
 
 static void mergeStaticStates(static_state_t* child, static_state_t* parent) {
@@ -362,7 +370,23 @@ static void staticCheckHelper(asm_state_t* code, static_state_t* states, size_t 
     
     mergeStaticStates(&states[idx], &states[parent_idx]);
     
-    staticCheckBlock(code, state);
+    addr_t deduced_jump_addr;
+    // If this returns true, we deduced an absolute jump via static analysis and
+    // should continue to that instead of our next block
+    if(staticCheckBlock(code, state, &deduced_jump_addr)) {
+        size_t new_next = findCtrlBlockSlot(&code->ctrl_graph, deduced_jump_addr);
+        if(states[new_next].block->block_pc == deduced_jump_addr) {
+            staticCheckHelper(code, states, new_next, idx);
+            return;
+            // We're making the assumption here that a deduced static jump means
+            // we aren't branching
+        } else {
+            printf("Warning: ignored a static branch that didn't match the "
+                   "control graph (%04hx)\n", deduced_jump_addr);
+        }
+        // If either we didn't deduce a static jump, or our static jump isn't an
+        // existing control block, fall through
+    }
     staticCheckHelper(code, states, state->block->next_idx, idx);
     staticCheckHelper(code, states, state->block->branch_idx, idx);
 }

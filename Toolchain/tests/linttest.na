@@ -2,10 +2,11 @@
     wr sp
     rd dx
     eint
-    j later
-now:
+    call func
     dint
+    brk
 
-later:
-    wr sp # this is always safe
-    j now
+func:
+    # ...
+    wr sp
+    ja
