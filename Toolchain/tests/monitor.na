@@ -1,0 +1,94 @@
+    rdi 0
+    wr sp
+    ioa 0
+
+    rdi 7
+    rda io_locals
+    stra 0
+    stra 1
+
+    eint
+loop:
+    rda io_locals
+    dint
+    isp -1
+    
+    lda 1 # tail
+    strs 0
+    lda 0 # head
+    wr x
+    lds 0
+    sub x
+    nzero
+    jcz buffer_empty
+    
+    rdi inputbuf>>8
+    wr y
+    lda 0
+    wr io
+ 
+    rd x
+    addi 0
+    andi 0xF
+    rda io_locals
+    brk
+    stra 0
+
+buffer_empty:
+    isp 1
+    eint
+    j loop
+
+
+@loc ISR
+    isp -5
+    strs 0
+    rd x
+    strs 1
+    rd y
+    strs 2
+    rd io
+    strs 3
+
+    rda io_locals
+    lda 0 # head
+    strs 4
+    lda 1 # tail
+    wr x 
+    lds 4
+    # head in acc, tail in x
+
+    sub x # if head - tail == 0xF, buffer is full
+    subi 0xF
+    nzero
+    jcz eat_input
+    
+    rdi inputbuf>>8
+    wr y
+    lds 3
+    stra 0
+    
+    rd x
+    addi 1
+    andi 0xF
+    rda io_locals
+    stra 1
+
+eat_input:
+
+    lds 2
+    wr x
+    lds 1
+    wr y
+    lds 0
+    isp 5
+    jri
+    
+
+
+@memalign 0x100
+@static inputbuf 0x10
+
+@static io_locals 0x10
+# 0 : input head
+# 1 : input tail

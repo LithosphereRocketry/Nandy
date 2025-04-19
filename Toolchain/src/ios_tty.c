@@ -12,7 +12,7 @@ bool io_step_tty(cpu_state_t* cpu, bool active) {
         putc(cpu->ioout, tty_outstream);
         fflush(tty_outstream);
     }
-    if(stdinAvail() && cpu->elapsed - lastIOcycle > COOLDOWN) {
+    if(!interrupt && stdinAvail() && cpu->elapsed - lastIOcycle > COOLDOWN) {
         incoming = getc(stdin);
         interrupt = true;
         lastIOcycle = cpu->elapsed;

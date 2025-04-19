@@ -86,7 +86,7 @@ static const char* asm_macro_loc(const instruction_t* instr, const char* text, a
                         value, text, state->rom_loc);
             }
         } else {
-            if(debug) fprintf(debug, "Assertion failed (%s)\n", text);
+            if(debug) fprintf(debug, "Value %x (%s) outside valid address range\n", value, text);
         }
     } else {
         if(debug) fprintf(debug, "Parse failed: %i\n", status);
@@ -97,6 +97,30 @@ static const char* asm_macro_loc(const instruction_t* instr, const char* text, a
 const instruction_t i_macro_loc = {
     .mnemonic = "@loc",
     .assemble = asm_macro_loc
+};
+
+static const char* asm_macro_align(const instruction_t* instr, const char* text, asm_state_t* state) {
+    FILE* debug = stdout;
+    int64_t value;
+    char* arg = strndup(text, endOfInput(text)-text);
+    shunting_status_t status = parseExp(&state->resolved, arg, &value, debug);
+    if(status == SHUNT_DONE) {
+        if(isBounded(value, 16, BOUND_UNSIGNED)) {
+            state->rom_loc = ((state->rom_loc + value - 1) / value) * value;
+            free(arg);
+            return endOfInput(text);
+        } else {
+            if(debug) fprintf(debug, "Value %x (%s) outside valid address range\n", value, text);
+        }
+    } else {
+        if(debug) fprintf(debug, "Parse failed: %i\n", status);
+    }
+    free(arg);
+    return NULL;
+}
+const instruction_t i_macro_align = {
+    .mnemonic = "@align",
+    .assemble = asm_macro_align
 };
 
 static const char* asm_macro_memloc(const instruction_t* instr, const char* text, asm_state_t* state) {
@@ -113,20 +137,44 @@ static const char* asm_macro_memloc(const instruction_t* instr, const char* text
             } else {
                 if(debug) fprintf(debug, "Memory location 0x%lx (%s) is before current address %i\n",
                         value, arg, state->ram_loc);
-                return NULL;
             }
         } else {
-            if(debug) fprintf(debug, "Assertion failed (%s)\n", text);
-            return NULL;
+            if(debug) fprintf(debug, "Value %x (%s) outside valid address range\n", value, text);
         }
     } else {
         if(debug) fprintf(debug, "Parse failed: %i\n", status);
-        return NULL;
     }
+    free(arg);
+    return NULL;
 }
 const instruction_t i_macro_memloc = {
     .mnemonic = "@memloc",
     .assemble = asm_macro_memloc
+};
+
+static const char* asm_macro_memalign(const instruction_t* instr, const char* text, asm_state_t* state) {
+    FILE* debug = stdout;
+    int64_t value;
+    const char* end = endOfInput(text);
+    char* arg = strndup(text, end-text);
+    shunting_status_t status = parseExp(&state->resolved, arg, &value, debug);
+    if(status == SHUNT_DONE) {
+        if(isBounded(value, 16, BOUND_UNSIGNED)) {
+            state->rom_loc = ((state->rom_loc + value - 1) / value) * value;
+            free(arg);
+            return endOfInput(text);
+        } else {
+            if(debug) fprintf(debug, "Value %x (%s) outside valid address range\n", value, text);
+        }
+    } else {
+        if(debug) fprintf(debug, "Parse failed: %i\n", status);
+    }
+    free(arg);
+    return NULL;
+}
+const instruction_t i_macro_memalign = {
+    .mnemonic = "@memalign",
+    .assemble = asm_macro_memalign
 };
 
 static const char* asm_macro_static(const instruction_t* instr, const char* text, asm_state_t* state) {
