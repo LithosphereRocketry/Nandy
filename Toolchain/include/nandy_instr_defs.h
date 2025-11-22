@@ -8,15 +8,15 @@ extern const instruction_t i_macro_echo, i_macro_define, i_macro_assert;
 extern const instruction_t i_macro_loc, i_macro_memloc, i_macro_static;
 extern const instruction_t i_macro_string; // align, memalign, include
 // temp macros
-extern const instruction_t i_rda, i_call, i_goto, i_move; 
+extern const instruction_t i__isp, i_isp, i_rda, i_call, i_goto, i_move, i_pusha;
 // register
 extern const instruction_t i_nop, i_rd, i_wr, i_sw;
 // jump
 extern const instruction_t i_ja, i_jar, i_jri, i_j, i_jcz;
 // flags
-extern const instruction_t i_brk, i_bell, i_csset, i_csclr, i_dint, i_eint, i_iclr, i_iset;
+extern const instruction_t i_brk, i_bell, i_csset, i_csclr, i_dint, i_eint, i_iclr, i_iset, i_ioa;
 // regbit
-extern const instruction_t i_or, i_and, i_xor;
+extern const instruction_t i_ipoll, i_or, i_and, i_xor;
 // regadd
 extern const instruction_t i__add, i__addc, i__sub, i__subc;
 extern const instruction_t i_add, i_addc, i_sub, i_subc;
@@ -31,6 +31,6 @@ extern const instruction_t i_rdi, i_ori, i_andi, i_xori;
 extern const instruction_t i__addi, i__addci, i__subi, i__subci;
 extern const instruction_t i_addi, i_addci, i_subi, i_subci;
 // memory
-extern const instruction_t i__isp, i_isp, i_lda, i_lds, i_stra, i_strs;
+extern const instruction_t i_lda, i_lds, i_stra, i_strs;
 
 #endif

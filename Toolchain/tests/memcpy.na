@@ -1,0 +1,51 @@
+    rdi 0
+    wr sp
+    pusha data
+    # ioa 0
+    call puts
+    brk
+
+puts:
+    # prologue
+    _isp -2
+    rd dx
+    strs 0
+    rd dy
+    strs 1
+
+    # get head of string in (y, x)
+    lds 2
+    wr dx
+    lds 3
+    wr dy
+
+    # put string to console
+puts_loop:
+    lda 0
+    nzero
+    jcz puts_done
+    wr io
+    rd x
+    addi 1
+    wr x
+    rd y
+    addci 0
+    wr y
+    j puts_loop
+
+puts_done:
+    # epilogue
+    lds 1
+    wr dy
+    lds 0
+    wr dx
+    ja
+
+    nop
+    nop
+    nop
+    nop
+
+data:
+    @string "I realized, the moment I fell into the fissure, that the book would not be destroyed as I had planned. It continued falling into that starry expanse of which I had only a fleeting glimpse. I have tried to speculate where it might have landed, but I must admit, however— such conjecture is futile. Still, the question of whose hands might someday hold my Myst book are unsettling to me. I know that my apprehensions might never be allayed, and so I close, realizing that perhaps, the ending has not yet been written."
+enddata:

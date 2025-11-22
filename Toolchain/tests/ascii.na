@@ -41,7 +41,6 @@ mul10_8:
     j done
 is_numeral:
     addi -38 # '0' - '\n'
- #   brk
     strs 2
     rd x
     call mul10_8

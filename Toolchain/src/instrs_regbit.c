@@ -2,6 +2,19 @@
 #include "nandy_parse_tools.h"
 #include <stdio.h>
 
+static void exe_ipoll(cpu_state_t* cpu) {
+    cpu->acc = cpu->ints_in;
+    cpu->pc ++; cpu->elapsed ++;
+}
+const instruction_t i_ipoll = {
+    .mnemonic = "ipoll",
+    .opcode_mask = XY_MASK,
+    .opcode = ALU_SEL_MASK | ALU_B,
+    .assemble = asm_basic,
+    .disassemble = dis_basic,
+    .execute = exe_ipoll
+};
+
 static void exe_or(cpu_state_t* cpu) {
     cpu->acc |= getALUReg(cpu);
     cpu->pc ++; cpu->elapsed ++;

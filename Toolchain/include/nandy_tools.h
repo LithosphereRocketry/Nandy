@@ -23,7 +23,8 @@ typedef struct cpu_state {
     size_t elapsed;
     addr_t pc;
     word_t acc, sp, dx, dy, irx, iry, ioin, ioout, ioaddr;
-    bool cycle, carry, int_en, int_active, int_in, io_rd, io_wr, idbg, cs;
+    bool cycle, carry, int_en, int_active, io_rd, io_wr, idbg, cs;
+    word_t ints_in;
     word_t rom[ROM_SIZE];
     word_t ram[RAM_SIZE];
 } cpu_state_t;
@@ -57,6 +58,8 @@ typedef struct asm_state {
     size_t unresolved_cap;
     unresolved_t* unresolved;
 } asm_state_t;
+
+const char* instr_assemble(const instruction_t* instr, const char* text, asm_state_t* state);
 
 extern const asm_state_t INIT_ASM;
 void asm_state_destroy(asm_state_t* state);

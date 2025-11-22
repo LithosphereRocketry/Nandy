@@ -23,6 +23,10 @@ const asm_state_t INIT_ASM = {
     .unresolved = NULL
 };
 
+const char* instr_assemble(const instruction_t* instr, const char* text, asm_state_t* state) {
+    return instr->assemble(instr, text, state);
+}
+
 void asm_state_destroy(asm_state_t* state) {
     symtab_destroy(&state->resolved);
     if(state->unresolved) {

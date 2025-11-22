@@ -4,6 +4,7 @@
 
 #include "nandy_instructions.h"
 #include "stdin_avail.h"
+#include "nandy_ios.h"
 
 
 const instruction_t* ilookup(word_t word) {
@@ -25,22 +26,20 @@ const instruction_t* ilookup(word_t word) {
     return cache[(unsigned char) word];
 }
 
-// Devices after 8 in this order won't get interrupt channels
-static const iorange_t iomap[] = {
-    {0, 1, io_step_intcontrol}
-};
-static const size_t n_ios = sizeof(iomap) / sizeof(iorange_t);
-static word_t ioints;
-
 bool io_step_intcontrol(cpu_state_t* cpu, bool active) {
-    if(active && cpu->io_rd) { cpu->ioin = ioints; }
+    if(active && cpu->io_rd) { cpu->ioin = cpu->ints_in; }
     return false;
 }
 
+// Devices after 8 in this order won't get interrupt channels
+static const iorange_t iomap[] = {
+    {0x00, 8, io_step_tty},
+};
+static const size_t n_ios = sizeof(iomap) / sizeof(iorange_t);
+
 // TODO: more flexibility
 #define COOLDOWN (1000000 / 1200)
-bool emu_step(cpu_state_t* state, FILE* outstream, iorange_t* iomap, size_t n_io) {
-    static size_t lastIOcycle = 0;
+bool emu_step(cpu_state_t* state, FILE* outstream/*, iorange_t* iomap, size_t n_ios*/) {
     // instruction execute phase (up clock)
     state->io_rd = false;
     state->io_wr = false;
@@ -51,34 +50,20 @@ bool emu_step(cpu_state_t* state, FILE* outstream, iorange_t* iomap, size_t n_io
     }
     instr->execute(state);
 
-    for(size_t i = 0; i < n_io; i++) {
+    for(size_t i = 0; i < n_ios; i++) {
         bool inbounds = (state->ioaddr >= iomap[i].base 
-                       & state->ioaddr < iomap[i].base + iomap[i].bound);
+                      && state->ioaddr < iomap[i].base + iomap[i].bound);
         bool interrupt = iomap[i].operation(state, inbounds);
-        if(i >= 0 && i < 9) {
-            
+        if(i < 8) {
+            if(interrupt) {
+                state->ints_in |= 1 << i;
+            } else {
+                state->ints_in &= ~(1 << i);
+            }
         }
     }
     
-
-    // I/O phase (down clock)
-    // TODO: this whole block should really be modularized
-    if(state->io_rd) {
-        // Experimenting with a new method of interrupt handling here
-        state->int_in = false;
-    }
-    if(state->io_wr) {
-        putc(state->ioout, outstream);
-    }
-    if(state->elapsed - lastIOcycle > COOLDOWN) {
-        if(stdinAvail()) {
-            state->ioin = getc(stdin);
-            state->int_in = true;
-        }
-        lastIOcycle = state->elapsed;
-    }
-    // End of I/O block
-    if(state->int_en && state->int_in && !state->int_active) {
+    if(state->int_en && state->ints_in && !state->int_active) {
         state->irx = state->pc & 0xFF;
         state->iry = (state->pc >> 8) & 0xFF;
         state->pc = ISR_ADDR;

@@ -1,6 +1,7 @@
     rdi 0
     wr sp
     rda hellostr
+    ioa 0
 loop:
     lda 0
     nzero

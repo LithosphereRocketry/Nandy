@@ -3,6 +3,6 @@
 
 #include "nandy_emu_tools.h"
 
-bool io_step_tty(cpu_state_t* cpu);
+bool io_step_tty(cpu_state_t* cpu, bool active);
 
 #endif
