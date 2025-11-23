@@ -1,9 +1,76 @@
     rdi 0
     wr sp
+    eint
+    pusha enddata-data
     pusha data
-    # ioa 0
+    pusha buffer
+    call memcpy
+    _isp 6
+    pusha buffer
+    ioa 0
     call puts
     brk
+
+# dest, src, size
+memcpy:
+    _isp -2
+    rd dx
+    strs 0
+    rd dy
+    strs 1
+
+memcpy_loop:
+    lds 7
+    zero
+    jcz memcpy_byte
+    lds 6
+    zero
+    jcz memcpy_byte
+
+    # if we fall through, then size is 0 and we exit
+    lds 1
+    wr dy
+    lds 0
+    wr dx
+    _isp 2
+    ja
+    
+memcpy_byte:
+    # decrement size
+    lds 6
+    subi 1
+    strs 6
+    lds 7
+    subci 0
+    strs 7
+
+    # copy byte
+    lds 4
+    wr x
+    lds 5
+    wr y
+    lda 0
+    wr y
+    lds 2
+    wr x
+    lds 3
+    sw y
+    stra 0
+
+    # increment pointers
+    rd x
+    addi 1
+    strs 2
+    rd y
+    addci 0
+    strs 3
+    lds 4
+    addi 1
+    strs 4
+    lds 5
+    addci 0
+    strs 5
+    j memcpy_loop
 
 puts:
     # prologue
@@ -41,11 +108,11 @@ puts_done:
     wr dx
     ja
 
-    nop
-    nop
-    nop
-    nop
-
 data:
-    @string "I realized, the moment I fell into the fissure, that the book would not be destroyed as I had planned. It continued falling into that starry expanse of which I had only a fleeting glimpse. I have tried to speculate where it might have landed, but I must admit, however— such conjecture is futile. Still, the question of whose hands might someday hold my Myst book are unsettling to me. I know that my apprehensions might never be allayed, and so I close, realizing that perhaps, the ending has not yet been written."
+    @string "I realized, the moment I fell into the fissure, that the book would not be destroyed as I had planned. It continued falling into that starry expanse of which I had only a fleeting glimpse. I have tried to speculate where it might have landed, but I must admit, however— such conjecture is futile. Still, the question of whose hands might someday hold my Myst book are unsettling to me. I know that my apprehensions might never be allayed, and so I close, realizing that perhaps, the ending has not yet been written.\n"
 enddata:
+
+@static buffer 4096
+
+@loc ISR
+    jri

@@ -1,0 +1,124 @@
+memcpy_loop:
+    # if size is > 16, move 16 bytes at a time using memcpy_blk16
+    lds 7 # size>>8
+    zero
+    jcz memcpy_blk16
+    lds 6 # size
+    # This might be possible to make into a too-clever-by-half use of `add`
+    zero
+    jcz memcpy_end
+    andi 0xF0
+    zero
+    jcz memcpy_blk16
+
+
+memcpy_blk16:
+    # set up non-interrupt xy with source address
+    lds 5
+    wr y
+    lds 4
+    wr x
+    # set up interrupt xy with destination address
+    # note we have to keep switching here to get access to the non-int stack -
+    # potential design implications? I think having separate stacks is still
+    # probably worth it
+    dint
+    lds 3
+    iset
+    wr y
+    iclr
+    lds 2
+    iset
+    wr x
+    iclr
+    
+    # copy 16 bytes at a time
+    lda 0
+    iset
+    stra 0
+    iclr
+    lda 1
+    iset
+    stra 1
+    iclr
+    lda 2
+    iset
+    stra 2
+    iclr
+    lda 3
+    iset
+    stra 3
+    iclr
+    lda 4
+    iset
+    stra 4
+    iclr
+    lda 5
+    iset
+    stra 5
+    iclr
+    lda 6
+    iset
+    stra 6
+    iclr
+    lda 7
+    iset
+    stra 7
+    iclr
+    lda 8
+    iset
+    stra 8
+    iclr
+    lda 9
+    iset
+    stra 9
+    iclr
+    lda 10
+    iset
+    stra 10
+    iclr
+    lda 11
+    iset
+    stra 11
+    iclr
+    lda 12
+    iset
+    stra 12
+    iclr
+    lda 13
+    iset
+    stra 13
+    iclr
+    lda 14
+    iset
+    stra 14
+    iclr
+    lda 15
+    iset
+    stra 15
+    iclr
+    eint
+
+    # increment pointers
+    lds 2
+    addi 16    
+    strs 2
+    lds 3
+    addci 0
+    strs 3
+
+    lds 4
+    addi 16    
+    strs 4
+    lds 5
+    addci 0
+    strs 5
+
+    lds 6
+    addi 16    
+    strs 6
+    lds 7
+    addci 0
+    strs 7
+
+    j memcpy_loop

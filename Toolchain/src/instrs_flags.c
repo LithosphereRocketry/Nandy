@@ -109,6 +109,7 @@ const instruction_t i_iset = {
 
 static void exe_ioa(cpu_state_t* cpu) {
     cpu->ioaddr = peek(cpu, cpu->pc) & IMM5_MASK;
+    cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i_ioa = {
     .mnemonic = "ioa",
