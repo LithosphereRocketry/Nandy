@@ -18,7 +18,7 @@ Stops program execution. In emulation, exits to the debugger interface.
 Plays an audible alert tone.
 ##### `eint`, `dint`
 Enables or disables interrupts, respectively.
-##### `iset`, `iclr`
+##### [currently disabled] `iset`, `iclr`
 Sets or clears interrupt status, respectively. Does not trigger an interrupt;
 behavior is undefined while external interrupts are enabled.
 ##### `j <label>`
@@ -81,13 +81,13 @@ high bits, respecitvely.
 ##### `and <dx/dy>`
 Bitwise-ands the contents of the accumulator with the specified register and
 stores the results in the accumulator.
-##### `nand <dx/dy>`
-Bitwise-nands the contents of the accumulator with the specified register and
-stores the results in the accumulator.
 ##### `or <dx/dy>`
 Bitwise-ors the contents of the accumulator with the specified register and
 stores the results in the accumulator.
-##### `andi`, `nandi`, `ori`
+##### `xor <dx/dy>`
+Bitwise-xors the contents of the accumulator with the specified register and
+stores the results in the accumulator.
+##### `andi`, `ori`, `xori`
 Identical to their respective non-`i` variants, but use the provided immediate
 value in place of the DX or DY register.
 
@@ -111,12 +111,6 @@ Identical to their respective non-underscore variants, but do not modify the
 carry bit.
 
 ### Memory
-#### Stack pointer
-##### `isp`
-Increments the stack pointer by the provided signed 4-bit value, and sets the
-carry bit to the carry-out value of the addition or subtraction.
-##### `_isp`
-Identical to `isp` but does not set the carry bit.
 #### Loads
 ##### `lda <offset>`
 Loads the value at the combined address stored in DY and DX plus the specified

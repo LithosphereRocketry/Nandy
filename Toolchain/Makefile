@@ -51,13 +51,13 @@ $(RKT_TARGETS): %: $(SRCDIR)%.rkt $(SRCDIR)*.rkt
 # - Require its corresponding object and all of the dependency objects to be up to date
 # - Throw everything to the system's default C++ compiler
 $(TARGETS): %: $(OBJDIR)%.o $(DEPOBJ)
-	$(CXX) -o $@ $< $(DEPOBJ)
+	$(CC) -o $@ $< $(DEPOBJ)
 
 # To build an object:
 # - require its .cpp file to be up to date, all includes to be up to date, and the OBJDIR folder to exist
 # - Throw it and the includes to default C++ compiler
 $(OBJDIR)%.o: $(SRCDIR)%.cpp $(INC) | $(OBJDIR)
-	$(CXX) -I$(INCDIR) -c $< -o $@
+	$(CC) -I$(INCDIR) -c $< -o $@
 
 # If the above rule fails, see if it has a .c file we can use instead of .cpp
 $(OBJDIR)%.o: $(SRCDIR)%.c $(INC) | $(OBJDIR)

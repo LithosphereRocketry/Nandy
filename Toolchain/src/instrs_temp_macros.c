@@ -106,27 +106,27 @@ const instruction_t i_isp = {
     .assemble = asm_isp
 };
 
-static const char* asm__iisp(const instruction_t* instr, const char* text, asm_state_t* state) {
-    instr_assemble(&i_dint, "", state);
-    text = i__isp.assemble(&i__isp, text, state);
-    instr_assemble(&i_eint, "", state);
-    return text;
-}
-const instruction_t i__iisp = {
-    .mnemonic = "_iisp",
-    .assemble = asm__iisp,
-};
+// static const char* asm__iisp(const instruction_t* instr, const char* text, asm_state_t* state) {
+//     instr_assemble(&i_dint, "", state);
+//     text = i__isp.assemble(&i__isp, text, state);
+//     instr_assemble(&i_eint, "", state);
+//     return text;
+// }
+// const instruction_t i__iisp = {
+//     .mnemonic = "_iisp",
+//     .assemble = asm__iisp,
+// };
 
-static const char* asm_iisp(const instruction_t* instr, const char* text, asm_state_t* state) {
-    instr_assemble(&i_dint, "", state);
-    text = instr_assemble(&i_isp, text, state);
-    instr_assemble(&i_eint, "", state);
-    return text;
-}
-const instruction_t i_iisp = {
-    .mnemonic = "iisp",
-    .assemble = asm_iisp,
-};
+// static const char* asm_iisp(const instruction_t* instr, const char* text, asm_state_t* state) {
+//     instr_assemble(&i_dint, "", state);
+//     text = instr_assemble(&i_isp, text, state);
+//     instr_assemble(&i_eint, "", state);
+//     return text;
+// }
+// const instruction_t i_iisp = {
+//     .mnemonic = "iisp",
+//     .assemble = asm_iisp,
+// };
 
 // This is a fairly wasteful implementation but at this point saving effort is
 // a lot more important than saving bytes

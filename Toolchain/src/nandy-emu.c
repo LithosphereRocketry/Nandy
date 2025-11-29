@@ -2,25 +2,12 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "argparse.h"
 #include "shuntingyard.h"
 #include "nandy_emu_tools.h"
 #include "nandy_instr_defs.h"
 #include "nandy_parse_tools.h"
 #include "micros.h"
-
-argument_t arg_debug = { .abbr = 'g', .name = "debug", .hasval = false };
-argument_t arg_forcedebug = { .abbr = 'G', .name = "force-debug", .hasval = false };
-argument_t arg_out = { .abbr = 'o', .name = "out", .hasval = true };
-argument_t arg_timeacc = { .abbr = 't', .name = "time-accurate", .hasval = false };
-
-argument_t* args[] = {
-    &arg_debug,
-    &arg_forcedebug,
-    &arg_out,
-    &arg_timeacc
-};
-const size_t n_args = sizeof(args) / sizeof(argument_t*);
+#include "emu_settings.h"
 
 cpu_state_t state;
 

@@ -102,7 +102,13 @@ can be treated as conventional instructions; they do not follow the "@"
 convetion.
 ##### `rda <label>`
 Reads the specified label as a 16-bit value into DX and DY as an address.
+##### `pusha <label>`
+Decrements the stack pointer by 2 and loads the value of the given label into
+the bottom two positions of the stack, least significant byte lowest.
 ##### `call <label>`
 Calls the function at the specified label; stores return address in DX and DY.
 ##### `goto <label>`
 Jumps to the specified label without a return address. Overwrites DX and DY.
+##### `isp <offset>`, `_isp offset`
+Increases the stack pointer by the given offset, with or without setting the
+carry flag, respectively.

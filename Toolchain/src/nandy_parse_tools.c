@@ -210,7 +210,8 @@ addr_t getAbsAddr(cpu_state_t* cpu) {
 }
 
 addr_t getStackAddr(cpu_state_t* cpu) {
-    return (0xFF00 | cpu->sp) + (peek(cpu, cpu->pc) & IMM4_MASK);
+    return (0xFE00 | (cpu->int_active ? 0 : 0x100) | cpu->sp)
+         + (peek(cpu, cpu->pc) & IMM4_MASK);
 }
 
 

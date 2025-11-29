@@ -1,0 +1,17 @@
+{
+  signal: [
+    {name: 'clk', wave: 'p..', period: 10 },
+    {name: 'PC', wave:'x3........x4........x5........', data: ["i-1", "i", "i+1"]},
+    {name: 'IR', wave:'3.........xxx4......xxx5......', data: ["rd dx", "rd/wr io", "wr dx"] },
+    {},
+    {name: 'Read', wave:'0.........xxxx1.....xxxx0.....' },
+    {name: 'ReadGated', wave:'0..............1....0.........' },
+    {name: 'DataIn', wave:'x.............9...............', data: ["incoming data"]},
+    {name: 'RegVal', wave:'x...................9.........', data: ["incoming data in accumulator"]},
+    {},
+    {name: 'Write', wave:'0.........xxxx1.....xxxx0.....'},
+    {name: 'WriteGated', wave:'0..............1....0.........'},
+    {name: 'DataOut', wave:'x.........7...................', data: ["outgoing data (always contents of accumulator)"]},
+  ],
+  config: { hscale: 1 }
+}
