@@ -7,5 +7,5 @@ wr io
 _subi 48
 addi -1
 ctog
-jcz start
+jc start
 brk

@@ -15,7 +15,7 @@ bool io_step_16550(cpu_state_t* cpu, bool active) {
     static uint16_t fifo[17];
 
     if(active) {
-        int reg_sel = cpu->ioaddr & 0b111;
+        int reg_sel = cpu->y & 0b111;
         
         // Read behaviors
         switch(reg_sel) {

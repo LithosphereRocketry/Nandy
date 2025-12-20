@@ -3,7 +3,9 @@
 #include <stdio.h>
 
 static void exe_ipoll(cpu_state_t* cpu) {
-    cpu->acc = cpu->ints_in;
+    cpu->acc = cpu->ints_in
+        | (cpu->int_en ? (1<<6) : 0)
+        | (cpu->int_active ? (1<<7) : 0);
     cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i_ipoll = {

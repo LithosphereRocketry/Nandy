@@ -173,7 +173,7 @@ static const char* asm_macro_string(const instruction_t* instr, const char* text
             return NULL;
         }
         state->rom_loc ++;
-        if(state->rom_loc >= ADDR_RAM_MASK-1) {
+        if(state->rom_loc >= ROM_SIZE-1) {
             printf("String does not fit in ROM!\n");
             return NULL;
         }

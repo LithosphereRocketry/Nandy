@@ -5,7 +5,7 @@
     pusha data
     pusha buffer
     call memcpy
-    _isp 6
+    isc 6
     pusha buffer
     ioa 0
     call puts
@@ -13,7 +13,7 @@
 
 # dest, src, size
 memcpy:
-    _isp -2
+    isc -2
     rd dx
     strs 0
     rd dy
@@ -22,18 +22,18 @@ memcpy:
 memcpy_loop:
     lds 7
     zero
-    jcz memcpy_byte
+    jc memcpy_byte
     lds 6
     zero
-    jcz memcpy_byte
+    jc memcpy_byte
 
     # if we fall through, then size is 0 and we exit
     lds 1
     wr dy
     lds 0
     wr dx
-    _isp 2
-    ja
+    isc 2
+    jp
     
 memcpy_byte:
     # decrement size
@@ -41,7 +41,7 @@ memcpy_byte:
     subi 1
     strs 6
     lds 7
-    subci 0
+    sbci 0
     strs 7
 
     # copy byte
@@ -62,19 +62,19 @@ memcpy_byte:
     addi 1
     strs 2
     rd y
-    addci 0
+    adci 0
     strs 3
     lds 4
     addi 1
     strs 4
     lds 5
-    addci 0
+    adci 0
     strs 5
     j memcpy_loop
 
 puts:
     # prologue
-    _isp -2
+    isc -2
     rd dx
     strs 0
     rd dy
@@ -90,13 +90,13 @@ puts:
 puts_loop:
     lda 0
     nzero
-    jcz puts_done
+    jc puts_done
     wr io
     rd x
     addi 1
     wr x
     rd y
-    addci 0
+    adci 0
     wr y
     j puts_loop
 
@@ -106,7 +106,7 @@ puts_done:
     wr dy
     lds 0
     wr dx
-    ja
+    jp
 
 data:
     @string "I realized, the moment I fell into the fissure, that the book would not be destroyed as I had planned. It continued falling into that starry expanse of which I had only a fleeting glimpse. I have tried to speculate where it might have landed, but I must admit, however- such conjecture is futile. Still, the question of whose hands might someday hold my Myst book are unsettling to me. I know that my apprehensions might never be allayed, and so I close, realizing that perhaps, the ending has not yet been written.\n"

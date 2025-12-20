@@ -5,20 +5,26 @@
 #include "nandy_parse_tools.h"
 #include "shuntingyard.h"
 
-
-static const char* regname_sp[] = {"sp", NULL};
-static const char* regname_io[] = {"io", NULL};
-static const char* regname_dx[] = {"dx", "x", "dl", NULL};
-static const char* regname_dy[] = {"dy", "y", "dh", NULL};
-static const char* regname_acc[] = {"acc", NULL};
-const char** regnames[] = {
-    [REG_SP] = regname_sp,
-    [REG_IO] = regname_io,
-    [REG_DX] = regname_dx,
-    [REG_DY] = regname_dy,
-    [REG_ACC] = regname_acc
+const char* regnames[] = {
+    [REG_SP] = "sp",
+    [REG_IO] = "io",
+    [REG_X] = "x",
+    [REG_Y] = "y",
+    [REG_PH] = "ph",
+    [REG_PL] = "pl",
+    [REG_QH] = "qh",
+    [REG_QL] = "ql",
+    [REG_ACC] = "acc"
 };
-const size_t n_regnames = sizeof(regnames) / sizeof(const char**);
+const size_t n_regnames = sizeof(regnames) / sizeof(const char*);
+
+const char* mmnames[] = {
+    [MM_STACK] = "sp",
+    [MM_P] = "p",
+    [MM_Q] = "q",
+    [MM_PPOST] = "p+"
+};
+const size_t n_mmnames = sizeof(mmnames) / sizeof(const char*);
 
 const char* endOfInput(const char* str) {
     const char* ptr = str;
@@ -36,13 +42,21 @@ const char* parseFallback(const char* text) {
 const char* parseReg(const char* text, regid_t* dest) {
     while(isspace(*text) && *text != '\n') text++;
     for(size_t i = 0; i < n_regnames; i++) {
-        const char** reg = regnames[i];
-        while(*reg) {
-            if(strncmp(text, *reg, strlen(*reg)) == 0) {
-                *dest = i;
-                return text + strlen(*reg);
-            }
-            reg++;
+        if(strncmp(text, regnames[i], strlen(regnames[i])) == 0) {
+            *dest = i;
+            return text + strlen(regnames[i]);
+        }
+    }
+    return NULL;
+}
+
+const char* parseMemMode(const char* text, memmode_t* dest) {
+    while(isspace(*text) && *text != '\n') text++;
+    // slightly hacky but we know these are spaced out by 2^5
+    for(size_t i = 0; i < n_mmnames; i += (1 << 5)) {
+        if(strncmp(text, mmnames[i], strlen(mmnames[i])) == 0) {
+            *dest = i;
+            return text + strlen(regnames[i]);
         }
     }
     return NULL;
@@ -144,12 +158,12 @@ const char* asm_alu_reg(const instruction_t* instr, const char* text, asm_state_
     regid_t reg;
     const char* after = parseRegRequired(text, &reg);
     if(!after) { return NULL; }
-    if(reg == REG_DX) {
+    if(reg == REG_X) {
         state->rom[state->rom_loc] = instr->opcode;
-    } else if(reg == REG_DY) {
+    } else if(reg == REG_Y) {
         state->rom[state->rom_loc] = instr->opcode | XY_MASK;
     } else {
-        printf("Register %s not valid for ALU instruction\n", regnames[reg][0]);
+        printf("Register %s not valid for ALU instruction\n", regnames[reg]);
         return NULL;
     }
     state->rom_loc ++;
@@ -163,79 +177,54 @@ const char* asm_alu_imm(const instruction_t* instr, const char* text, asm_state_
     return endptr;
 }
 
-const char *asm_imm4s(const instruction_t *instr, const char *text, asm_state_t *state) {
-    state->rom[state->rom_loc] = instr->opcode;
-    const char* endptr = addUnresolved(state, text, resolveImm4s);
-    state->rom_loc ++;
-    return endptr;
-}
-
-const char *asm_imm4u(const instruction_t *instr, const char *text, asm_state_t *state) {
-    state->rom[state->rom_loc] = instr->opcode;
+const char *asm_mem(const instruction_t *instr, const char *text, asm_state_t *state) {
+    memmode_t mm;
+    const char* midptr = parseMemMode(text, &mm);
+    if(!midptr) return NULL;
+    state->rom[state->rom_loc] = instr->opcode | mm;
     const char* endptr = addUnresolved(state, text, resolveImm4u);
     state->rom_loc ++;
     return endptr;
 }
 
-const char *asm_imm5u(const instruction_t *instr, const char *text, asm_state_t *state) {
-    state->rom[state->rom_loc] = instr->opcode;
-    const char* endptr = addUnresolved(state, text, resolveImm5u);
-    state->rom_loc ++;
-    return endptr;
+word_t getALUReg(cpu_state_t* cpu) {
+    return peek(cpu, cpu->pc) & XY_MASK ? cpu->y : cpu->x;
 }
 
-word_t getXYReg(cpu_state_t* cpu, bool isY) {
-    return cpu->int_active ? (isY ? cpu->iry : cpu->irx)
-                           : (isY ? cpu->dy : cpu->dx);
-}
-void putXYreg(cpu_state_t* cpu, bool isY, word_t value) {
-    if(cpu->int_active) {
-        if(isY) { cpu->iry = value; } else { cpu->irx = value; }
-    } else {
-        if(isY) { cpu->dy = value; } else { cpu->dx = value; }
+addr_t getMemAddr(cpu_state_t* cpu) {
+    word_t instr = peek(cpu, cpu->pc);
+    switch(instr & MMODE_MASK) {
+        addr_t tmp;
+        case MM_STACK:
+            return (0xFE00 | (cpu->int_active ? 0 : 0x100) | cpu->sp) + (instr & IMM4_MASK);
+        case MM_P:
+            return cpu->p + (instr & IMM4_MASK);
+        case MM_Q:
+            return cpu->q + (instr & IMM4_MASK);
+        case MM_PPOST:
+            tmp = cpu->p;
+            cpu->p += (instr & IMM4_MASK);
+            return tmp;        
     }
 }
-
-word_t getALUReg(cpu_state_t* cpu) {
-    return getXYReg(cpu, peek(cpu, cpu->pc) & XY_MASK);
-}
-
-addr_t getXYAddr(cpu_state_t* cpu) {
-    int upper = (((int) getXYReg(cpu, true)) << 8) & 0xFF00;
-    int lower = ((int) getXYReg(cpu, false)) & 0xFF;
-    return upper | lower;
-}
-addr_t getAbsAddr(cpu_state_t* cpu) {
-    return getXYAddr(cpu) + (peek(cpu, cpu->pc) & IMM4_MASK);
-}
-
-addr_t getStackAddr(cpu_state_t* cpu) {
-    return (0xFE00 | (cpu->int_active ? 0 : 0x100) | cpu->sp)
-         + (peek(cpu, cpu->pc) & IMM4_MASK);
-}
-
 
 void dis_basic(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* buf, size_t len) {
     snprintf(buf, len, "%s", instr->mnemonic);
 }
 void dis_register(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* buf, size_t len) {
-    snprintf(buf, len, "%s %s", instr->mnemonic, regnames[peek(cpu, addr) & 0b11][0]);
+    snprintf(buf, len, "%s %s", instr->mnemonic, regnames[peek(cpu, addr) & REGID_MASK]);
 }
 void dis_alu_reg(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* buf, size_t len) {
     snprintf(buf, len, "%s %s", instr->mnemonic,
-            regnames[(peek(cpu, addr) & XY_MASK) ? REG_DY : REG_DX][0]);
+            regnames[(peek(cpu, addr) & XY_MASK) ? REG_Y : REG_X]);
 }
 void dis_alu_imm(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* buf, size_t len) {
     snprintf(buf, len, "%s %hhi", instr->mnemonic, peek(cpu, addr+1));
 }
-void dis_imm4s(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* buf, size_t len) {
-    snprintf(buf, len, "%s %li", instr->mnemonic, signExtend(peek(cpu, addr), 4));
-}
-void dis_imm4u(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* buf, size_t len) {
-    snprintf(buf, len, "%s %i", instr->mnemonic, peek(cpu, addr) & IMM4_MASK);
-}
-void dis_imm5u(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* buf, size_t len) {
-    snprintf(buf, len, "%s %i", instr->mnemonic, peek(cpu, addr) & IMM5_MASK);
+void dis_mem(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* buf, size_t len) {
+    word_t ibyte = peek(cpu, addr);
+    const char* regname = mmnames[ibyte & MMODE_MASK];
+    snprintf(buf, len, "%s %s %i", instr->mnemonic, regname, peek(cpu, addr) & IMM4_MASK);
 }
 
 bool isBounded(int64_t value, int64_t bitwidth, bound_mode_t bound) {

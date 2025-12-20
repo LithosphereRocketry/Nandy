@@ -5,13 +5,13 @@
 loop:
     lda 0
     nzero
-    jcz done
+    jc done
     wr io
     rd x
     addi 1
     wr x
     rd y
-    addci 0
+    adci 0
     wr y
     j loop
 done:

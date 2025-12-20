@@ -26,11 +26,11 @@ void scanDisasm(cpu_state_t* state, addr_t start) {
         for(int i = 1; i < len; i++) { disasm_cache[start + i] = NULL; }
         // These instructions are completely intractable to the disassembler
         // because their jump target is runtime-variable
-        if(instr != &i_ja && instr != &i_jar && instr != &i_jri) {
+        if(instr != &i_jp && instr != &i_jpr && instr != &i_jri) {
             // TODO: how do we scan targets of relative jumps without creating
             // infinite loops of misaligned instructions fighting with each
             // other
-            if(instr == &i_jcz) {
+            if(instr == &i_jc) {
                 scanDisasm(state, start + len);
                 // TODO: scan jump target
             } else if(instr == &i_j) {
@@ -90,16 +90,16 @@ Cycles 1234567890       SP> FF      nop
             state->pc, state->carry ? '1' : '0', peek(state, 0xFF00 + (uint8_t) state->sp + 7), linebuf[0]);
     printf("ACC 0x%02hhx    SP  0x%02hhx        %02hhx      %-40s\n",
             state->acc, state->sp, peek(state, 0xFF00 + (uint8_t) state->sp + 6), linebuf[1]);
-    printf("DX  0x%02hhx    DY  0x%02hhx        %02hhx      %-40s\n",
-            state->dx, state->dy, peek(state, 0xFF00 + (uint8_t) state->sp + 5), linebuf[2]);
-    printf("IRX 0x%02hhx    IRY 0x%02hhx        %02hhx      %-40s\n",
-            state->irx, state->iry, peek(state, 0xFF00 + (uint8_t) state->sp + 4), linebuf[3]);
+    printf("X   0x%02hhx    Y   0x%02hhx        %02hhx      %-40s\n",
+            state->x, state->y, peek(state, 0xFF00 + (uint8_t) state->sp + 5), linebuf[2]);
+    printf("P 0x%04hx    Q 0x%04hhx        %02hhx      %-40s\n",
+            state->p, state->q, peek(state, 0xFF00 + (uint8_t) state->sp + 4), linebuf[3]);
     printf("IN  0x%02hhx    OUT 0x%02hhx        %02hhx  PC> %-40s\n",
             state->ioin, state->ioout, peek(state, 0xFF00 + (uint8_t) state->sp + 3), linebuf[4]);
     printf("IE  %c       INT %c           %02hhx      %-40s\n",
             state->int_en ? '1' : '0', state->int_active ? '1' : '0', peek(state, 0xFF00 + (uint8_t) state->sp + 2), linebuf[5]);
-    printf("CS  %c       IOS %c%c          %02hhx      %-40s\n",
-            state->cs ? '1' : '0', state->io_rd ? 'R' : '-', state->io_wr ? 'W' : '-',
+    printf("IA 0x%04x   IOS %c%c          %02hhx      %-40s\n",
+            state->ia, state->io_rd ? 'R' : '-', state->io_wr ? 'W' : '-',
             peek(state, 0xFF00 + (uint8_t) state->sp + 1), linebuf[6]);
     char cyclesbuf[17];
     snprintf(cyclesbuf, 17, "%lu", state->elapsed);
@@ -220,7 +220,7 @@ int main(int argc, char** argv) {
     }
 
     state = INIT_STATE;
-    fread(state.rom, sizeof(word_t), ADDR_RAM_MASK, f);
+    fread(state.rom, sizeof(word_t), ROM_SIZE, f);
 
 #ifdef __unix__
     sigaction(SIGINT, &act, NULL);

@@ -14,7 +14,7 @@ const asm_state_t INIT_ASM = {
     .instrs = &NANDY_ILIST,
 
     .rom_loc = 0,
-    .ram_loc = ADDR_RAM_MASK,
+    .ram_loc = ROM_SIZE,
 
     .resolved = SYMTAB_INIT,
 
@@ -38,22 +38,22 @@ void asm_state_destroy(asm_state_t* state) {
 }
 
 word_t peek(const cpu_state_t* cpu, addr_t addr) {
-    return addr & ADDR_RAM_MASK ?
-        cpu->ram[addr & ~ADDR_RAM_MASK]
-      : cpu->rom[addr & ~ADDR_RAM_MASK];
+    return addr & ROM_SIZE ?
+        cpu->ram[addr & ~ROM_SIZE]
+      : cpu->rom[addr & ~ROM_SIZE];
 }
 
 void poke(cpu_state_t* cpu, addr_t addr, word_t value) {
     // Properly emulates real CPU's behavior on trying to write ROM
-    cpu->ram[addr & ~ADDR_RAM_MASK] = value;
+    cpu->ram[addr & ~ROM_SIZE] = value;
 }
 
 addr_t nbytes(word_t inst) {
-    return (inst & MULTICYCLE_MASK) && (inst & ALU_SEL_MASK) ? 2 : 1;
+    return (inst & MULTIBYTE_MASK) && !(inst & MEM_MASK) ? 2 : 1;
 }
 
 size_t nclocks(word_t inst) {
-    return (inst & MULTICYCLE_MASK) ? 2 : 1;
+    return (inst & (MULTIBYTE_MASK | MEM_MASK)) ? 2 : 1;
 }
 
 addr_t nextinst(const cpu_state_t* cpu, addr_t addr) {

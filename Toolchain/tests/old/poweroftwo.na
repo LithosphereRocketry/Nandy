@@ -48,7 +48,7 @@ poweroftwo:
     # interrupts so keyboard input doesn't screw up our real stack
     # dint
     # Place the SP at arg[7]
-    _isp 9
+    isc 9
 ptwo_loop:
     # retrieve the old shift result, or the zero at the top if this is the
     # first time through
@@ -64,14 +64,14 @@ ptwo_loop:
     or dx
     sw dx
     strs 0
-    _isp -1
+    isc -1
 
     sw dy
     # simultaneously throw the old carry result in dy and read the loop counter
     src
     # if the carry is absent, exit the loop
     ctog
-    jcz ptwo_loop
+    jc ptwo_loop
 
     isp -1 # realign the stack pointer
     # eint
@@ -81,11 +81,11 @@ ptwo_loop:
     rd dx
     nzero
     rdi 0
-    jcz return
+    jc return
     # step 2: are we odd?
     rd dy
     sl
-    jcz reccall
+    jc reccall
     # else: we must be -1
     rdi -1
 return:
@@ -95,7 +95,7 @@ return:
     lds 1
     sw dy
     isp 3
-    ja
+    jp
 
 reccall:
     # Calling this function recursively is a little nasty because of all the
@@ -130,7 +130,7 @@ reccall:
 
     call poweroftwo
     addi 1
-    jcz keepone
+    jc keepone
     addi -1
 keepone:
     wr dy
@@ -139,4 +139,4 @@ keepone:
     lds 8
     sw dy
     isp 2
-    ja
+    jp

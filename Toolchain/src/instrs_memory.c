@@ -2,54 +2,30 @@
 #include "nandy_parse_tools.h"
 #include "nandy_alufuncs.h"
 
-static void exe_lda(cpu_state_t* cpu) {
-    cpu->acc = peek(cpu, getAbsAddr(cpu));
+
+
+static void exe_ld(cpu_state_t* cpu) {
+    cpu->acc = peek(cpu, 0);
     cpu->pc ++; cpu->elapsed += 2;
 }
-const instruction_t i_lda = {
-    .mnemonic = "lda",
-    .opcode_mask = IMM4_MASK,
-    .opcode = MULTICYCLE_MASK,
-    .assemble = asm_imm4u,
-    .disassemble = dis_imm4u,
-    .execute = exe_lda
+const instruction_t i_ld = {
+    .mnemonic = "ld",
+    .opcode_mask = IMM4_MASK | LOAD_MASK | MMODE_MASK,
+    .opcode = MEM_MASK | LOAD_MASK,
+    .assemble = asm_mem,
+    .disassemble = dis_mem,
+    .execute = exe_ld
 };
 
-static void exe_lds(cpu_state_t* cpu) {
-    cpu->acc = peek(cpu, getStackAddr(cpu));
+static void exe_st(cpu_state_t* cpu) {
+    poke(cpu, 0, cpu->acc);
     cpu->pc ++; cpu->elapsed += 2;
 }
-const instruction_t i_lds = {
-    .mnemonic = "lds",
+const instruction_t i_st = {
+    .mnemonic = "st",
     .opcode_mask = IMM4_MASK,
-    .opcode = MULTICYCLE_MASK | MEM_STACK_MASK,
-    .assemble = asm_imm4u,
-    .disassemble = dis_imm4u,
-    .execute = exe_lds
-};
-
-static void exe_stra(cpu_state_t* cpu) {
-    poke(cpu, getAbsAddr(cpu), cpu->acc);
-    cpu->pc ++; cpu->elapsed += 2;
-}
-const instruction_t i_stra = {
-    .mnemonic = "stra",
-    .opcode_mask = IMM4_MASK,
-    .opcode = MULTICYCLE_MASK | MEM_WRITE_MASK,
-    .assemble = asm_imm4u,
-    .disassemble = dis_imm4u,
-    .execute = exe_stra
-};
-
-static void exe_strs(cpu_state_t* cpu) {
-    poke(cpu, getStackAddr(cpu), cpu->acc);
-    cpu->pc ++; cpu->elapsed += 2;
-}
-const instruction_t i_strs = {
-    .mnemonic = "strs",
-    .opcode_mask = IMM4_MASK,
-    .opcode = MULTICYCLE_MASK | MEM_WRITE_MASK | MEM_STACK_MASK,
-    .assemble = asm_imm4u,
-    .disassemble = dis_imm4u,
-    .execute = exe_strs
+    .opcode = MEM_MASK,
+    .assemble = asm_mem,
+    .disassemble = dis_mem,
+    .execute = exe_st
 };

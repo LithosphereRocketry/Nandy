@@ -51,8 +51,8 @@ bool emu_step(cpu_state_t* state, FILE* outstream/*, iorange_t* iomap, size_t n_
     instr->execute(state);
 
     for(size_t i = 0; i < n_ios; i++) {
-        bool inbounds = (state->ioaddr >= iomap[i].base 
-                      && state->ioaddr < iomap[i].base + iomap[i].bound);
+        bool inbounds = (state->y >= iomap[i].base 
+                      && state->y < iomap[i].base + iomap[i].bound);
         bool interrupt = iomap[i].operation(state, inbounds);
         if(i < 8) {
             if(interrupt) {
@@ -64,8 +64,7 @@ bool emu_step(cpu_state_t* state, FILE* outstream/*, iorange_t* iomap, size_t n_
     }
     
     if(state->int_en && state->ints_in && !state->int_active) {
-        state->irx = state->pc & 0xFF;
-        state->iry = (state->pc >> 8) & 0xFF;
+        state->ia = state->pc;
         state->pc = ISR_ADDR;
         state->int_active = true;
     }

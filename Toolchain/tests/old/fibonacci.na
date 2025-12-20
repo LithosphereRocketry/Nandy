@@ -19,7 +19,7 @@ fib:isp -3
 fib_loop:
     lds 0
     addi -1
-    jcz fib_done
+    jc fib_done
     strs 0
     rd x
     add y
@@ -35,4 +35,4 @@ fib_done:
     wr dh
     lds 0
     isp 3
-    ja
+    jp

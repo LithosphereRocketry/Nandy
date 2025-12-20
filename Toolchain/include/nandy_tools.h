@@ -21,9 +21,10 @@
 // CPU state
 typedef struct cpu_state {
     size_t elapsed;
-    addr_t pc;
-    word_t acc, sp, dx, dy, irx, iry, ioin, ioout, ioaddr;
-    bool cycle, carry, int_en, int_active, io_rd, io_wr, idbg, cs;
+    addr_t pc, ia;
+    word_t acc, sp, x, y, ioin, ioout;
+    addr_t p, q;
+    bool cycle, carry, int_en, int_active, io_rd, io_wr, idbg;
     word_t ints_in;
     word_t rom[ROM_SIZE];
     word_t ram[RAM_SIZE];

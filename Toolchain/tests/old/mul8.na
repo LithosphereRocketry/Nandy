@@ -38,7 +38,7 @@ mul8_loop:
     rd dx
     sl
     wr dx
-    jcz mul8_skip
+    jc mul8_skip
 
     lds 2
     sw dx
@@ -61,7 +61,7 @@ mul8_skip:
     addi -1
     wr dy
     ctog
-    jcz mul8_loop
+    jc mul8_loop
 
     lds 0
     wr dx
@@ -69,4 +69,4 @@ mul8_skip:
     wr dy
     lds 2
     isp 3
-    ja
+    jp

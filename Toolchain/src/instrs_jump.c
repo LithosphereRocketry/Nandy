@@ -3,47 +3,46 @@
 #include "stdio.h"
 #include "shuntingyard.h"
 
-static void exe_ja(cpu_state_t* cpu) {
-    cpu->pc = getXYAddr(cpu);
+static void exe_jp(cpu_state_t* cpu) {
+    cpu->pc = cpu->p;
     cpu->elapsed ++;
 }
-const instruction_t i_ja = {
-    .mnemonic = "ja",
-    .opcode_mask = 0b1,
-    .opcode = PROGFLOW_MASK,
+const instruction_t i_jp = {
+    .mnemonic = "jp",
+    .opcode_mask = 0,
+    .opcode = 0b100,
     .assemble = asm_basic,
     .disassemble = dis_basic,
-    .execute = exe_ja
+    .execute = exe_jp
+};
+
+static void exe_jpr(cpu_state_t* cpu) {
+    addr_t prevAddr = cpu->pc + 1;
+    cpu->pc = cpu->p;
+    cpu->p = prevAddr;
+    cpu->elapsed ++;
+}
+const instruction_t i_jpr = {
+    .mnemonic = "jpr",
+    .opcode_mask = 0,
+    .opcode = 0b101,
+    .assemble = asm_basic,
+    .disassemble = dis_basic,
+    .execute = exe_jpr
 };
 
 static void exe_jri(cpu_state_t* cpu) {
-    cpu->pc = getXYAddr(cpu);
+    cpu->pc = cpu->ia;
     cpu->int_active = false;
     cpu->elapsed ++;
 }
 const instruction_t i_jri = {
     .mnemonic = "jri",
-    .opcode_mask = 0b1,
-    .opcode = PROGFLOW_MASK | CI_MASK,
+    .opcode_mask = 0,
+    .opcode = 0b110,
     .assemble = asm_basic,
     .disassemble = dis_basic,
     .execute = exe_jri
-};
-
-static void exe_jar(cpu_state_t* cpu) {
-    addr_t prevAddr = cpu->pc + 1;
-    cpu->pc = getXYAddr(cpu);
-    putXYreg(cpu, false, prevAddr & 0xFF);
-    putXYreg(cpu, true, (prevAddr >> 8) & 0xFF);
-    cpu->elapsed ++;
-}
-const instruction_t i_jar = {
-    .mnemonic = "jar",
-    .opcode_mask = 0b1,
-    .opcode = PROGFLOW_MASK | RET_MASK,
-    .assemble = asm_basic,
-    .disassemble = dis_basic,
-    .execute = exe_jar
 };
 
 static bool resolveReljump(asm_state_t* state, const char* text, addr_t pos, FILE* debug) {
@@ -83,25 +82,25 @@ static void exe_j(cpu_state_t* cpu) {
 const instruction_t i_j = {
     .mnemonic = "j",
     .opcode_mask = IMM4_MASK,
-    .opcode = MULTICYCLE_MASK | ALU_SEL_MASK | JUMP_MASK,
+    .opcode = 0b01000000,
     .assemble = asm_reljump,
     .disassemble = dis_reljump,
     .execute = exe_j
 };
 
-static void exe_jcz(cpu_state_t* cpu) {
+static void exe_jc(cpu_state_t* cpu) {
     if(!cpu->carry) {
-        cpu->pc += signExtend((((int) peek(cpu, cpu->pc)) << 8) | peek(cpu, cpu->pc+1), 12) + 1;
+        exe_j(cpu);
     } else {
         cpu->pc += 2;
+        cpu->elapsed += 2;
     }
-    cpu->elapsed += 2;
 }
-const instruction_t i_jcz = {
-    .mnemonic = "jcz",
+const instruction_t i_jc = {
+    .mnemonic = "jc",
     .opcode_mask = IMM4_MASK,
-    .opcode = MULTICYCLE_MASK | ALU_SEL_MASK | JUMP_MASK | COND_MASK,
+    .opcode = 0b01010000,
     .assemble = asm_reljump,
     .disassemble = dis_reljump,
-    .execute = exe_jcz
+    .execute = exe_jc
 };

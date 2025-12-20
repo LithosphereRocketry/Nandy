@@ -28,17 +28,17 @@ const instruction_t i_nzero = {
     .execute = exe_nzero
 };
 
-static void exe_par(cpu_state_t* cpu) {
-    cpu->carry = parity(cpu->acc);
+static void exe_sgn(cpu_state_t* cpu) {
+    cpu->carry = !!(cpu->acc & 0x80);
     cpu->pc ++; cpu->elapsed ++;
 }
-const instruction_t i_par = {
-    .mnemonic = "par",
+const instruction_t i_sgn = {
+    .mnemonic = "sgn",
     .opcode_mask = 0,
     .opcode = ALU_SEL_MASK | CARRY_SEL_MASK | ALU_XOR,
     .assemble = asm_basic,
     .disassemble = dis_basic,
-    .execute = exe_par
+    .execute = exe_sgn
 };
 
 static void exe_cset(cpu_state_t* cpu) {
@@ -80,15 +80,15 @@ const instruction_t i_zero = {
     .execute = exe_zero
 };
 
-static void exe_npar(cpu_state_t* cpu) {
-    cpu->carry = !parity(cpu->acc);
+static void exe_nsgn(cpu_state_t* cpu) {
+    cpu->carry = !(cpu->acc & 0x80);
     cpu->pc ++; cpu->elapsed ++;
 }
-const instruction_t i_npar = {
-    .mnemonic = "npar",
+const instruction_t i_nsgn = {
+    .mnemonic = "nsgn",
     .opcode_mask = 0,
     .opcode = ALU_SEL_MASK | XY_MASK | CARRY_SEL_MASK | ALU_XOR,
     .assemble = asm_basic,
     .disassemble = dis_basic,
-    .execute = exe_npar
+    .execute = exe_nsgn
 };

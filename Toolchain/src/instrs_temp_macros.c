@@ -24,11 +24,11 @@ static const char* asm_rda(const instruction_t* instr, const char* text, asm_sta
     // An instruction with a null argument skips label resolution, since we're
     // going to be doing that manually
     const char* end = addUnresolved(state, text, resolveRda);
-    instr_assemble(&i_wr, regnames[REG_DY][0], state);
+    instr_assemble(&i_wr, regnames[REG_Y], state);
     instr_assemble(&i_rdi, NULL, state);
-    instr_assemble(&i_wr, regnames[REG_DX][0], state);
+    instr_assemble(&i_wr, regnames[REG_X], state);
     instr_assemble(&i_rdi, NULL, state);
-    instr_assemble(&i_sw, regnames[REG_DY][0], state);
+    instr_assemble(&i_sw, regnames[REG_Y], state);
     return end;
 }
 const instruction_t i_rda = {
@@ -38,7 +38,7 @@ const instruction_t i_rda = {
 
 static const char* asm_call(const instruction_t* instr, const char* text, asm_state_t* state) {
     const char* end = instr_assemble(&i_rda, text, state);
-    instr_assemble(&i_jar, "", state);
+    instr_assemble(&i_jpr, "", state);
     return end;
 }
 const instruction_t i_call = {
@@ -48,7 +48,7 @@ const instruction_t i_call = {
 
 static const char* asm_goto(const instruction_t* instr, const char* text, asm_state_t* state) {
     const char* end = instr_assemble(&i_rda, text, state);
-    instr_assemble(&i_ja, "", state);
+    instr_assemble(&i_jp, "", state);
     return end;
 }
 const instruction_t i_goto = {
@@ -64,17 +64,17 @@ static const char* asm_move(const instruction_t* instr, const char* text, asm_st
     if(!text) return NULL;
     if(a != b) {
         if(b == REG_ACC) {
-            instr_assemble(&i_rd, regnames[a][0], state);
+            instr_assemble(&i_rd, regnames[a], state);
         } else if(a == REG_ACC) {
-            instr_assemble(&i_wr, regnames[b][0], state);
+            instr_assemble(&i_wr, regnames[b], state);
         } else if(a == REG_IO) {
-            instr_assemble(&i_sw, regnames[b][0], state);
-            instr_assemble(&i_rd, regnames[a][0], state);
-            instr_assemble(&i_sw, regnames[b][0], state);
+            instr_assemble(&i_sw, regnames[b], state);
+            instr_assemble(&i_rd, regnames[a], state);
+            instr_assemble(&i_sw, regnames[b], state);
         } else {
-            instr_assemble(&i_sw, regnames[a][0], state);
-            instr_assemble(&i_wr, regnames[b][0], state);
-            instr_assemble(&i_sw, regnames[a][0], state);
+            instr_assemble(&i_sw, regnames[a], state);
+            instr_assemble(&i_wr, regnames[b], state);
+            instr_assemble(&i_sw, regnames[a], state);
         }
     }
     return text;
@@ -84,62 +84,40 @@ const instruction_t i_move = {
     .assemble = asm_move
 };
 
-static const char* asm__isp(const instruction_t* instr, const char* text, asm_state_t* state) {
-    instr_assemble(&i_sw, regnames[REG_SP][0], state);
-    text = i__addi.assemble(&i__addi, text, state);
-    instr_assemble(&i_sw, regnames[REG_SP][0], state);
+static const char* asm_isc(const instruction_t* instr, const char* text, asm_state_t* state) {
+    instr_assemble(&i_sw, regnames[REG_SP], state);
+    text = i_adci.assemble(&i_adci, text, state);
+    instr_assemble(&i_sw, regnames[REG_SP], state);
     return text;
 }
-const instruction_t i__isp = {
-    .mnemonic = "_isp",
-    .assemble = asm__isp
+const instruction_t i_isc = {
+    .mnemonic = "isc",
+    .assemble = asm_isc
 };
 
-static const char* asm_isp(const instruction_t* instr, const char* text, asm_state_t* state) {
-    instr_assemble(&i_sw, regnames[REG_SP][0], state);
+static const char* asmisc(const instruction_t* instr, const char* text, asm_state_t* state) {
+    instr_assemble(&i_sw, regnames[REG_SP], state);
     text = instr_assemble(&i_addi, text, state);
-    instr_assemble(&i_sw, regnames[REG_SP][0], state);
+    instr_assemble(&i_sw, regnames[REG_SP], state);
     return text;
 }
 const instruction_t i_isp = {
     .mnemonic = "isp",
-    .assemble = asm_isp
+    .assemble = asmisc
 };
-
-// static const char* asm__iisp(const instruction_t* instr, const char* text, asm_state_t* state) {
-//     instr_assemble(&i_dint, "", state);
-//     text = i__isp.assemble(&i__isp, text, state);
-//     instr_assemble(&i_eint, "", state);
-//     return text;
-// }
-// const instruction_t i__iisp = {
-//     .mnemonic = "_iisp",
-//     .assemble = asm__iisp,
-// };
-
-// static const char* asm_iisp(const instruction_t* instr, const char* text, asm_state_t* state) {
-//     instr_assemble(&i_dint, "", state);
-//     text = instr_assemble(&i_isp, text, state);
-//     instr_assemble(&i_eint, "", state);
-//     return text;
-// }
-// const instruction_t i_iisp = {
-//     .mnemonic = "iisp",
-//     .assemble = asm_iisp,
-// };
 
 // This is a fairly wasteful implementation but at this point saving effort is
 // a lot more important than saving bytes
 static const char* asm_pusha(const instruction_t* instr, const char* text, asm_state_t* state) {
-    i__isp.assemble(&i__isp, "-2", state);
+    i_isc.assemble(&i_isc, "-2", state);
 
     state->rom_loc--;
     const char* end = addUnresolved(state, text, resolveRda);
     state->rom_loc++;
     instr_assemble(&i_rdi, NULL, state);
-    instr_assemble(&i_strs, "0", state);
+    instr_assemble(&i_st, "sp 0", state);
     instr_assemble(&i_rdi, NULL, state);
-    instr_assemble(&i_strs, "1", state);
+    instr_assemble(&i_st, "sp 1", state);
     return end;
 }
 const instruction_t i_pusha = {

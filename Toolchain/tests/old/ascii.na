@@ -17,7 +17,7 @@ mul10_8:
     lds 0
     sw x
     isp 1
-    ja
+    jp
 
 
 @loc ISR
@@ -31,7 +31,7 @@ mul10_8:
     addi -10 # is newline?
     nzero
     ctog
-    jcz is_numeral
+    jc is_numeral
     
     rd x
     wr io

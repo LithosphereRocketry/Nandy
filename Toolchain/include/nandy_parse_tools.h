@@ -9,7 +9,7 @@
 // Instruction parsing
 const char* endOfInput(const char* str);
 // Debugging tools
-extern const char** regnames[];
+extern const char* regnames[];
 extern const size_t n_regnames;
 // Assembly & parsing tools
 const char* parseFallback(const char* text);
@@ -21,26 +21,18 @@ const char* asm_basic(const instruction_t* instr, const char* text, asm_state_t*
 const char* asm_register(const instruction_t* instr, const char* text, asm_state_t* state);
 const char* asm_alu_reg(const instruction_t* instr, const char* text, asm_state_t* state);
 const char* asm_alu_imm(const instruction_t* instr, const char* text, asm_state_t* state);
-const char *asm_imm4s(const instruction_t *instr, const char *text, asm_state_t *state);
-const char *asm_imm4u(const instruction_t *instr, const char *text, asm_state_t *state);
-const char *asm_imm5u(const instruction_t *instr, const char *text, asm_state_t *state);
+const char *asm_mem(const instruction_t *instr, const char *text, asm_state_t *state);
 
 // Execution tools
-word_t getXYReg(cpu_state_t* cpu, bool isY);
-void putXYreg(cpu_state_t* cpu, bool isY, word_t value);
 word_t getALUReg(cpu_state_t* cpu);
-addr_t getXYAddr(cpu_state_t* cpu);
-addr_t getAbsAddr(cpu_state_t* cpu);
-addr_t getStackAddr(cpu_state_t* cpu);
+addr_t getMemAddr(cpu_state_t* cpu);
 
 // Disassembly tools
 void dis_basic(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* buf, size_t len);
 void dis_register(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* buf, size_t len);
 void dis_alu_reg(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* buf, size_t len);
 void dis_alu_imm(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* buf, size_t len);
-void dis_imm4s(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* buf, size_t len);
-void dis_imm4u(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* buf, size_t len);
-void dis_imm5u(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* buf, size_t len);
+void dis_mem(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* buf, size_t len);
 
 // Verification
 typedef enum {

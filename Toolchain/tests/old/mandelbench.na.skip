@@ -14,7 +14,7 @@
 
     call mul2_6
     # output should be -78/64 = 0xB2
-    jcz no_overflow
+    jc no_overflow
     isp -1
     strs 0
     rdi 'v'
@@ -47,7 +47,7 @@ xloop:
     andi 0b111
     xori 0b111
     zero
-    jcz no_print
+    jc no_print
     # TODO: Actually print the accumulated value
     rdi 0x23
     call puthex
@@ -55,13 +55,13 @@ xloop:
 no_print:
     lds 1
     addi 1
-    jcz xloop
+    jc xloop
 
     lds 0
     addi 128 # We can't combine these because they don't produce the right carry
     addi -1
     ctog
-    jcz yloop
+    jc yloop
 
     isp 3
     brk
@@ -93,20 +93,20 @@ puthex:
     lds 2
     wr dy
     isp 3
-    ja
+    jp
 
 # args: acc
 # return: void
 puthexhalf:
     subi 0xA
-    jcz puthex_digit
+    jc puthex_digit
     addi 'A'
     wr io
-    ja
+    jp
 puthex_digit:
     addi 0xA + '0'
     wr io
-    ja
+    jp
 
 # args: acc, sp[0]
 # return: acc
@@ -126,7 +126,7 @@ mul2_6:
 # sp[1] = low
     lds 0
     sl
-    jcz no_offset
+    jc no_offset
     lds 1
     addi 63
     strs 1
@@ -149,7 +149,7 @@ no_offset:
     lds 3
     sw dy
     isp 4
-    ja
+    jp
 
 # args: acc, sp[0]
 # return: {sp[0], acc}
@@ -183,11 +183,11 @@ mul8_ext_loop:
     sl
     sw dx
     iclr
-    jcz mul8_ext_no_add
+    jc mul8_ext_no_add
     sw dy
     add dx
     sw dy
-    jcz mul8_ext_no_add
+    jc mul8_ext_no_add
     iset
     sw dy
     addi 0xFF
@@ -195,7 +195,7 @@ mul8_ext_loop:
     iclr
 mul8_ext_no_add:
     addi 1
-    jcz mul8_ext_loop
+    jc mul8_ext_loop
     iset
     rd dy
     strs 2
@@ -208,7 +208,7 @@ mul8_ext_no_add:
     lds 1
     sw dy
     isp 2
-    ja
+    jp
 
 @loc ISR
     jri

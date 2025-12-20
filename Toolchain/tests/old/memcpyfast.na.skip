@@ -2,14 +2,14 @@ memcpy_loop:
     # if size is > 16, move 16 bytes at a time using memcpy_blk16
     lds 7 # size>>8
     zero
-    jcz memcpy_blk16
+    jc memcpy_blk16
     lds 6 # size
     # This might be possible to make into a too-clever-by-half use of `add`
     zero
-    jcz memcpy_end
+    jc memcpy_end
     andi 0xF0
     zero
-    jcz memcpy_blk16
+    jc memcpy_blk16
 
 
 memcpy_blk16:
@@ -104,21 +104,21 @@ memcpy_blk16:
     addi 16    
     strs 2
     lds 3
-    addci 0
+    adci 0
     strs 3
 
     lds 4
     addi 16    
     strs 4
     lds 5
-    addci 0
+    adci 0
     strs 5
 
     lds 6
     addi 16    
     strs 6
     lds 7
-    addci 0
+    adci 0
     strs 7
 
     j memcpy_loop

@@ -10,49 +10,23 @@ static void exe_brk(cpu_state_t* cpu) {
 const instruction_t i_brk = {
     .mnemonic = "brk",
     .opcode_mask = 0,
-    .opcode = PROGFLOW_MASK | SIG_MASK | SIG_BRK,
+    .opcode = 0,
     .assemble = asm_basic,
     .disassemble = dis_basic,
     .execute = exe_brk
 };
 
-static void exe_bell(cpu_state_t* cpu) {
-    putchar('\a');
+static void exe_int(cpu_state_t* cpu) {
+    printf("int not yet supported\n");
     cpu->pc ++; cpu->elapsed ++;
 }
-const instruction_t i_bell = {
-    .mnemonic = "bell",
+const instruction_t i_int = {
+    .mnemonic = "int",
     .opcode_mask = 0,
-    .opcode = PROGFLOW_MASK | SIG_MASK | SIG_BELL,
+    .opcode = 1,
     .assemble = asm_basic,
     .disassemble = dis_basic,
-    .execute = exe_bell
-};
-
-static void exe_csclr(cpu_state_t* cpu) {
-    cpu->cs = false;
-    cpu->pc ++; cpu->elapsed ++;
-}
-const instruction_t i_csclr = {
-    .mnemonic = "csclr",
-    .opcode_mask = 0,
-    .opcode = PROGFLOW_MASK | SIG_MASK | SIG_CSCLR,
-    .assemble = asm_basic,
-    .disassemble = dis_basic,
-    .execute = exe_csclr
-};
-
-static void exe_csset(cpu_state_t* cpu) {
-    cpu->cs = true;
-    cpu->pc ++; cpu->elapsed ++;
-}
-const instruction_t i_csset = {
-    .mnemonic = "csset",
-    .opcode_mask = 0,
-    .opcode = PROGFLOW_MASK | SIG_MASK | SIG_CSSET,
-    .assemble = asm_basic,
-    .disassemble = dis_basic,
-    .execute = exe_csset
+    .execute = exe_int
 };
 
 static void exe_dint(cpu_state_t* cpu) {
@@ -62,7 +36,7 @@ static void exe_dint(cpu_state_t* cpu) {
 const instruction_t i_dint = {
     .mnemonic = "dint",
     .opcode_mask = 0,
-    .opcode = PROGFLOW_MASK | SIG_MASK | SIG_DINT,
+    .opcode = 2,
     .assemble = asm_basic,
     .disassemble = dis_basic,
     .execute = exe_dint
@@ -75,47 +49,8 @@ static void exe_eint(cpu_state_t* cpu) {
 const instruction_t i_eint = {
     .mnemonic = "eint",
     .opcode_mask = 0,
-    .opcode = PROGFLOW_MASK | SIG_MASK | SIG_EINT,
+    .opcode = 3,
     .assemble = asm_basic,
     .disassemble = dis_basic,
     .execute = exe_eint
-};
-
-static void exe_iclr(cpu_state_t* cpu) {
-    cpu->int_active = false;
-    cpu->pc ++; cpu->elapsed ++;
-}
-const instruction_t i_iclr = {
-    .mnemonic = "iclr",
-    .opcode_mask = 0,
-    .opcode = PROGFLOW_MASK | SIG_MASK | SIG_ICLR,
-    .assemble = asm_basic,
-    .disassemble = dis_basic,
-    .execute = exe_iclr
-};
-
-static void exe_iset(cpu_state_t* cpu) {
-    cpu->int_active = true;
-    cpu->pc ++; cpu->elapsed ++;
-}
-const instruction_t i_iset = {
-    .mnemonic = "iset",
-    .opcode_mask = 0,
-    .opcode = PROGFLOW_MASK | SIG_MASK | SIG_ISET,
-    .assemble = asm_basic,
-    .disassemble = dis_basic,
-    .execute = exe_iset
-};
-
-static void exe_ioa(cpu_state_t* cpu) {
-    cpu->ioaddr = peek(cpu, cpu->pc) & IMM5_MASK;
-    cpu->pc ++; cpu->elapsed ++;
-}
-const instruction_t i_ioa = {
-    .mnemonic = "ioa",
-    .opcode_mask = IMM5_MASK,
-    .opcode = IOA_MASK,
-    .assemble = asm_imm5u,
-    .disassemble = dis_imm5u,
-    .execute = exe_ioa
 };
