@@ -16,4 +16,4 @@ idle:
     lds 0
     sw dx
     isp 1
-    jri
+    jxi

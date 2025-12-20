@@ -11,4 +11,4 @@ lbl:wr io
 	brk
 
 @loc ISR
-	jri
+	jxi

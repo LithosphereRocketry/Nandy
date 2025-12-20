@@ -14,6 +14,8 @@ static const instruction_t* default_instrs[] = {
     &i_isc,
     &i_isp,
     &i_rdp,
+    &i_rdq,
+    &i_rdja,
     &i_call,
     &i_goto,
     &i_move,
@@ -25,7 +27,7 @@ static const instruction_t* default_instrs[] = {
     &i_sw,
     &i_jp,
     &i_jpr,
-    &i_jri,
+    &i_jxi,
     &i_brk,
     &i_dint,
     &i_eint,
@@ -59,7 +61,9 @@ static const instruction_t* default_instrs[] = {
     &i_subi,
     &i_sbci,
     &i_j,
-    &i_jc
+    &i_jr,
+    &i_jc,
+    &i_jcr
 };
 
 const ilist_t NANDY_ILIST = {

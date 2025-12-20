@@ -7,4 +7,4 @@ idle:
 @loc ISR
     addi 1
     brk
-    jri
+    jxi

@@ -8,11 +8,11 @@ extern const instruction_t i_macro_echo, i_macro_define, i_macro_assert;
 extern const instruction_t i_macro_loc, i_macro_memloc, i_macro_static;
 extern const instruction_t i_macro_string; // align, memalign, include
 // temp macros
-extern const instruction_t i_isc, i_isp, i_rdp, i_call, i_goto, i_move, i_swap, i_pusha;
+extern const instruction_t i_isc, i_isp, i_rdp, i_rdq, i_rdja, i_call, i_goto, i_move, i_swap, i_pusha;
 // register
 extern const instruction_t i_rd, i_wr, i_sw;
 // jump
-extern const instruction_t i_jp, i_jpr, i_jri, i_j, i_jc;
+extern const instruction_t i_jp, i_jpr, i_jxi, i_j, i_jr, i_jc, i_jcr;
 // flags
 extern const instruction_t i_brk, i_int, i_dint, i_eint;
 // regbit

@@ -22,4 +22,4 @@ idle:
     wr dy
     lds 2
     isc 3
-    jri
+    jxi

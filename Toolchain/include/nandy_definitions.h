@@ -7,6 +7,7 @@
 #define COMMENT_TOK "#"
 
 #define ABSJ_MASK (1<<2)
+#define RET_MASK (1<<0)
 
 #define RD_MASK (1<<4)
 #define WR_MASK (1<<3)
@@ -14,6 +15,8 @@
 #define CARRY_SEL_MASK (1<<3)
 #define XY_MASK (1<<4)
 #define ALU_SEL_MASK (1<<5)
+
+#define COND_MASK (1<<4)
 
 #define MULTIBYTE_MASK (1<<6)
 
@@ -32,6 +35,7 @@
 
 #define REGID_MASK 0b0111
 #define IMM4_MASK 0b1111
+#define IMMJ_MASK 0b1110
 
 #define MEM_MASK (1<<7)
 #define MMODE_MASK (0b11 << 5)

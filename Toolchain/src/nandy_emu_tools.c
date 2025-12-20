@@ -63,7 +63,8 @@ bool emu_step(cpu_state_t* state, FILE* outstream/*, iorange_t* iomap, size_t n_
     }
     
     if(state->int_en && state->ints_in && !state->int_active) {
-        state->ia = state->pc;
+        // not quite how it works in hardware, but close enough
+        state->ia = state->pc-1;
         state->pc = ISR_ADDR;
         state->int_active = true;
     }

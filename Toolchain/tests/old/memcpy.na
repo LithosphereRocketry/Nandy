@@ -115,4 +115,4 @@ enddata:
 @static buffer 4096
 
 @loc ISR
-    jri
+    jxi

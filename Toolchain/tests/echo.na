@@ -5,4 +5,4 @@ idle:
 @loc ISR
     rd io
     wr io
-    jri
+    jxi

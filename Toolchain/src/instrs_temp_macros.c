@@ -36,8 +36,59 @@ const instruction_t i_rdp = {
     .assemble = asm_rdp
 };
 
+// todo: these can probably be deduplicated
+static bool resolveRdja(asm_state_t* state, const char* text, addr_t pos, FILE* debug) {
+    int64_t value;
+    shunting_status_t status = parseExp(&state->resolved, text, &value, debug);
+    value--;
+    if(status == SHUNT_DONE) {
+        if(!isBounded(value, 16, BOUND_UNSIGNED)) {
+            if(debug) fprintf(debug, "Error: address %s is out of range! (%li)\n", text, value);
+            return false;
+        }
+        state->rom[pos+5] = (value >> 8) & 0xFF;
+        state->rom[pos+2] = value & 0xFF;
+        printf("%lx %hhx %hhx\n", value, state->rom[pos+5], state->rom[pos+2]);
+        return true;
+    } else {
+        if(debug) fprintf(debug, "Parse failed: %i\n", status);
+        return false;
+    }
+}
+static const char* asm_rdja(const instruction_t* instr, const char* text, asm_state_t* state) {
+    // An instruction with a null argument skips label resolution, since we're
+    // going to be doing that manually
+    const char* end = addUnresolved(state, text, resolveRdja);
+    instr_assemble(&i_wr, regnames[REG_PH], state);
+    instr_assemble(&i_rdi, NULL, state);
+    instr_assemble(&i_wr, regnames[REG_PL], state);
+    instr_assemble(&i_rdi, NULL, state);
+    instr_assemble(&i_sw, regnames[REG_PH], state);
+    return end;
+}
+const instruction_t i_rdja = {
+    .mnemonic = "rdja",
+    .assemble = asm_rdja
+};
+
+static const char* asm_rdq(const instruction_t* instr, const char* text, asm_state_t* state) {
+    // An instruction with a null argument skips label resolution, since we're
+    // going to be doing that manually
+    const char* end = addUnresolved(state, text, resolveRdp);
+    instr_assemble(&i_wr, regnames[REG_QH], state);
+    instr_assemble(&i_rdi, NULL, state);
+    instr_assemble(&i_wr, regnames[REG_QL], state);
+    instr_assemble(&i_rdi, NULL, state);
+    instr_assemble(&i_sw, regnames[REG_QH], state);
+    return end;
+}
+const instruction_t i_rdq = {
+    .mnemonic = "rdq",
+    .assemble = asm_rdq
+};
+
 static const char* asm_call(const instruction_t* instr, const char* text, asm_state_t* state) {
-    const char* end = instr_assemble(&i_rdp, text, state);
+    const char* end = instr_assemble(&i_rdja, text, state);
     instr_assemble(&i_jpr, "", state);
     return end;
 }
@@ -47,7 +98,7 @@ const instruction_t i_call = {
 };
 
 static const char* asm_goto(const instruction_t* instr, const char* text, asm_state_t* state) {
-    const char* end = instr_assemble(&i_rdp, text, state);
+    const char* end = instr_assemble(&i_rdja, text, state);
     instr_assemble(&i_jp, "", state);
     return end;
 }

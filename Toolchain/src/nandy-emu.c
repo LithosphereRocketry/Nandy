@@ -26,7 +26,7 @@ void scanDisasm(cpu_state_t* state, addr_t start) {
         for(int i = 1; i < len; i++) { disasm_cache[start + i] = NULL; }
         // These instructions are completely intractable to the disassembler
         // because their jump target is runtime-variable
-        if(instr != &i_jp && instr != &i_jpr && instr != &i_jri) {
+        if(instr != &i_jp && instr != &i_jpr && instr != &i_jxi) {
             // TODO: how do we scan targets of relative jumps without creating
             // infinite loops of misaligned instructions fighting with each
             // other
@@ -49,7 +49,7 @@ ACC 0x3F    SP  0x3F        FF      rd io
 DX  0x3F    DY  0x3F        FF      sw dy
 IRX 0x3F    IRY 0x3F        FF      add dx
 IN  0x3F    OUT 0x3F        FF  PC> addi 6
-IE  1       INT 1           FF      jri
+IE  1       INT 1           FF      jxi
                             FF      nop
 Cycles 1234567890       SP> FF      nop 
     */

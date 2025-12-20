@@ -55,4 +55,4 @@ done:
     lds 1
     sw y
     isp 2
-    jri
+    jxi
