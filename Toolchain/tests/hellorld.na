@@ -1,0 +1,37 @@
+rdi hellostr>>8
+wr qh
+rdi hellostr&0xFF
+wr ql
+call puts
+brk
+
+# argument in q
+# clobbers q
+puts:
+    isp -2
+    st sp 0
+    rd y
+    st sp 1
+    swap ph qh
+    swap pl ql
+    rdi 0
+    wr y
+    
+puts_loop:
+    ld p+ 1
+    zero
+    jc puts_done
+    wr io
+    j puts_loop
+
+puts_done:
+    swap ph qh
+    swap pl ql
+    ld sp 1
+    wr y
+    ld sp 0
+    jp
+
+
+hellostr:
+    @string "Hellorld!\n"

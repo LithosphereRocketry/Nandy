@@ -89,7 +89,7 @@ const instruction_t i_j = {
 };
 
 static void exe_jc(cpu_state_t* cpu) {
-    if(!cpu->carry) {
+    if(cpu->carry) {
         exe_j(cpu);
     } else {
         cpu->pc += 2;

@@ -13,10 +13,11 @@ static const instruction_t* default_instrs[] = {
 
     &i_isc,
     &i_isp,
-    &i_rda,
+    &i_rdp,
     &i_call,
     &i_goto,
     &i_move,
+    &i_swap,
     &i_pusha,
 
     &i_rd,

@@ -52,11 +52,13 @@ const char* parseReg(const char* text, regid_t* dest) {
 
 const char* parseMemMode(const char* text, memmode_t* dest) {
     while(isspace(*text) && *text != '\n') text++;
+    const char* end_name = text;
+    while(!isspace(*end_name)) end_name++;
     // slightly hacky but we know these are spaced out by 2^5
     for(size_t i = 0; i < n_mmnames; i += (1 << 5)) {
-        if(strncmp(text, mmnames[i], strlen(mmnames[i])) == 0) {
+        if(strncmp(text, mmnames[i], end_name-text) == 0) {
             *dest = i;
-            return text + strlen(regnames[i]);
+            return text + strlen(mmnames[i]);
         }
     }
     return NULL;
@@ -182,7 +184,8 @@ const char *asm_mem(const instruction_t *instr, const char *text, asm_state_t *s
     const char* midptr = parseMemMode(text, &mm);
     if(!midptr) return NULL;
     state->rom[state->rom_loc] = instr->opcode | mm;
-    const char* endptr = addUnresolved(state, text, resolveImm4u);
+    while(isspace(*midptr)) midptr++;
+    const char* endptr = addUnresolved(state, midptr, resolveImm4u);
     state->rom_loc ++;
     return endptr;
 }

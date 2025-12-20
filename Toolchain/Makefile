@@ -12,7 +12,7 @@ OBJDIR = obj/
 # Assembly tests go here
 TESTDIR = tests/
 
-COPTS = -Wall -Wextra -O2 -flto -Wno-unused-result -Wno-unused-parameter -Werror=implicit-function-declaration -Werror=int-conversion
+COPTS = -Wall -Wextra -Og -g3 -flto -Wno-unused-result -Wno-unused-parameter -Werror=implicit-function-declaration -Werror=int-conversion
 
 # if you just type "make", this happens
 .DEFAULT_GOAL: all
@@ -49,7 +49,7 @@ $(RKT_TARGETS): %: $(SRCDIR)%.rkt $(SRCDIR)*.rkt
 
 # To build a target:
 # - Require its corresponding object and all of the dependency objects to be up to date
-# - Throw everything to the system's default C++ compiler
+# - Throw everything to the system's default C compiler
 $(TARGETS): %: $(OBJDIR)%.o $(DEPOBJ)
 	$(CC) -o $@ $< $(DEPOBJ)
 
