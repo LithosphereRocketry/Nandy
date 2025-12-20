@@ -22,7 +22,7 @@ extern const instruction_t i_add, i_adc, i_sub, i_sbc;
 // regshift
 extern const instruction_t i_sl, i_slc, i_sr, i_src;
 // regcomp
-extern const instruction_t i_ctog, i_cset, i_cclr, i_zero, i_nzero, i_sgn, i_nsgn;
+extern const instruction_t i_nop, i_ctog, i_cset, i_cclr, i_zero, i_nzero, i_sgn, i_nsgn;
 // immbit
 extern const instruction_t i_rdi, i_ori, i_andi, i_xori;
 // immadd

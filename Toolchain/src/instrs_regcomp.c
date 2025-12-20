@@ -54,6 +54,18 @@ const instruction_t i_cset = {
     .execute = exe_cset
 };
 
+static void exe_nop(cpu_state_t* cpu) {
+    cpu->pc ++; cpu->elapsed ++;
+}
+const instruction_t i_nop = {
+    .mnemonic = "nop",
+    .opcode_mask = 0,
+    .opcode = ALU_SEL_MASK | XY_MASK | CARRY_SEL_MASK | ALU_OR,
+    .assemble = asm_basic,
+    .disassemble = dis_basic,
+    .execute = exe_nop
+};
+
 static void exe_ctog(cpu_state_t* cpu) {
     cpu->carry = !cpu->carry;
     cpu->pc ++; cpu->elapsed ++;

@@ -36,6 +36,7 @@ static const instruction_t* default_instrs[] = {
     &i_and,
     &i_xor,
     &i_cclr,
+    &i_nop,
     &i_nzero,
     &i_sgn,
     &i_cset,
