@@ -2,7 +2,7 @@
 
 ## Introduction
 This document is meant as a supplement to the NANDy Programmer's guide. It
-provides a concise listing of all hardware-supported instructions for the NANDy
+provides a concise listing of all hardware-supported instructions for the NANy
 CPU architecture.
 
 ## Instruction Reference
@@ -10,7 +10,7 @@ CPU architecture.
 ### General-purpose
 
 #### Control
-##### `nop`
+##### `nop` [^1]
 Does nothing.
 ##### `brk`
 Stops program execution. In emulation, exits to the debugger interface.
@@ -18,20 +18,22 @@ Stops program execution. In emulation, exits to the debugger interface.
 Plays an audible alert tone.
 ##### `eint`, `dint`
 Enables or disables interrupts, respectively.
-##### [currently disabled] `iset`, `iclr`
-Sets or clears interrupt status, respectively. Does not trigger an interrupt;
-behavior is undefined while external interrupts are enabled.
 ##### `j <label>`
 Jumps to the specified label.
-##### `jcz <label>`
-Jumps to the specified label if the carry bit is 0.
-##### `ja`
-Jumps to the address formed by the combination of DY and DX.
-##### `jar`
-Identical to `ja`, but replaces the contents of DY and DX with the address of
-the following instruction.
-##### `jri`
-Identical to `ja`, but also clears interrupt status if it is present.
+##### `jr <label>`
+Jumps to the specified label, storing the current PC in `p`. [^2]
+##### `jc <label>`
+Jumps to the specified label if the carry bit is set.
+##### `jcr <label>`
+Jumps to the specified label if the carry bit is set, storing the current PC in
+`p`. [^2]
+##### `jp`
+Jumps to one byte past the address stored in `p`. [^3]
+##### `jpr`
+Jumps to one byte past the address stored in `p`, storing the current PC in `p`. [^3]
+##### `jxi`
+Jumps to the address stored in the hidden `IA` register and clears the interrupt
+flag.
 
 #### Registers
 ##### `rd <register>`
@@ -52,44 +54,39 @@ Toggles the value of the carry bit.
 #### Addition & subtraction
 For all of the following, the carry bit is set to the carry-out value of the
 operation.
-##### `add <dx/dy>`
+##### `add <x/y>`
 Adds the contents of the specified register to the accumulator.
-##### `addc <dx/dy>`
-Identical to `add` but treats the carry bit as a carry-in bit from a less
-significant byte.
-##### `sub <dx/dy>`
+##### `adc <x/y>`
+Adds the contents of the specified register plus the carry bit to the
+accumulator, and sets the carry bit to the carry-out value of the result.
+##### `sub <x/y>`
 Subtracts the contents of the specified register from the accumulator.
-##### `subc <dx/dy>`
-Identical to `sub` but treats the carry bit as a carry-in bit from a less
-significant byte.
-##### `_add`, `_sub`, `_addc`, `_subc`
-Identical to their respective non-underscore variants, but do not modify the
-carry bit.
-##### `addi`, `addci`, `subi`, `subci`, `_addi`, `_addci`, `_subi`, `_subci`
-Identical to their respective non-`i` variants, but use the provided immediate
-value in place of the DX or DY register.
+##### `sbc <x/y>`
+Subtracts the contents of the specified register minus the inverse of the carry
+bit from the accumulator, and sets the carry bit to the carry-out value of the
+result.
 
 #### Comparison
 ##### `zero`, `nzero`
 Sets the carry bit to 1 if the accumulator does or does not hold the value 0,
 respectively, and sets it to zero otherwise.
-##### `par`, `npar`
-Sets the carry bit to 1 if the accumulator contains an odd or even number of
-high bits, respecitvely.
+##### `sgn`, `nsgn`
+Sets the carry bit to the sign bit or inverse of the sign bit of the
+accumulator, respectively.
 
 #### Bitwise logic
-##### `and <dx/dy>`
+##### `and <x/y>`
 Bitwise-ands the contents of the accumulator with the specified register and
 stores the results in the accumulator.
-##### `or <dx/dy>`
+##### `or <x/y>`
 Bitwise-ors the contents of the accumulator with the specified register and
 stores the results in the accumulator.
-##### `xor <dx/dy>`
+##### `xor <x/y>`
 Bitwise-xors the contents of the accumulator with the specified register and
 stores the results in the accumulator.
 ##### `andi`, `ori`, `xori`
 Identical to their respective non-`i` variants, but use the provided immediate
-value in place of the DX or DY register.
+value in place of the x or y register.
 
 #### Shifts
 For all of the following, the carry bit is set to the value shifted off the end
@@ -99,29 +96,40 @@ Shifts the accumulator left or right, respectively, by one bit, inserting a 0 at
 the vacated place.
 ##### `slc`, `src`
 Shifts the accumulator left or right, respectively, by one bit, inserting the
-previous value of the carry bit at the vacated place.
-##### `sla`, `sra`
-Shifts the accumulator left or right, respectively, by one bit, copying the
-value of the vacated place from the bit adjacent to it.
-##### `slr`, `srr`
-Shifts the accumulator left or right, respectively, by one bit, copying the
-value of the vacated place from the bit shifted off the end.
-##### `_sl`, `_sr`, `_slc`, `_src`, `_sla`, `_sra`, `_slr`, `_srr`
-Identical to their respective non-underscore variants, but do not modify the
-carry bit.
+previous value of the carry bit at the vacated place, and setting the carry bit
+to the shifted-out value of the result.
 
 ### Memory
 #### Loads
 ##### `lda <offset>`
-Loads the value at the combined address stored in DY and DX plus the specified
+Loads the value at the combined address stored in y and x plus the specified
 unsigned 4-bit offset into the accumulator.
 ##### `lds <offset>`
 Loads the value at the address formed by 0xFF00 + SP + offset into the
 accumulator.
 #### Stores
 ##### `stra <offset>`
-Stores the value of the accumulator at the combined address stored in DY and DX
+Stores the value of the accumulator at the combined address stored in y and x
 plus the specified unsigned 4-bit offset.
 ##### `strs <offset>`
 Stores the value of the accumulator at the address formed by 0xFF00 + SP +
 offset.
+
+[^1]: At several places in NANDy internals `nop` is referred to as a comparison
+    instruction. This is because, internally, it's implemented as "set carry
+    equal to carry" - the non-inverted form of `ctog`. (The instructions `cset`,
+    `cclr`, and `ctog` are also internally treated as comparisons.)
+
+[^2]: When a two-byte instruction stores the current value of PC, it stores the
+    address of the second byte of the instruction. This allows `jp` to the
+    resultant address to jump to the following instruction.
+
+[^3]: Register-absolute jumps target the byte after the given address because of
+    NANDy's two-cycle-per-instruction limit. The full task of making a relative
+    function call requires three 16-bit adds:
+    * Compute PC+1 to load the second byte of the instruction.
+    * Compute PC+offset to determine the target of the jump.
+    * Compute PC+2 to determine the return address of the jump.
+    By making the stored return address equal to PC+1 instead of PC+2, we can
+    offload the computation of PC+2 to the return step, allowing `jr` to fit in
+    two cycles.
