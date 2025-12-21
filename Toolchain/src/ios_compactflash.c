@@ -30,10 +30,34 @@ static uint8_t registers[8] = {
     [CF_STATUS_CMD] = 0 // BUSY, RDY, WF, SC, DRQ, CORR, IDX(0), ERR / command
 };
 
-void cf_command(uint8_t cmd) {
+static uint8_t error_register;
+
+static bool feat_8bit;
+
+static void cf_abort() {
+    registers[CF_STATUS_CMD] |= 0b1;
+    error_register |= 0b101;
+}
+
+static void cf_command(uint8_t cmd) {
+    error_register = 0;
     switch(cmd) {
+        case 0xEF: // set feature
+            switch(registers[CF_ERROR_FEATURE]) {
+                case 0x01: // enable 8-bit mode
+                    feat_8bit = true;
+                    break;
+                case 0x81: // disable 8-bit mode
+                    feat_8bit = false;
+                    break;
+                default:
+                    fprintf(stderr, "Tried to set an unknown feature 0x%hhx",
+                        registers[CF_ERROR_FEATURE]);
+                    cf_abort();
+            }
         default:
             fprintf(stderr, "Received an unknown CF command 0x%hhx", cmd);
+                    cf_abort();
     }
 }
 
@@ -60,14 +84,18 @@ bool io_step_compactflash(cpu_state_t* cpu, bool active) {
         
         // Read behaviors
         switch(reg_sel) {
+            case CF_ERROR_FEATURE:
+                cpu->ioin = error_register;
+                break;
             default:
                 cpu->ioin = registers[reg_sel];
         }
 
         if(cpu->io_wr) {
+            // write behaviors
             switch(reg_sel) {
                 case CF_STATUS_CMD:
-                    
+                    cf_command(cpu->ioout);
                     break;
                 default:
                     registers[reg_sel] = cpu->ioout;

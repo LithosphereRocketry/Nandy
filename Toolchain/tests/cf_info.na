@@ -22,6 +22,9 @@ main:
 # Initializes compactflash card in 8 bit mode
 cf_init:
     isp -4
+    st sp 3
+    rd y
+    st sp 2
     rd ph
     st sp 1
     rd pl
@@ -30,16 +33,26 @@ cf_init:
     # waveguide.se does a drive reset here with 0x04 but that's not actually
     # listed as a valid CF command
     jr cf_wait
+    # Enable LBA mode
     rdi CF_LBA_27_24_MODE
     wr y
-    rdi 0xE0 # Enable LBA mode
-    wr io    
+    rdi 0xE0
+    wr io
+    # Enable 8-bit access
+    rdi CF_ERROR_FEATURE
+    wr y
+    rdi 0x01
+    wr io
 
 
-    ld sp 1
-    wr ph
     ld sp 0
     wr pl
+    ld sp 1
+    wr ph
+    ld sp 2
+    wr y
+    ld sp 3
+    isp 4
     jp
 
 
@@ -67,7 +80,7 @@ cf_identify_drive:
     ld sp 2
     wr y
     ld sp 3
-    isp 3
+    isp 4
     jp
 
 # Wait for CF card to become un-busy
