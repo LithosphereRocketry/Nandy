@@ -20,7 +20,9 @@ const asm_state_t INIT_ASM = {
 
     .unresolved_sz = 0,
     .unresolved_cap = 0,
-    .unresolved = NULL
+    .unresolved = NULL,
+
+    .skipped_over = 0
 };
 
 const char* instr_assemble(const instruction_t* instr, const char* text, asm_state_t* state) {

@@ -1,0 +1,146 @@
+# CompactFlash LBA mode parameters
+@define CF_BASE 8
+@define CF_DATA CF_BASE | 0
+@define CF_ERROR_FEATURE CF_BASE | 1
+@define CF_SECTOR_COUNT CF_BASE | 2
+@define CF_LBA_7_0 CF_BASE | 3
+@define CF_LBA_15_8 CF_BASE | 4
+@define CF_LBA_23_16 CF_BASE | 5
+@define CF_LBA_27_24_MODE CF_BASE | 6
+@define CF_STATUS_CMD CF_BASE | 7
+
+main:
+    rdi 0
+    wr sp
+    rdq sector_buf
+    jr cf_identify_drive
+    brk
+
+# Based on 8-bit CF interface from waveguide.se
+# https://www.waveguide.se/?article=8-bit-compact-flash-interface
+
+# Initializes compactflash card in 8 bit mode
+cf_init:
+    isp -4
+    rd ph
+    st sp 1
+    rd pl
+    st sp 0
+    
+    # waveguide.se does a drive reset here with 0x04 but that's not actually
+    # listed as a valid CF command
+    jr cf_wait
+    rdi CF_LBA_27_24_MODE
+    wr y
+    rdi 0xE0 # Enable LBA mode
+    wr io    
+
+
+    ld sp 1
+    wr ph
+    ld sp 0
+    wr pl
+    jp
+
+
+# Read the CF info into the sector buffer
+# Sector buffer address passed in q, clobbered
+cf_identify_drive:
+    isp -4
+    st sp 3
+    rd y
+    st sp 2
+    rd ph
+    st sp 1
+    rd pl
+    st sp 0
+
+    jr cf_wait
+    rdi 0xEC
+    jr cf_cmd
+
+
+    ld sp 0
+    wr pl
+    ld sp 1
+    wr ph
+    ld sp 2
+    wr y
+    ld sp 3
+    isp 3
+    jp
+
+# Wait for CF card to become un-busy
+# clobbers ACC, Y
+cf_wait:
+    sw y
+    rdi CF_STATUS_CMD
+    sw y
+cf_wait_loop:
+    rd io
+    sgn
+    jc cf_wait_loop
+    jp
+
+# Send a command to the CF card
+# Takes input in ACC, clobbers Y
+cf_cmd:
+    sw y
+    rdi CF_STATUS_CMD
+    sw y
+    wr io
+    jp
+
+# Read sector into buffer after it is already prompted
+# Sector buffer address passed in q, clobbered
+cf_receive_sector:
+    isp -4
+    st sp 3
+    rd y
+    st sp 2
+    rd ph
+    st sp 1
+    rd pl
+    st sp 0
+
+    swap ph qh
+    swap pl ql
+
+    rdi CF_STATUS_CMD
+    wr y
+    rdi 0xEC
+    wr io
+    j cf_receive_sector_entry
+
+# I'm not sure that this is correct but it's what waveguide.se does - just keep
+# reading data until DRQ is clear
+# It seems like the card might take a second to set DRQ 
+cf_receive_sector_loop:
+    rdi CF_DATA
+    wr y
+    rd io
+    st p+ 1
+cf_receive_sector_entry:
+    rdi CF_STATUS_CMD
+    wr y
+    rd io
+    andi 0b00001000
+    zero
+    jc cf_receive_sector_loop
+
+cf_receive_sector_done:
+    swap ph qh
+    swap pl ql
+
+    ld sp 0
+    wr pl
+    ld sp 1
+    wr ph
+    ld sp 2
+    wr y
+    ld sp 3
+    isp 3
+    jp
+
+@static 512 sector_buf
+

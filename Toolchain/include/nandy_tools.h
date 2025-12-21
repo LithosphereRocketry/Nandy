@@ -58,6 +58,8 @@ typedef struct asm_state {
     size_t unresolved_sz;
     size_t unresolved_cap;
     unresolved_t* unresolved;
+
+    size_t skipped_over;
 } asm_state_t;
 
 const char* instr_assemble(const instruction_t* instr, const char* text, asm_state_t* state);
