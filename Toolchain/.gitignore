@@ -1,6 +1,8 @@
 # NANDy specific
 *.nb
 *.logi
+card.img
+card.img.failed
 parse-test
 nandy-emu
 nandy-asm

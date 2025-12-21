@@ -1,5 +1,9 @@
 # Semi-automated C/C++ makefile
 
+# number of blocks to allocate to virtual disk `card.img`; always uses 512 byte
+# blocks, so the default 8192 blocks = 4MiB
+FAT_BLOCKCOUNT = 8192
+
 # This should be all you need to change
 TARGETS = nandy-emu binconvert nandy-asm shuntingyard_test
 # RKT_TARGETS = nandy-asm-racket
@@ -11,16 +15,21 @@ SRCDIR = src/
 OBJDIR = obj/
 # Assembly tests go here
 TESTDIR = tests/
+# Card image will be created from this directory
+CARDDIR = card/
 
 COPTS = -Wall -Wextra -Og -g3 -flto -Wno-unused-result -Wno-unused-parameter -Werror=implicit-function-declaration -Werror=int-conversion
 
+
 # if you just type "make", this happens
-.DEFAULT_GOAL: all
+.DEFAULT_GOAL=targets
 # these rules don't refer to real files, so they shouldn't get timestamp-checked
-.PHONY: all clean assemble
+.PHONY: targets clean assemble all
+
+all: targets assemble card.img
 
 # make all = make (all of the final targets given)
-all: $(TARGETS) $(RKT_TARGETS)
+targets: $(TARGETS) $(RKT_TARGETS)
 
 # includes = everything in INCDIR with a .h file extension
 INC = $(wildcard $(INCDIR)*.h)
@@ -39,6 +48,17 @@ DEPOBJ = $(filter-out $(TGTOBJ),$(OBJ))
 ASMTESTS = $(patsubst $(TESTDIR)%.na,%.nb,$(wildcard $(TESTDIR)*.na))
 
 assemble: $(ASMTESTS)
+
+# doesn't work recursively or for deletions but good enough for now
+# notes:
+# if any command fails we 
+# one sector per cluster gives the image enough clusters that mkfs.fat doesn't
+# complain about it being misdetected as fat12
+CARD_FAIL = { mv card.img card.img.failed; exit 1; }
+card.img: $(wildcard $(CARDDIR)/*)
+	dd if=/dev/zero of=$@ bs=512 count=$(FAT_BLOCKCOUNT) || $(CARD_FAIL)
+	mkfs.fat -F 16 --mbr=y -s 1 -S 512 card.img || $(CARD_FAIL)
+	mcopy -i $@ -Qsv $^ :: || $(CARD_FAIL)
 
 $(ASMTESTS): %.nb: $(TESTDIR)%.na nandy-asm
 	./nandy-asm $< $@
@@ -73,4 +93,4 @@ $(OBJDIR):
 
 # clean deletes all objects and target executables
 clean:
-	rm -f $(OBJDIR)* $(TARGETS) $(RKT_TARGETS) *.nb *.logi
+	rm -f $(OBJDIR)* $(TARGETS) $(RKT_TARGETS) *.nb *.logi card.img card.img.failed
