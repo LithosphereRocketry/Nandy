@@ -24,7 +24,7 @@ static void exe_rmove(cpu_state_t* cpu) {
             case REG_SP: cpu->sp = tmp; break;
             case REG_IO: cpu->ioout = tmp; cpu->io_wr = true; break;
             case REG_X: cpu->x = tmp; break;
-            case REG_Y: cpu->y = cpu->acc; break;
+            case REG_Y: cpu->y = tmp; break;
             case REG_PH: cpu->p = (cpu->p & 0xFF) | (tmp << 8); break;
             case REG_PL: cpu->p = (cpu->p & 0xFF00) | tmp; break;
             case REG_QH: cpu->q = (cpu->q & 0xFF) | (tmp << 8); break;

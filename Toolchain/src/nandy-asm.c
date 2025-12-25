@@ -29,7 +29,7 @@ int main(int argc, char** argv) {
         return err;
     }
 
-    printf("Assembly complete, used %zu bytes", state.rom_loc - state.skipped_over);
+    printf("Assembly complete, used %zu bytes\n", state.rom_loc - state.skipped_over);
 
     FILE* fdest = fopen(argv[2], "w");
     fwrite(state.rom, sizeof(word_t), ROM_SIZE, fdest);
