@@ -1,170 +1,55 @@
-`timescale 1ns/1ps
+module core(
+        input clk,
 
-module core #(parameter rompath = "memory.txt") (
-        input int,
-        input reset,
-        input clock,
-        input [7:0] ioin,
-        output [7:0] ioout,
-        output iowrite,
-        output ioread
-    );
-    wire [15:0] pc;
-    wire nM;
-    // Technically this invert can be optimized out
-    invert invmem(.a(M), .q(nM));
-    register #(16) rpc(
-        .d(intnewpc),
-        .clk(clock),
-        .en(nM),
-        .nclr(reset),
-        .q(pc)
+        input [7:0] io_in,
+        output [7:0] io_addr,
+        output [7:0] io_out
     );
 
-    wire [15:0] memaddr, ret, newpc;
-    addresscalc acalc(
-        .pcin(pc),
-        .dx(dx),
-        .dy(dy),
-        .sp(sp),
-        .longoffs(memout),
-        .offs(instr[3:0]),
-        .mem(M),
-        .stack(S),
-        .jump(J),
-        .longjump(LJ),
+    wire wr_acc, wr_ph, wr_pl, wr_sp, wr_x, wr_y;
 
-        .addr(memaddr),
-        .ret(ret),
-        .pcout(newpc)
+    wire [2:0] regsel;
+
+    reg [7:0] acc, x, y, sp;
+
+    assign io_addr = y;
+
+    wire [15:0] p_in;
+    wire [15:0] p, q;
+
+    wire [15:0] pointer = regsel[0] ? q : p;
+    wire [7:0] iosp = regsel[0] ? io : sp;
+    wire [7:0] xy = regsel[0] ? y : x;
+    wire [7:0] reg_read;
+    mux4 muxreg(
+        .a(iosp),
+        .b(xy),
+        .c(pointer[7:0]),
+        .d(pointer[15:8]),
+        .sel(regsel[2:1]),
+        .q(reg_read)
     );
 
-    wire [7:0] memout;
-    memory #(rompath) mem(
-        .addr(memaddr),
-        .din(acc),
-        .we(MW),
-        .clk(clock),
-        .dout(memout)
+    split_reg regp(
+        .clk(clk),
+        .d(p_in),
+        .we({wr_ph, wr_pl}),
+        .q(p)
     );
 
-    wire [7:0] instr;
-    dlatch il [7:0] (
-        .en(ncycle),
-        .d(memout),
-        .nclr(1'b1),
-        .q(instr)
+    split_reg regq(
+        .clk(clk),
+        .d({acc, acc}),
+        .we({wr_qh, wr_ql}),
+        .q(q)
     );
 
-    // There's a few control signals
-    wire M, S, J, LJ, nCLI, nLJR, MW, MC, nMC, RD, WR, Y, WA, nISP, WC;
-    wire [1:0] RS;
-    wire [3:0] aluop;
-    wire [7:0] nSIG;
-    control ctrl(
-        .inst(instr),
-        .cycle(cycle),
-        .ncycle(ncycle),
-        .carry(carry),
+    wire [7:0] alu_out;
 
-        .M(M),
-        .S(S),
-        .J(J),
-        .LJ(LJ),
-        .nCLI(nCLI),
-        .nLJR(nLJR),
-        .MW(MW),
-        .MC(MC),
-        .nMC(nMC),
-        .RD(RD),
-        .WR(WR),
-        .Y(Y),
-        .RS(RS),
-        .WA(WA),
-        .nISP(nISP),
-        .WC(WC),
-        .ALU(aluop),
-        .nSIG(nSIG)
-    );
-
-    wire cycle, ncycle;
-    register #(1) rcycle(
-        .d(MC),
-        .clk(clock),
-        .en(1'b1),
-        .nclr(reset),
-        .q(cycle),
-        .nq(ncycle)
-    );
-
-    wire [15:0] intnewpc;
-    wire ienabled, istatus;
-    intcontrol ictrl(
-        .pcin(newpc),
-        .nie(nSIG[5]),
-        .nid(nSIG[4]),
-        .int(int),
-        .nclr(nCLI),
-        .nis(nSIG[7]),
-        .nic(nSIG[6]),
-        .ncycle(nMC),
-        .clk(clock),
-        .rst(reset),
-
-        .pcout(intnewpc),
-        .ienabled(ienabled),
-        .istatus(istatus)
-    );
-
-    wire [7:0] acc, sp, dx, dy, alua, alub;
-    regfile rfile(
-        .RD(RD),
-        .WR(WR),
-        .Y(Y),
-        .cycle(cycle),
-        .RS(RS),
-        .WA(WA),
-        .nISP(nISP),
-        .nLJR(nLJR),
-        .clk(clock),
-        .RA(ret),
-        .ienabled(ienabled),
-        .istatus(istatus),
-        .intRA(newpc),
-        .aluout(aluout),
-        .mem(memout),
-        .ioin(ioin),
-        .imm(instr[3:0]),
-
-        .ior(ioread),
-        .iow(iowrite),
-        .A(alua),
-        .B(alub),
-
-        .acc(acc),
-        .sp(sp),
-        .dx(dx),
-        .dy(dy),
-        .ioout(ioout)
-    );
-
-    wire carry;
-    wire cout;
-    wire [7:0] aluout;
-    alu ALU(
-        .a(alua),
-        .b(alub),
-        .op(aluop),
-        .xy(Y),
-        .cin(carry),
-        .q(aluout),
-        .cout(cout)
-    );
-    register #(1) rcarry(
-        .d(cout),
-        .clk(clock),
-        .en(WC),
-        .nclr(1'b1),
-        .q(carry)
-    );
+    always @(posedge clk) begin
+        if(wr_acc) acc <= alu_out;
+        if(wr_sp) sp <= acc;
+        if(wr_x) x <= acc;
+        if(wr_y) y <= acc;
+    end
 endmodule
