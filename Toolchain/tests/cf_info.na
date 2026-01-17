@@ -155,5 +155,5 @@ cf_receive_sector_done:
     isp 3
     jp
 
-@static 512 sector_buf
+@static sector_buf 512
 
