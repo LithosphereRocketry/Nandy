@@ -1,6 +1,9 @@
 #include "nandy_ios.h"
 
 #include <stdio.h>
+#include <fcntl.h>
+#include <termios.h>
+#include <unistd.h>
 
 #include "iotools.h"
 #include "emu_settings.h"
@@ -28,6 +31,14 @@ static uint8_t registers[8] = {
     [CF_LBA_23_16] = 0,
     [CF_LBA_27_24_MODE] = 0b10100000,// 1, LBA enable, 1, DRV, LBA 27-24
     [CF_STATUS_CMD] = 0 // BUSY, RDY, WF, SC, DRQ, CORR, IDX(0), ERR / command
+};
+
+static int serial_fd;
+static struct termios serial_settings = {
+    .c_cflag = B115200 | CS8 | CLOCAL | CREAD,
+    .c_iflag = IGNPAR,
+    .c_lflag = 0,
+    .c_cc[VMIN] = 1
 };
 
 static uint8_t error_register;
@@ -64,7 +75,12 @@ static void cf_command(uint8_t cmd) {
 bool io_step_compactflash(cpu_state_t* cpu, bool active) {
 
     if(first_access) {
-        if(arg_diskimg.result.value) {
+        if(arg_diskser.result.value) {
+            serial_fd = open(arg_diskser.result.value, O_RDWR | O_NOCTTY);
+            tcflush(serial_fd, TCIFLUSH);
+            tcsetattr(serial_fd, TCSANOW, &serial_settings);
+
+        } else if(arg_diskimg.result.value) {
             // To prevent annoying hidden state, don't actually write changes
             // back to disk (at least for now)
             FILE* diskfile = fopen(arg_diskimg.result.value, "rb");
@@ -83,22 +99,35 @@ bool io_step_compactflash(cpu_state_t* cpu, bool active) {
         int reg_sel = cpu->y & 0b111;
         
         // Read behaviors
-        switch(reg_sel) {
-            case CF_ERROR_FEATURE:
-                cpu->ioin = error_register;
-                break;
-            default:
-                cpu->ioin = registers[reg_sel];
+        if(cpu->io_rd) {
+            if(arg_diskser.result.value) {
+                uint8_t msg[] = {reg_sel};
+                write(serial_fd, msg, 1);
+                read(serial_fd, &cpu->acc, 1);
+            } else {
+                switch(reg_sel) {
+                    case CF_ERROR_FEATURE:
+                        cpu->acc = error_register;
+                        break;
+                    default:
+                        cpu->acc = registers[reg_sel];
+                }
+            }            
         }
 
         if(cpu->io_wr) {
-            // write behaviors
-            switch(reg_sel) {
-                case CF_STATUS_CMD:
-                    cf_command(cpu->ioout);
-                    break;
-                default:
-                    registers[reg_sel] = cpu->ioout;
+            if(arg_diskser.result.value) {
+                uint8_t msg[] = {0x80 | reg_sel, cpu->acc};
+                write(serial_fd, msg, 2);
+            } else {
+                // write behaviors
+                switch(reg_sel) {
+                    case CF_STATUS_CMD:
+                        cf_command(cpu->acc);
+                        break;
+                    default:
+                        registers[reg_sel] = cpu->acc;
+                }
             }
         }
     }

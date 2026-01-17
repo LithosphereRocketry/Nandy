@@ -2,6 +2,7 @@
 #include "nandy_parse_tools.h"
 #include "stdio.h"
 
+
 static void exe_rmove(cpu_state_t* cpu) {
     word_t ibyte = peek(cpu, cpu->pc);
     // by casting to int16 early we make editing top bytes a little easier
@@ -9,8 +10,9 @@ static void exe_rmove(cpu_state_t* cpu) {
 
     if(ibyte & RD_MASK) {
         switch(ibyte & REGID_MASK) {
+            // IO operations are handled by the IO device
             case REG_SP: cpu->acc = cpu->sp; break;
-            case REG_IO: cpu->acc = cpu->ioin; cpu->io_rd = true; break;
+            case REG_IO: cpu->io_rd = true; break;
             case REG_X: cpu->acc = cpu->x; break;
             case REG_Y: cpu->acc = cpu->y; break;
             case REG_PH: cpu->acc = cpu->p >> 8; break;
@@ -22,7 +24,7 @@ static void exe_rmove(cpu_state_t* cpu) {
     if(ibyte & WR_MASK) {
         switch(ibyte & REGID_MASK) {
             case REG_SP: cpu->sp = tmp; break;
-            case REG_IO: cpu->ioout = tmp; cpu->io_wr = true; break;
+            case REG_IO: cpu->io_wr = true; break;
             case REG_X: cpu->x = tmp; break;
             case REG_Y: cpu->y = cpu->acc; break;
             case REG_PH: cpu->p = (cpu->p & 0xFF) | (tmp << 8); break;

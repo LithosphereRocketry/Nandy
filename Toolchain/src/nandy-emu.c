@@ -94,8 +94,8 @@ Cycles 1234567890       SP> FF      nop
             state->x, state->y, peek(state, 0xFF00 + (uint8_t) state->sp + 5), linebuf[2]);
     printf("P 0x%04hx    Q 0x%04hhx        %02hhx      %-40s\n",
             state->p, state->q, peek(state, 0xFF00 + (uint8_t) state->sp + 4), linebuf[3]);
-    printf("IN  0x%02hhx    OUT 0x%02hhx        %02hhx  PC> %-40s\n",
-            state->ioin, state->ioout, peek(state, 0xFF00 + (uint8_t) state->sp + 3), linebuf[4]);
+    printf("                            %02hhx  PC> %-40s\n",
+            peek(state, 0xFF00 + (uint8_t) state->sp + 3), linebuf[4]);
     printf("IE  %c       INT %c           %02hhx      %-40s\n",
             state->int_en ? '1' : '0', state->int_active ? '1' : '0', peek(state, 0xFF00 + (uint8_t) state->sp + 2), linebuf[5]);
     printf("IA 0x%04x   IOS %c%c          %02hhx      %-40s\n",
@@ -130,16 +130,6 @@ bool debug(cpu_state_t* state) {
         } else if(!strcmp(cmd, "continue") || !strcmp(cmd, "c")) {
             state->idbg = false;
             return true;
-        } else if(!strcmp(cmd, "io") || !strcmp(cmd, "i")) {
-            int64_t io;
-            if(parseExp(NULL, input+scanlen, &io, stdout) != SHUNT_DONE) {
-                printf("Failed to parse value\n");
-            } else if(!isBounded(io, 8, BOUND_EITHER)) {
-                printf("Value does not fit in word\n");
-            } else {
-                state->ioin = (word_t) io;
-                return debug(state);
-            }
         } else if(!strcmp(cmd, "peek") || !strcmp(cmd, "e")) {
             int64_t addr;
             if(parseExp(NULL, input+scanlen, &addr, stdout) != SHUNT_DONE) {
