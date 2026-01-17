@@ -78,7 +78,7 @@ static const char* asm_macro_loc(const instruction_t* instr, const char* text, a
     if(status == SHUNT_DONE) {
         if(isBounded(value, 16, BOUND_UNSIGNED)) {
             if(value > state->rom_loc) {
-                state->skipped_over += value - state->ram_loc;
+                state->skipped_over += value - state->rom_loc;
                 state->rom_loc = value;
                 free(arg);
                 return endOfInput(text);
