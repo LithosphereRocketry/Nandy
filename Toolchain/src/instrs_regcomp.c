@@ -42,7 +42,7 @@ const instruction_t i_sgn = {
 };
 
 static void exe_cset(cpu_state_t* cpu) {
-    cpu->carry = (cpu->acc & 0x80) == 0;
+    cpu->carry = true;
     cpu->pc ++; cpu->elapsed ++;
 }
 const instruction_t i_cset = {
