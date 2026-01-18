@@ -6,7 +6,7 @@
 static void exe_rmove(cpu_state_t* cpu) {
     word_t ibyte = peek(cpu, cpu->pc);
     // by casting to int16 early we make editing top bytes a little easier
-    addr_t tmp = cpu->acc;
+    addr_t tmp = (uint8_t) cpu->acc;
 
     if(ibyte & RD_MASK) {
         switch(ibyte & REGID_MASK) {

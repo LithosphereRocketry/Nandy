@@ -8,6 +8,8 @@
 #include "iotools.h"
 #include "emu_settings.h"
 
+#define SERIAL_SPEED B115200
+
 enum cf_registers {
     CF_DATA = 0,
     CF_ERROR_FEATURE = 1,
@@ -34,12 +36,7 @@ static uint8_t registers[8] = {
 };
 
 static int serial_fd;
-static struct termios serial_settings = {
-    .c_cflag = B115200 | CS8 | CLOCAL | CREAD,
-    .c_iflag = IGNPAR,
-    .c_lflag = 0,
-    .c_cc[VMIN] = 1
-};
+static struct termios serial_settings;
 
 static uint8_t error_register;
 
@@ -78,7 +75,25 @@ bool io_step_compactflash(cpu_state_t* cpu, bool active) {
         if(arg_diskser.result.value) {
             serial_fd = open(arg_diskser.result.value, O_RDWR | O_NOCTTY);
             tcflush(serial_fd, TCIFLUSH);
+            tcgetattr(serial_fd, &serial_settings);
+            cfsetispeed(&serial_settings, SERIAL_SPEED);
+            cfsetospeed(&serial_settings, SERIAL_SPEED);
+            serial_settings.c_cflag &= ~(CSIZE | PARENB);
+            serial_settings.c_cflag |= CS8 | CLOCAL | CREAD;
+            serial_settings.c_lflag &= ~(ICANON | ECHO);
+            serial_settings.c_cc[VMIN] = 1;
+            serial_settings.c_cc[VTIME] = 0;
             tcsetattr(serial_fd, TCSANOW, &serial_settings);
+            // Opening the serial port causes the arduino to reset, which takes
+            // a shockingly long time, so wait for it to send us a byte before
+            // we start blasting it
+
+            uint8_t ack;
+            read(serial_fd, &ack, 1);
+            if(ack != 0xF0) {
+                fprintf(stderr, "Unexpected serial acknowledge 0x%hhx\n", ack);
+                exit(-1);
+            }
 
         } else if(arg_diskimg.result.value) {
             // To prevent annoying hidden state, don't actually write changes
@@ -102,8 +117,14 @@ bool io_step_compactflash(cpu_state_t* cpu, bool active) {
         if(cpu->io_rd) {
             if(arg_diskser.result.value) {
                 uint8_t msg[] = {reg_sel};
-                write(serial_fd, msg, 1);
-                read(serial_fd, &cpu->acc, 1);
+                if(write(serial_fd, msg, 1) != 1) {
+                    fprintf(stderr, "Serial didn't send command!\n");
+                    exit(-1);
+                }
+                if(read(serial_fd, &cpu->acc, 1) != 1) {
+                    fprintf(stderr, "Serial didn't get data!\n");
+                    exit(-1);
+                }
             } else {
                 switch(reg_sel) {
                     case CF_ERROR_FEATURE:
@@ -118,7 +139,10 @@ bool io_step_compactflash(cpu_state_t* cpu, bool active) {
         if(cpu->io_wr) {
             if(arg_diskser.result.value) {
                 uint8_t msg[] = {0x80 | reg_sel, cpu->acc};
-                write(serial_fd, msg, 2);
+                if(write(serial_fd, msg, 2) != 2) {
+                    fprintf(stderr, "Serial didn't send data!\n");
+                    exit(-1);
+                }
             } else {
                 // write behaviors
                 switch(reg_sel) {
