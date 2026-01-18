@@ -22,12 +22,12 @@ bool io_step_tty(cpu_state_t* cpu, bool active) {
     }
     
     if(active) {
-        cpu->ioin = incoming_input;
         if(cpu->io_rd) {
+            cpu->acc = incoming_input;
             input_available = false;
         }
         if(cpu->io_wr) {
-            putc(cpu->ioout, stdout);
+            putc(cpu->acc, stdout);
         }
     }
     

@@ -26,14 +26,10 @@ const instruction_t* ilookup(word_t word) {
     return cache[(unsigned char) word];
 }
 
-bool io_step_intcontrol(cpu_state_t* cpu, bool active) {
-    if(active && cpu->io_rd) { cpu->ioin = cpu->ints_in; }
-    return false;
-}
-
 // Devices after 8 in this order won't get interrupt channels
 static const iorange_t iomap[] = {
     {0x00, 8, io_step_tty},
+    {0x08, 8, io_step_compactflash}
 };
 static const size_t n_ios = sizeof(iomap) / sizeof(iorange_t);
 

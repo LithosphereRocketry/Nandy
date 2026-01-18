@@ -18,15 +18,18 @@ bool io_step_16550(cpu_state_t* cpu, bool active) {
         int reg_sel = cpu->y & 0b111;
         
         // Read behaviors
-        switch(reg_sel) {
-            default:
-                cpu->ioin = registers[reg_sel];
+        if(cpu->io_rd) {
+            switch(reg_sel) {
+                default:
+                    cpu->acc = registers[reg_sel];
+            }
+
         }
 
         if(cpu->io_wr) {
             switch(reg_sel) {
                 default:
-                    registers[reg_sel] = cpu->ioout;
+                    registers[reg_sel] = cpu->acc;
             }
         }
     }

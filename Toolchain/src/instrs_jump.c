@@ -50,6 +50,7 @@ static bool resolveReljump(asm_state_t* state, const char* text, addr_t pos, FIL
     shunting_status_t status = parseExp(&state->resolved, text, &value, debug);
     if(status == SHUNT_DONE) {
         int64_t offset = value - pos - 1;
+        printf("Assembling jump to %s, from %hx to %hx with offset %hx\n", text, pos+1, value, offset);
         if(!isBounded(offset, 11, BOUND_SIGNED)) {
             printf("Error: jump to %s is too long! (%li)\n", text, offset);
             return false;
@@ -70,13 +71,20 @@ static const char* asm_reljump(const instruction_t *instr, const char *text, asm
     return endptr;
 }
 
+static addr_t offset_from_instr(cpu_state_t* cpu, addr_t addr) {
+    return  signExtend(
+        ((int) peek(cpu, addr) & IMMJ_MASK) << 7
+        | (uint8_t) peek(cpu, addr+1)
+    , 11);
+}
+
 void dis_reljump(const instruction_t* instr, cpu_state_t* cpu, addr_t addr, char* buf, size_t len) {
-    int64_t offset = signExtend((((int) peek(cpu, addr) & IMMJ_MASK) << 7) | peek(cpu, addr+1), 11);
-    snprintf(buf, len, "%s %04lx", instr->mnemonic, addr + offset + 1);
+    int64_t offset = offset_from_instr(cpu, addr);
+    snprintf(buf, len, "%s %04hx", instr->mnemonic, addr + ((addr_t) offset) + 1);
 }
 
 static void exe_j(cpu_state_t* cpu) {
-    cpu->pc += signExtend((((int) peek(cpu, cpu->pc)) << 8) | peek(cpu, cpu->pc+1), 12) + 1;
+    cpu->pc += offset_from_instr(cpu, cpu->pc) + 1;
     cpu->elapsed += 2;
 }
 const instruction_t i_j = {
@@ -90,7 +98,7 @@ const instruction_t i_j = {
 
 static void exe_jr(cpu_state_t* cpu) {
     cpu->p = cpu->pc+1;
-    cpu->pc += signExtend((((int) peek(cpu, cpu->pc) & IMMJ_MASK) << 7) | peek(cpu, cpu->pc+1), 11) + 1;
+    cpu->pc += offset_from_instr(cpu, cpu->pc) + 1;
     cpu->elapsed += 2;
 }
 const instruction_t i_jr = {
