@@ -12,8 +12,11 @@
 main:
     rdi 0
     wr sp
+    jr cf_init
     rdq sector_buf
     jr cf_identify_drive
+    rdq sector_buf
+    jr dump_sector
     brk
 
 # Based on 8-bit CF interface from waveguide.se
@@ -43,7 +46,8 @@ cf_init:
     wr y
     rdi 0x01
     wr io
-
+    rdi 0xEF
+    jr cf_cmd 
 
     ld sp 0
     wr pl
@@ -71,7 +75,7 @@ cf_identify_drive:
     jr cf_wait
     rdi 0xEC
     jr cf_cmd
-
+    jr cf_receive_sector
 
     ld sp 0
     wr pl
@@ -84,7 +88,7 @@ cf_identify_drive:
     jp
 
 # Wait for CF card to become un-busy
-# clobbers ACC, Y
+# clobbers Y, ACC contains status register
 cf_wait:
     sw y
     rdi CF_STATUS_CMD
@@ -116,35 +120,40 @@ cf_receive_sector:
     rd pl
     st sp 0
 
-    swap ph qh
-    swap pl ql
-
     rdi CF_STATUS_CMD
     wr y
     rdi 0xEC
     wr io
-    j cf_receive_sector_entry
-
-# I'm not sure that this is correct but it's what waveguide.se does - just keep
-# reading data until DRQ is clear
-# It seems like the card might take a second to set DRQ 
-cf_receive_sector_loop:
-    rdi CF_DATA
-    wr y
-    rd io
-    st p+ 1
-cf_receive_sector_entry:
+    jr cf_wait
+    # wait for it to set DRDY
     rdi CF_STATUS_CMD
     wr y
+    # move q into p in a ruthless, clobber-y way
+    rd qh
+    wr ph
+    rd ql
+    wr pl
+
+    # ql will be our loop counter
+    # qh is free for a potential "read sectors" command down the line, maybe
+    # using acc as parameter?
+    rdi 0
+    wr ql
+    rdi CF_DATA
+    wr y
+
+cf_receive_sector_loop:
     rd io
-    andi 0b00001000
-    zero
+    st p+ 1
+    rd io
+    st p+ 1
+    rd ql
+    subi 1
+    wr ql
+    nzero
     jc cf_receive_sector_loop
 
 cf_receive_sector_done:
-    swap ph qh
-    swap pl ql
-
     ld sp 0
     wr pl
     ld sp 1
@@ -152,8 +161,137 @@ cf_receive_sector_done:
     ld sp 2
     wr y
     ld sp 3
+    isp 4
+    jp
+
+# Prints a 512 byte memory region (must be 2 byte aligned)
+# Sector buffer address passed in q, clobbered
+# clobbers acc, x, y
+dump_sector:
+    isp -3
+    rd pl
+    st sp 0
+    rd ph
+    st sp 1
+    rdi 0
+dump_sector_loop:
+    st sp 2
+    # unroll by two because we get a nice 256-cycle loop
+
+    # load byte into acc
+    swap ph qh
+    swap pl ql
+    ld p+ 1
+    swap ph qh
+    swap pl ql
+    jr dump_byte
+
+    rdi 0
+    wr y
+    rdi ' '
+    wr io
+
+    swap ph qh
+    swap pl ql
+    ld p+ 1
+    swap ph qh
+    swap pl ql
+    jr dump_byte
+
+    rdi 0
+    wr y
+    rdi ' '
+    wr io
+
+    ld sp 2
+    subi 1
+    andi 0x7
+    nzero
+    jc dump_sector_no_nl
+    rdi '\r'
+    wr io
+    rdi '\n'
+    wr io
+
+dump_sector_no_nl:
+    ld sp 2
+    subi 1
+    nzero
+    jc dump_sector_loop
+
+    ld sp 0
+    wr pl
+    ld sp 1
+    wr ph
     isp 3
     jp
 
-@static 512 sector_buf
+
+# input in acc, clobbers x, expects y already set
+dump_byte:
+    wr x
+    sr
+    sr
+    sr
+    sr
+    subi 10
+    nsgn
+    jc dump_byte_letter
+    addi '0' + 10
+    wr io
+    j dump_byte_chr2
+dump_byte_letter:
+    addi 'a'
+    wr io
+
+dump_byte_chr2:
+    rd x
+    andi 0xF
+
+    subi 10
+    nsgn
+    jc dump_byte_letter2
+    addi '0' + 10
+    wr io
+    j dump_byte_done
+dump_byte_letter2:
+    addi 'a'
+    wr io
+
+dump_byte_done:
+    jp
+
+
+# argument in q
+# clobbers q
+puts:
+    isp -2
+    st sp 0
+    rd y
+    st sp 1
+    swap ph qh
+    swap pl ql
+    rdi 0
+    wr y
+    j puts_entry
+
+puts_loop:
+    wr io
+puts_entry:
+    ld p+ 1
+    nzero
+    jc puts_loop
+
+puts_done:
+    swap ph qh
+    swap pl ql
+    ld sp 1
+    wr y
+    ld sp 0
+    jp
+
+failstr:
+@string "CF card returned error!\n"
+
+@static sector_buf 512
 

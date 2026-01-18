@@ -92,7 +92,7 @@ Cycles 1234567890       SP> FF      nop
             state->acc, state->sp, peek(state, 0xFF00 + (uint8_t) state->sp + 6), linebuf[1]);
     printf("X   0x%02hhx    Y   0x%02hhx        %02hhx      %-40s\n",
             state->x, state->y, peek(state, 0xFF00 + (uint8_t) state->sp + 5), linebuf[2]);
-    printf("P 0x%04hx    Q 0x%04hhx        %02hhx      %-40s\n",
+    printf("P 0x%04hx    Q 0x%04hx        %02hhx      %-40s\n",
             state->p, state->q, peek(state, 0xFF00 + (uint8_t) state->sp + 4), linebuf[3]);
     printf("                            %02hhx  PC> %-40s\n",
             peek(state, 0xFF00 + (uint8_t) state->sp + 3), linebuf[4]);
@@ -108,6 +108,7 @@ Cycles 1234567890       SP> FF      nop
 }
 
 bool debug(cpu_state_t* state) {
+    static char lastInput[256] = { '\0' };
     scanDisasm(state, state->pc);
     printDebug(state);
     while(1) {
@@ -115,10 +116,11 @@ bool debug(cpu_state_t* state) {
         printf("DEBUG> ");
         char input[256];
         fgets(input, 255, stdin);
-        if(input[0] == '\n') {
-            // On empty line, reprint the display
-            return debug(state);
+        if(input[0] == '\n' && lastInput[0] != '\0') {
+            // On empty line, repeat last command
+            strcpy(input, lastInput);
         }
+        strcpy(lastInput, input);
         char cmd[64];
         int scanlen;
         sscanf(input, "%63s%n", cmd, &scanlen);
@@ -173,6 +175,7 @@ bool debug(cpu_state_t* state) {
             }
         } else {
             printf("Unrecognized command \"%s\"\n", cmd);
+            lastInput[0] = '\0';
         }
     }
 }
