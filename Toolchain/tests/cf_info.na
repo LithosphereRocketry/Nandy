@@ -120,10 +120,6 @@ cf_receive_sector:
     rd pl
     st sp 0
 
-    rdi CF_STATUS_CMD
-    wr y
-    rdi 0xEC
-    wr io
     jr cf_wait
     # wait for it to set DRDY
     rdi CF_STATUS_CMD
