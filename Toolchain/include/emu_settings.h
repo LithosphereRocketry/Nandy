@@ -3,7 +3,7 @@
 
 #include "argparse.h"
 
-extern argument_t arg_debug, arg_forcedebug, arg_out, arg_timeacc, arg_diskimg, arg_diskser;
+extern argument_t arg_debug, arg_forcedebug, arg_timeacc, arg_diskimg, arg_diskser;
 
 extern argument_t* args[];
 extern const size_t n_args;

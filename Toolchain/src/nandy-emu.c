@@ -203,15 +203,6 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    FILE* fout = stdout;
-    if(arg_out.result.value) {
-        fout = fopen(arg_out.result.value, "wb");
-        if(!fout) {
-            printf("File %s not found\n", arg_out.result.value);
-            return -1;
-        }
-    }
-
     state = INIT_STATE;
     fread(state.rom, sizeof(word_t), ROM_SIZE, f);
 
@@ -237,7 +228,7 @@ int main(int argc, char** argv) {
                 // really this should use a system delay call probably
                 lastMicros += 1000;
             }
-        } while(!emu_step(&state, fout));
+        } while(!emu_step(&state));
         if(arg_debug.result.present) {
             if(!debug(&state)) { break; }
         }
@@ -246,8 +237,4 @@ int main(int argc, char** argv) {
     printf("Complete, executed %li cycles\n", state.elapsed);
 
     fclose(f);
-    if(arg_out.result.value) { // technically it's probably harmless to close
-            // stdout here but it makes me sad
-        fclose(fout);
-    }
 }

@@ -12,6 +12,6 @@ typedef struct {
 } iorange_t;
 
 const instruction_t* ilookup(word_t word);
-bool emu_step(cpu_state_t* state, FILE* outstream/*, iorange_t* iomap, size_t n_ios*/);
+bool emu_step(cpu_state_t* state/*, iorange_t* iomap, size_t n_ios*/);
 
 #endif
