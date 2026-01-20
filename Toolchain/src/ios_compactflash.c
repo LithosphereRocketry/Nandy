@@ -70,7 +70,7 @@ static void set_up_ident() {
     size_t n_sectors = disksize/512;
     if(n_sectors > 0xFFFFFFFF) {
         fprintf(stderr, "Warning: disk size of %zu sectors does not fit in 32-"
-                "bit disk size parameter, size may be truncated", n_sectors);
+                "bit disk size parameter, size may be truncated\n", n_sectors);
     }
 
     memset(ident_buffer, 0, 512); // probably unnecessary but it doesn't hurt

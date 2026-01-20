@@ -1,6 +1,7 @@
 #include "argparse.h"
 
 #include <string.h>
+#include <stdlib.h>
 
 static int doarg(argument_t* arg, int i, int argc, char** argv) {
     if(arg->hasval) {
@@ -15,6 +16,36 @@ static int doarg(argument_t* arg, int i, int argc, char** argv) {
         arg->result.present = true;
         return i;
     }
+}
+
+static void dohelp(argument_t** args, size_t nargs) {
+    size_t max_width = 0;
+    size_t* widths = malloc(nargs * sizeof(size_t));
+    for(size_t i = 0; i < nargs; i++) {
+        argument_t* arg = args[i];
+        widths[i] = 0;
+        if(arg->abbr) widths[i] += 2;
+        if(arg->abbr && arg->name) widths[i]++;
+        if(arg->name) widths[i] += strlen(arg->name) + 2;
+        if(widths[i] > max_width) max_width = widths[i];
+    }
+
+    printf("Arguments:\n");
+    printf("  -h/--help");
+    for(size_t j = 0; j < (max_width - 7); j++) printf(" ");
+    printf("Prints this help text.\n");
+    for(size_t i = 0; i < nargs; i++) {
+        argument_t* arg = args[i];
+        printf("  ");
+        if(arg->abbr) printf("-%c", arg->abbr);
+        if(arg->abbr && arg->name) printf("/");
+        if(arg->name) printf("--%s", arg->name);
+        for(size_t j = 0; j < (max_width - widths[i]); j++) printf(" ");
+        if(arg->help) printf("  %s", arg->help);
+        printf("\n");
+    }
+    free(widths);
+    exit(0);
 }
 
 int argparse(argument_t** args, size_t nargs, int argc, char** argv) {
@@ -40,6 +71,9 @@ int argparse(argument_t** args, size_t nargs, int argc, char** argv) {
                 while(*seekptr) {
                     bool found = false;
                     int newi = 0;
+                    if(*seekptr == 'h') {
+                        dohelp(args, nargs);
+                    }
                     for(size_t j = 0; j < nargs; j++) {
                         if(args[j]->abbr != '\0' && *seekptr == args[j]->abbr) {
                             newi = doarg(args[j], i, argc, argv);
