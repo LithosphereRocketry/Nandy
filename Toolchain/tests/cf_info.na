@@ -13,16 +13,23 @@ main:
     rdi 0
     wr sp
     jr cf_init
+    jc cf_no_card
     rdq sector_buf
     jr cf_identify_drive
     rdq sector_buf
     jr dump_sector
     brk
 
+cf_no_card:
+    rdq nocardstr
+    jr puts
+    brk
+
 # Based on 8-bit CF interface from waveguide.se
 # https://www.waveguide.se/?article=8-bit-compact-flash-interface
 
 # Initializes compactflash card in 8 bit mode
+# Sets carry if no card was detected
 cf_init:
     isp -4
     st sp 3
@@ -32,6 +39,15 @@ cf_init:
     st sp 1
     rd pl
     st sp 0
+
+    rdi CF_ERROR_FEATURE
+    wr y
+    rd io
+    # these bits of the error/feature register are defined as 0, so if any read
+    # as 1, the bus is disconnected and being pulled high
+    andi 0b00101010
+    nzero
+    jc cf_init_end
     
     # waveguide.se does a drive reset here with 0x04 but that's not actually
     # listed as a valid CF command
@@ -49,6 +65,8 @@ cf_init:
     rdi 0xEF
     jr cf_cmd 
 
+    cclr
+cf_init_end:
     ld sp 0
     wr pl
     ld sp 1
@@ -286,6 +304,9 @@ puts_done:
     ld sp 0
     jp
 
+
+nocardstr:
+@string "No CF card detected!\n"
 failstr:
 @string "CF card returned error!\n"
 

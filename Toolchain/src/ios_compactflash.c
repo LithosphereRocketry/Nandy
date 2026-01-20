@@ -172,8 +172,8 @@ bool io_step_compactflash(cpu_state_t* cpu, bool active) {
             } else {
                 fprintf(stderr, "Warning, could not open file '%s', defaulting to no disk", arg_diskimg.result.value);
             }
+            set_up_ident();
         }
-        set_up_ident();
         first_access = false;
     }
 
@@ -192,7 +192,7 @@ bool io_step_compactflash(cpu_state_t* cpu, bool active) {
                     fprintf(stderr, "Serial didn't get data!\n");
                     exit(-1);
                 }
-            } else {
+            } else if(disk) {
                 switch(reg_sel) {
                 case CF_ERROR_FEATURE:
                     cpu->acc = error_register;
@@ -213,6 +213,8 @@ bool io_step_compactflash(cpu_state_t* cpu, bool active) {
                 default:
                     cpu->acc = registers[reg_sel];
                 }            
+            } else {
+                cpu->acc = 0xFF;
             }
         }
 
@@ -223,7 +225,7 @@ bool io_step_compactflash(cpu_state_t* cpu, bool active) {
                     fprintf(stderr, "Serial didn't send data!\n");
                     exit(-1);
                 }
-            } else {
+            } else if(disk) {
                 // write behaviors
                 switch(reg_sel) {
                     case CF_STATUS_CMD:
