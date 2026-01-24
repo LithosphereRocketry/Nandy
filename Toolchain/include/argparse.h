@@ -9,6 +9,7 @@
 typedef struct argument {
     const char abbr;
     const char* name;
+    const char* help;
     bool hasval;
     union {
         bool present;

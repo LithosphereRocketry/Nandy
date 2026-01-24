@@ -34,7 +34,7 @@ static const iorange_t iomap[] = {
 static const size_t n_ios = sizeof(iomap) / sizeof(iorange_t);
 
 // TODO: more flexibility
-bool emu_step(cpu_state_t* state, FILE* outstream/*, iorange_t* iomap, size_t n_ios*/) {
+bool emu_step(cpu_state_t* state/*, iorange_t* iomap, size_t n_ios*/) {
     // instruction execute phase (up clock)
     state->io_rd = false;
     state->io_wr = false;
