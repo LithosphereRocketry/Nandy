@@ -203,7 +203,7 @@ bool debug(cpu_state_t* state) {
 // Weird little block here for Unix signal support
 #ifdef __unix__
 #include <signal.h>
-void onInterrupt() {
+void onInterrupt(int ignored) {
     state.idbg = true;
 }
 struct sigaction act = { .sa_handler = onInterrupt };
