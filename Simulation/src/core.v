@@ -10,6 +10,7 @@ module core(
         output [7:0] io_out
     );
 
+    wire carry;
     wire wr_acc, wr_ph, wr_pl, wr_sp, wr_x, wr_y, wr_mem, alu_from_mem, p_from_addr;
 
     wire [2:0] regsel;
@@ -69,6 +70,17 @@ module core(
     wire [7:0] alu_b = alu_from_mem ? mem_out : reg_read;
 
     wire [7:0] alu_out;
+    alu arith(
+        .clk(clk),
+        .ncycle(),
+        .cmpinv(regsel[0]),
+        .aluop(),
+        .a(acc),
+        .b(alu_b),
+        .status(),
+        .q(alu_out),
+        .carry(carry)
+    );
 
     memory mem(
         .clk(clk),
