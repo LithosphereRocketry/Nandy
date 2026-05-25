@@ -22,7 +22,7 @@ const char* mmnames[] = {
     [MM_STACK] = "sp",
     [MM_P] = "p",
     [MM_Q] = "q",
-    [MM_PPOST] = "p+"
+    [MM_PPRE] = "+p"
 };
 const size_t n_mmnames = sizeof(mmnames) / sizeof(const char*);
 
@@ -204,10 +204,9 @@ addr_t getMemAddr(cpu_state_t* cpu) {
             return cpu->p + (instr & IMM4_MASK);
         case MM_Q:
             return cpu->q + (instr & IMM4_MASK);
-        case MM_PPOST:
-            tmp = cpu->p;
+        case MM_PPRE:
             cpu->p += (instr & IMM4_MASK);
-            return tmp;        
+            return cpu->p;        
     }
 }
 

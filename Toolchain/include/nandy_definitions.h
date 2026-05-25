@@ -77,7 +77,7 @@ typedef enum memmode {
 	MM_STACK = (0b00 << 5),
 	MM_Q = (0b01 << 5),
 	MM_P = (0b10 << 5),
-	MM_PPOST = (0b11 << 5)
+	MM_PPRE = (0b11 << 5)
 } memmode_t;
 
 #endif

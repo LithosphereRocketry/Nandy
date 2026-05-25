@@ -22,15 +22,26 @@ puts:
     st sp 0
     rd y
     st sp 1
+
+    # Decrement for preincrement
+    cset
+    rd ql
+    sbci 1
+    wr ql
+    rd qh
+    sbci 0
+    wr qh
+
     swap ph qh
     swap pl ql
     rdi 0
     wr y
     j puts_entry
+
 puts_loop:
     wr io
 puts_entry:
-    ld p+ 1
+    ld +p 1
     nzero
     jc puts_loop
 
@@ -55,11 +66,14 @@ memcpy:
     rd pl
     st sp 0
 
-    # retrieve our source address off the stack
-    ld sp 4
-    wr ph
+    cset
+    # retrieve our source address off the stack and decrement it
     ld sp 3
+    sbci 1
     wr pl
+    ld sp 4
+    sbci 0
+    wr ph
     # now all three pointers are in registers so we can avoid using the stack
     # at all
 
@@ -68,9 +82,9 @@ memcpy:
     j memcpy_entry
 
 memcpy_loop:
-    # with the P register, we can use the built-in postincrement and suffer a
+    # with the P register, we can use the built-in preincrement and suffer a
     # lot less
-    ld p+ 1
+    ld +p 1
     # no such luck with q
     st q 0
     cclr

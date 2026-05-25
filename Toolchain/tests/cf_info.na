@@ -18,6 +18,18 @@ main:
     jr cf_identify_drive
     rdq sector_buf
     jr dump_sector
+    # TODO: ASCII fields on CF cards are byte swapped, for reasons I don't
+    # entirely understand - to get nice printouts we need to swap them back
+    rdq namestr
+    jr puts
+    rdq sector_buf+54
+    rdi 40
+    jr putbuf_small
+    rdq serstr
+    jr puts
+    rdq sector_buf+20
+    rdi 20
+    jr putbuf_small
     brk
 
 cf_no_card:
@@ -142,11 +154,15 @@ cf_receive_sector:
     # wait for it to set DRDY
     rdi CF_STATUS_CMD
     wr y
-    # move q into p in a ruthless, clobber-y way
-    rd qh
-    wr ph
+    # move q into p in a ruthless, clobber-y way and decrement it as we go
+    # so that preincrement puts us where we need to be
+    cset
     rd ql
+    sbci 1
     wr pl
+    rd qh
+    sbci 0
+    wr ph
 
     # ql will be our loop counter
     # qh is free for a potential "read sectors" command down the line, maybe
@@ -158,9 +174,9 @@ cf_receive_sector:
 
 cf_receive_sector_loop:
     rd io
-    st p+ 1
+    st +p 1
     rd io
-    st p+ 1
+    st +p 1
     rd ql
     subi 1
     wr ql
@@ -187,6 +203,16 @@ dump_sector:
     st sp 0
     rd ph
     st sp 1
+
+    # Decrement for preincrement
+    cset
+    rd ql
+    sbci 1
+    wr ql
+    rd qh
+    sbci 0
+    wr qh
+
     rdi 0
 dump_sector_loop:
     st sp 2
@@ -195,7 +221,7 @@ dump_sector_loop:
     # load byte into acc
     swap ph qh
     swap pl ql
-    ld p+ 1
+    ld +p 1
     swap ph qh
     swap pl ql
     jr dump_byte
@@ -207,7 +233,7 @@ dump_sector_loop:
 
     swap ph qh
     swap pl ql
-    ld p+ 1
+    ld +p 1
     swap ph qh
     swap pl ql
     jr dump_byte
@@ -275,7 +301,6 @@ dump_byte_letter2:
 dump_byte_done:
     jp
 
-
 # argument in q
 # clobbers q
 puts:
@@ -283,6 +308,16 @@ puts:
     st sp 0
     rd y
     st sp 1
+
+    # Decrement for preincrement
+    cset
+    rd ql
+    sbci 1
+    wr ql
+    rd qh
+    sbci 0
+    wr qh
+
     swap ph qh
     swap pl ql
     rdi 0
@@ -292,7 +327,7 @@ puts:
 puts_loop:
     wr io
 puts_entry:
-    ld p+ 1
+    ld +p 1
     nzero
     jc puts_loop
 
@@ -304,11 +339,45 @@ puts_done:
     ld sp 0
     jp
 
+# Count in acc, buffer addr in q (clobbered), clobbers x because I'm lazy
+putbuf_small:
+    # Decrement for preinc
+    cset
+    sw ql
+    sbci 1
+    sw ql
+    sw qh
+    sbci 0
+    sw qh
+
+    swap pl ql
+    swap ph qh
+    
+    j putbuf_small_entry
+
+putbuf_small_loop:
+    wr x
+    ld +p 1
+    wr io
+    rd x
+    subi 1
+putbuf_small_entry:
+    nzero
+    jc putbuf_small_loop
+
+    swap pl ql
+    swap ph qh
+    jp
 
 nocardstr:
 @string "No CF card detected!\n"
 failstr:
 @string "CF card returned error!\n"
+namestr:
+@string "\nCard model number: "
+serstr:
+@string "\nCard serial number: "
+
 
 @static sector_buf 512
 
