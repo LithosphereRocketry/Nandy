@@ -100,20 +100,7 @@ previous value of the carry bit at the vacated place, and setting the carry bit
 to the shifted-out value of the result.
 
 ### Memory
-#### Loads
-##### `lda <offset>`
-Loads the value at the combined address stored in y and x plus the specified
-unsigned 4-bit offset into the accumulator.
-##### `lds <offset>`
-Loads the value at the address formed by 0xFF00 + SP + offset into the
-accumulator.
-#### Stores
-##### `stra <offset>`
-Stores the value of the accumulator at the combined address stored in y and x
-plus the specified unsigned 4-bit offset.
-##### `strs <offset>`
-Stores the value of the accumulator at the address formed by 0xFF00 + SP +
-offset.
+TODO
 
 [^1]: At several places in NANDy internals `nop` is referred to as a comparison
     instruction. This is because, internally, it's implemented as "set carry

@@ -5,7 +5,7 @@ module split_reg(
         output reg [15:0] q;
     );
 
-    always @(posedge clk) q = {
+    always @(posedge clk) q <= {
         we[1] ? d[15:8] : q[15:8],
         we[0] ? d[7:0] : q[7:0]
     }

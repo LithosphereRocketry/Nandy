@@ -1,3 +1,7 @@
+/*
+Main datapath of NANDy CPU. Denoted in green in block diagram.
+*/
+
 module core(
         input clk,
 
@@ -6,19 +10,23 @@ module core(
         output [7:0] io_out
     );
 
-    wire wr_acc, wr_ph, wr_pl, wr_sp, wr_x, wr_y;
+    wire wr_acc, wr_ph, wr_pl, wr_sp, wr_x, wr_y, wr_mem, alu_from_mem, p_from_addr;
 
     wire [2:0] regsel;
 
     reg [7:0] acc, x, y, sp;
 
     assign io_addr = y;
+    assign io_out = acc;
 
-    wire [15:0] p_in;
+    reg [15:0] pc, ia;
+
+    wire [15:0] mem_addr;
+    wire [15:0] p_in = p_from_addr ? mem_addr : {acc, acc};
     wire [15:0] p, q;
 
     wire [15:0] pointer = regsel[0] ? q : p;
-    wire [7:0] iosp = regsel[0] ? io : sp;
+    wire [7:0] iosp = regsel[0] ? io_in : sp;
     wire [7:0] xy = regsel[0] ? y : x;
     wire [7:0] reg_read;
     mux4 muxreg(
@@ -44,7 +52,31 @@ module core(
         .q(q)
     );
 
+    addr_calc addrcalc (
+        .clk(clk),
+
+        .use_add(), .do_interrupt() .in_interrupt(), .wr_pc(),
+        .base_sel(),
+
+        .immediate(),
+        .pq(pointer),
+        .sp(sp),
+
+        .addr(mem_addr)
+    );
+
+    wire [7:0] mem_out;
+    wire [7:0] alu_b = alu_from_mem ? mem_out : reg_read;
+
     wire [7:0] alu_out;
+
+    memory mem(
+        .clk(clk),
+        .addr(mem_addr),
+        .din(acc),
+        .wr(wr_mem),
+        .dout(mem_out)
+    );
 
     always @(posedge clk) begin
         if(wr_acc) acc <= alu_out;
