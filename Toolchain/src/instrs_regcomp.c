@@ -60,7 +60,7 @@ static void exe_nop(cpu_state_t* cpu) {
 const instruction_t i_nop = {
     .mnemonic = "nop",
     .opcode_mask = 0,
-    .opcode = ALU_SEL_MASK | XY_MASK | CARRY_SEL_MASK | ALU_OR,
+    .opcode = ALU_SEL_MASK | CARRY_SEL_MASK | ALU_OR,
     .assemble = asm_basic,
     .disassemble = dis_basic,
     .execute = exe_nop
