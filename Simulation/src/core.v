@@ -6,14 +6,19 @@ module core(
         input clk,
 
         input [7:0] io_in,
+        input [5:0] ints_in,
         output [7:0] io_addr,
-        output [7:0] io_out
+        output [7:0] io_out,
+        output wr_io
     );
 
-    wire carry;
-    wire wr_acc, wr_ph, wr_pl, wr_sp, wr_x, wr_y, wr_mem, alu_from_mem, p_from_addr;
-
+    wire carry, int_en, int_active;
+    wire wr_acc, wr_ph, wr_pl, wr_qh, wr_ql, wr_sp, wr_x, wr_y, wr_mem,
+        p_from_addr, ncycle, addr_use_add, n_do_interrupt, in_interrupt, write_pc;
+    wire [1:0] base_sel;
+    wire [2:0] aluop;
     wire [2:0] regsel;
+    wire [15:0] addr_imm;
 
     reg [7:0] acc, x, y, sp;
 
@@ -56,10 +61,11 @@ module core(
     addr_calc addrcalc (
         .clk(clk),
 
-        .use_add(), .do_interrupt() .in_interrupt(), .wr_pc(),
-        .base_sel(),
+        .use_add(addr_use_add), .n_do_interrupt(n_do_interrupt),
+        .in_interrupt(in_interrupt), .wr_pc(write_pc),
+        .base_sel(base_sel),
 
-        .immediate(),
+        .immediate(addr_imm),
         .pq(pointer),
         .sp(sp),
 
@@ -67,17 +73,17 @@ module core(
     );
 
     wire [7:0] mem_out;
-    wire [7:0] alu_b = alu_from_mem ? mem_out : reg_read;
+    wire [7:0] alu_b = ncycle ? reg_read : mem_out;
 
     wire [7:0] alu_out;
     alu arith(
         .clk(clk),
-        .ncycle(),
+        .ncycle(ncycle),
         .cmpinv(regsel[0]),
-        .aluop(),
+        .aluop(aluop),
         .a(acc),
         .b(alu_b),
-        .status(),
+        .status({int_active, int_en, ints_in}),
         .q(alu_out),
         .carry(carry)
     );

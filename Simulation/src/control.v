@@ -1,0 +1,68 @@
+/*
+Control logic for NANDy CPU; denoted in block diagram in blue
+*/
+
+module control(
+        input clk,
+        input [7:0] instr,
+        input [5:0] ints_in,
+        input carry,
+
+        output wr_acc, wr_ph, wr_pl, wr_qh, wr_ql, wr_sp, wr_x, wr_y, wr_io, wr_mem,
+            p_from_addr, addr_use_add, n_do_interrupt,  write_pc,
+        output reg int_en, in_interrupt, ncycle;
+        output [1:0] base_sel;
+        output [2:0] aluop; //
+        output [2:0] regsel;
+        output [15:0] addr_imm;
+    );
+
+    reg [7:0] ir;
+
+    initial ncycle = 1;
+    wire next_ncycle = ~(ncycle & (instr[6] | instr[7]));
+
+    assign wr_acc = ncycle
+        ? (
+            instr[7:4] == 4'b0001 // read
+            | instr[7:4] == 4'b001 & (~instr[3] | instr[2]) // register ALU
+        ) 
+        : (
+            ir[7] & ir[4] // ld
+            | ir[5] & ir[6] // imm alu
+        );
+    
+    wire [7:0] write_from_move = {8{ncycle & instr[3] & (instr[7:5] == 0)}}
+        & (1 << instr[2:0]);
+    assign wr_sp = write_from_move[0];
+    assign wr_io = write_from_move[1];
+    assign wr_x = write_from_move[2];
+    assign wr_y = write_from_move[3];
+    assign wr_pl = write_from_move[4] | p_from_addr;
+    assign wr_ph = write_from_move[5] | p_from_addr;
+    assign wr_ql = write_from_move[6];
+    assign wr_qh = write_from_move[7];
+
+    assign wr_mem = ~ncycle & ir[7] & ~ir[4];
+
+    assign p_from_addr = ncycle & instr[7:0] == 8'b00000101 // jpr
+        | ~ncycle & ir[7:5] == 3'b010 & ir[0] & (~ir[4] | carry) // jr/jcr
+        | ~ncycle & ir[7:4] == 4'b1111; // ld +p
+    
+    assign aluop = ncycle
+        ? (instr[5] ? instr[2:0] : 0)
+        : (ir[7] ? 0 : ir[2:0]);
+
+
+    assign n_do_interrupt = ~{int_en & int_flag & ~in_interrupt}; // invert for free
+    wire n_keep_interrupt = ~{n_jri & in_interrupt};
+    wire int_active_next = ~{n_do_interrupt & n_keep_interrupt};
+
+    initial in_interrupt = 0;
+    always @(posedge clk) begin
+        in_interrupt <= int_active_next;
+        ncycle <= next_ncycle;
+        ir <= instr;
+    end
+
+endmodule
