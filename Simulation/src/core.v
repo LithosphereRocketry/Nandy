@@ -14,7 +14,7 @@ module core(
 
     wire carry, int_en, int_active;
     wire wr_acc, wr_ph, wr_pl, wr_qh, wr_ql, wr_sp, wr_x, wr_y, wr_mem,
-        p_from_addr, ncycle, addr_use_add, n_do_interrupt, in_interrupt, write_pc;
+        p_from_addr, ncycle, n_addr_use_add, n_do_interrupt, in_interrupt, write_pc;
     wire [1:0] base_sel;
     wire [2:0] aluop;
     wire [2:0] regsel;
@@ -61,7 +61,7 @@ module core(
     addr_calc addrcalc (
         .clk(clk),
 
-        .use_add(addr_use_add), .n_do_interrupt(n_do_interrupt),
+        .n_use_add(n_addr_use_add), .n_do_interrupt(n_do_interrupt),
         .in_interrupt(in_interrupt), .wr_pc(write_pc),
         .base_sel(base_sel),
 
