@@ -27,7 +27,7 @@ endmodule
 
 module bitwise (
         input [1:0] aluop,
-        input ncycle,
+        input status_possible,
 
         input [7:0] a, b, status,
 
@@ -35,7 +35,7 @@ module bitwise (
     );
 
     wire [1:0] naluop = ~aluop;
-    wire nstatsel = ~(ncycle & naluop[1] & naluop[0]);
+    wire nstatsel = ~(status_possible & naluop[1] & naluop[0]);
     wire statsel = ~nstatsel;
 
     bitwise_slice slices [7:0] (

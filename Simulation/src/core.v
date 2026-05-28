@@ -13,8 +13,8 @@ module core #(parameter PATH = "memory.txt") (
     );
 
     wire carry, int_en, int_active;
-    wire wr_acc, wr_ph, wr_pl, wr_qh, wr_ql, wr_sp, wr_x, wr_y, wr_mem, addr_use_imm,
-        p_from_addr, ncycle, n_addr_use_add, n_do_interrupt, in_interrupt, write_pc;
+    wire wr_acc, wr_ph, wr_pl, wr_qh, wr_ql, wr_sp, wr_x, wr_y, wr_mem, wr_carry, addr_use_imm,
+        p_from_addr, ncycle, n_addr_use_add, n_do_interrupt, in_interrupt, write_pc, status_possible;
     wire [1:0] base_sel;
     wire [2:0] aluop;
     wire [2:0] regsel;
@@ -37,12 +37,14 @@ module core #(parameter PATH = "memory.txt") (
         .wr_y(wr_y),
         .wr_io(wr_io),
         .wr_mem(wr_mem),
+        .wr_carry(wr_carry),
         .p_from_addr(p_from_addr),
         .n_addr_use_add(n_addr_use_add),
         .addr_use_imm(addr_use_imm),
         .n_do_interrupt(n_do_interrupt),
         .write_pc(write_pc),
         .ncycle(ncycle),
+        .status_possible(status_possible),
         .int_en(int_en),
         .in_interrupt(int_active),
         .base_sel(base_sel),
@@ -62,16 +64,16 @@ module core #(parameter PATH = "memory.txt") (
     wire [15:0] p_in = p_from_addr ? mem_addr : {acc, acc};
     wire [15:0] p, q;
 
-    wire [15:0] pointer = regsel[0] ? q : p;
-    wire [7:0] iosp = regsel[0] ? io_in : sp;
-    wire [7:0] xy = regsel[0] ? y : x;
+    wire [15:0] pointer = regsel[1] ? q : p;
+    wire [7:0] spx = regsel[1] ? x : sp;
+    wire [7:0] ioy = regsel[1] ? y : io_in;
     wire [7:0] reg_read;
     mux4 muxreg(
-        .a(iosp),
-        .b(xy),
+        .a(spx),
+        .b(ioy),
         .c(pointer[7:0]),
         .d(pointer[15:8]),
-        .sel(regsel[2:1]),
+        .sel({regsel[2], regsel[0]}),
         .q(reg_read)
     );
 
@@ -109,7 +111,8 @@ module core #(parameter PATH = "memory.txt") (
     wire [7:0] alu_out;
     alu arith(
         .clk(clk),
-        .ncycle(ncycle),
+        .wr_carry(wr_carry),
+        .status_possible(status_possible),
         .cmpinv(regsel[0]),
         .aluop(aluop),
         .a(acc),

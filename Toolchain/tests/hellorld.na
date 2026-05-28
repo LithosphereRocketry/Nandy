@@ -1,3 +1,5 @@
+rdi 0
+wr sp
 rdq hellostr
 jr puts
 brk

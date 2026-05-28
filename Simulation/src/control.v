@@ -8,8 +8,8 @@ module control(
         input [5:0] ints_in,
         input carry,
 
-        output wr_acc, wr_ph, wr_pl, wr_qh, wr_ql, wr_sp, wr_x, wr_y, wr_io, wr_mem,
-            p_from_addr, n_addr_use_add, addr_use_imm, n_do_interrupt,  write_pc,
+        output wr_acc, wr_ph, wr_pl, wr_qh, wr_ql, wr_sp, wr_x, wr_y, wr_io, wr_mem, wr_carry, 
+            p_from_addr, n_addr_use_add, addr_use_imm, n_do_interrupt,  write_pc, status_possible,
         output reg int_en, in_interrupt, ncycle,
         output [1:0] base_sel,
         output [2:0] aluop,
@@ -45,6 +45,9 @@ module control(
 
     assign wr_mem = ~ncycle & ir[7] & ~ir[4];
 
+    assign wr_carry = ncycle & instr[7:5] == 3'b001 & instr[3]
+                    | ~ncycle & ir[7:5] == 3'b011 & ir[3];
+
     assign p_from_addr = ncycle & instr[7:0] == 8'b00000101 // jpr
         | ~ncycle & ir[7:5] == 3'b010 & ir[0] & (~ir[4] | carry) // jr/jcr
         | ~ncycle & ir[7:4] == 4'b1111; // ld +p
@@ -63,7 +66,8 @@ module control(
         ? (instr[5] ? instr[2:0] : 0)
         : (ir[7] ? 0 : ir[2:0]);
 
-    assign regsel = instr[5] ? {2'b01, instr[4]} : instr[2:0];
+    assign regsel = ncycle ? (instr[5] ? {2'b01, instr[4]} : instr[2:0])
+                           : {1'bx, ~ir[6], 1'bx}; 
 
     assign addr_imm = ir[7] ? {12'b0, ir[3:0]} : {{5{ir[3]}}, ir[3:1], instr};
 
@@ -72,12 +76,16 @@ module control(
 
     assign write_pc = ~{~ncycle & ir[7]};
 
+    // We can't always read the status register on cycle 1, because register
+    // moves also use the ALU B path
+    assign status_possible = ncycle & instr[5];
+
     wire n_keep_interrupt = ~{n_jri & in_interrupt};
     initial in_interrupt = 0;
     wire int_active_next = ~{n_do_interrupt & n_keep_interrupt};
 
     initial int_en = 0;
-    wire int_en_next = int_en | (instr == 8'b00000010) & ~(instr == 8'b00000011);
+    wire int_en_next = int_en | (ncycle & instr == 8'b00000010) & ~(ncycle & instr == 8'b00000011);
 
 
     always @(posedge clk) begin

@@ -1,5 +1,6 @@
 # Twiddles harmless LBA address registers to make sure we can talk to the card
-
+    rdi 0
+    wr sp
     rdi 8|4
     wr y
     rdi 123

@@ -6,7 +6,7 @@ module alu (
         input clk,
 
         input wr_carry,
-        input ncycle, cmpinv,
+        input status_possible, cmpinv,
         input [2:0] aluop,
 
         input [7:0] a, b, status,
@@ -30,7 +30,7 @@ module alu (
     wire [7:0] q_bitwise;
     bitwise bw(
         .aluop(aluop[1:0]),
-        .ncycle(ncycle),
+        .status_possible(status_possible),
         .a(a),
         .b(b),
         .status(status),

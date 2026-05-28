@@ -36,7 +36,7 @@ module addr_calc(
     wire [8:0] lower_sum = addr_base[7:0] + addr_offset[7:0];
     wire cross_carry = (base_sel != 2'b11) & lower_sum[8];
     wire [7:0] upper_sum = addr_base[15:8] + addr_offset[15:8] + cross_carry;
-    wire [15:0] addr_sum = {upper_sum, lower_sum};
+    wire [15:0] addr_sum = {upper_sum, lower_sum[7:0]};
 
     // With some major rework it might be possible to optimize away this mux
     assign addr = n_use_add ? pc : addr_sum;
