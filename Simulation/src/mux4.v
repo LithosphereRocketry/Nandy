@@ -7,5 +7,6 @@ module mux4(
         output [7:0] q
     );
 
-    assign q = {d, c, b, a}[8*sel +: 8];
+    wire [31:0] inputs = {d, c, b, a};
+    assign q = inputs[8*sel +: 8];
 endmodule

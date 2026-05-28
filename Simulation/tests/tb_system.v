@@ -1,0 +1,38 @@
+`timescale 1ns/1ps
+
+`define DELAY 500 // 1Mhz clock
+
+module tb_system();
+    reg clk;
+    wire [7:0] io_out;
+    wire wr_io;
+    reg [7:0] result;
+
+    assert #("Incorrect value for result") adone(.value(result === 233));
+
+    // This program is completely non-interactive, so we just set all the
+    // interactive elements to 0 or ignore them
+    core #("testcode/fibonacci.txt") testGate(
+        .clk(clk),
+        .io_in(8'd12),
+        .ints_in(6'b000000),
+        .io_addr(),
+        .io_out(io_out),
+        .wr_io(wr_io)
+    );
+
+    always @(posedge clk) if(wr_io) result <= io_out;
+
+    initial begin
+        $dumpfile(`WAVEPATH);
+        $dumpvars;
+        // Reset the CPU
+        repeat(216) begin
+            clk = 1;
+            #(`DELAY);
+            clk = 0;
+            #(`DELAY);
+        end
+        adone.test();
+    end
+endmodule

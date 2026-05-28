@@ -2,7 +2,7 @@
 Main datapath of NANDy CPU. Denoted in green in block diagram.
 */
 
-module core(
+module core #(parameter PATH = "memory.txt") (
         input clk,
 
         input [7:0] io_in,
@@ -88,7 +88,7 @@ module core(
         .carry(carry)
     );
 
-    memory mem(
+    memory #(PATH) mem(
         .clk(clk),
         .addr(mem_addr),
         .din(acc),

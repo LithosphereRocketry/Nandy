@@ -3,16 +3,16 @@ Address calculation datapath for NANDy CPU. Denoted in purple in block diagram.
 */
 
 module addr_calc(
-        input clk;
+        input clk,
 
-        input n_use_add, use_imm, n_do_interrupt, in_interrupt, wr_pc;
-        input [1:0] base_sel;
+        input n_use_add, use_imm, n_do_interrupt, in_interrupt, wr_pc,
+        input [1:0] base_sel,
 
-        input [15:0] immediate;
-        input [15:0] pq;
-        input [7:0] sp;
+        input [15:0] immediate,
+        input [15:0] pq,
+        input [7:0] sp,
         
-        output [15:0] addr;
+        output [15:0] addr
     );
 
     wire [15:0] int_vector = 16'h7F00;
@@ -21,14 +21,14 @@ module addr_calc(
     initial pc = 0;
 
     wire [15:0] addr_base;
-    mux4 muxbase [1:0](
+    mux4 muxbase [1:0] (
         .a(pc),
         .b(ia),
         .c(pq),
         .d({7'h7F, in_interrupt, sp}),
         .sel(base_sel),
         .q(addr_base)
-    )
+    );
 
 
     wire [15:0] addr_offset = use_imm ? immediate : 1;
@@ -44,7 +44,7 @@ module addr_calc(
     wire [15:0] pc_in = n_do_interrupt ? addr_sum : int_vector;
 
     always @(posedge clk) begin
-        if(wr_ia) ia <= pc;
+        if(~n_do_interrupt) ia <= pc;
         if(wr_pc) pc <= pc_in;
     end
 

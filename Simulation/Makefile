@@ -20,7 +20,7 @@ INC = $(wildcard $(INCDIR)*.vh)
 # Each test file gets exactly one verilog source
 TEST_SRC = $(wildcard $(TESTDIR)*.v)
 # Each will be compiled to a wave result
-TEST_OUT = $(patsubst $(TESTDIR)%.v,$(LOGDIR)%.txt,$(TEST_SRC))
+TEST_OUT = $(patsubst $(TESTDIR)%.v,$(LOGDIR)vl_%.txt,$(TEST_SRC))
 
 .PHONY: all clean
 
@@ -29,13 +29,13 @@ all: $(TEST_OUT)
 $(FUZZFILE): $(MAKEFUZZ)
 	$(PY) $(MAKEFUZZ) > $@
 
-$(TEST_OUT): $(LOGDIR)%.txt: $(OBJDIR)%.vvp $(FUZZFILE) | $(LOGDIR) $(ERRDIR)
-	$(VVP) $< > $(ERRDIR)$*.txt
-	@! grep -Fq "ERROR:" $(ERRDIR)$*.txt
-	@mv $(ERRDIR)$*.txt $@
+$(TEST_OUT): $(LOGDIR)vl_%.txt: $(OBJDIR)%.vvp $(FUZZFILE) | $(LOGDIR) $(ERRDIR)
+	$(VVP) $< > $(ERRDIR)vl_$*.txt
+	@! grep -Fq "ERROR:" $(ERRDIR)vl_$*.txt
+	@mv $(ERRDIR)vl_$*.txt $@
 
 $(OBJDIR)%.vvp: $(TESTDIR)%.v $(SRC) $(INC) | $(OBJDIR) $(WAVEDIR)
-	$(VLG) -DWAVEPATH=\"$(WAVEDIR)$*.vcd\" -I$(INCDIR) -s $* -o $@ $< $(SRC)
+	$(VLG) -DWAVEPATH=\"$(WAVEDIR)vl_$*.vcd\" -I$(INCDIR) -s $* -o $@ $< $(SRC)
 
 # If the directories don't exist, make them
 $(WAVEDIR):
@@ -53,4 +53,4 @@ $(OBJDIR):
 	@false
 
 clean:
-	rm -f $(WAVEDIR)*.vcd $(OBJDIR)*.vvp $(LOGDIR)*.txt
+	rm -rf $(WAVEDIR) $(OBJDIR) $(LOGDIR) $(ERRDIR)

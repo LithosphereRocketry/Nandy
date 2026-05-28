@@ -4,9 +4,9 @@ a conceptual model like the rest of this sim
 */
 
 module bitwise_slice (
-        wire op1, nop1, op0, nop0, statsel, nstatsel;
-        input a, b, status;
-        output q;
+        input op1, nop1, op0, nop0, statsel, nstatsel,
+        input a, b, status,
+        output q
     );
 
     wire xor_center = ~(a & b & op1);
@@ -26,12 +26,12 @@ module bitwise_slice (
 endmodule
 
 module bitwise (
-        input [1:0] aluop;
-        input ncycle;
+        input [1:0] aluop,
+        input ncycle,
 
-        input [7:0] a, b, status;
+        input [7:0] a, b, status,
 
-        output [7:0] q;
+        output [7:0] q
     );
 
     wire [1:0] naluop = ~aluop;

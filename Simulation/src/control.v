@@ -10,11 +10,11 @@ module control(
 
         output wr_acc, wr_ph, wr_pl, wr_qh, wr_ql, wr_sp, wr_x, wr_y, wr_io, wr_mem,
             p_from_addr, n_addr_use_add, n_do_interrupt,  write_pc,
-        output reg int_en, in_interrupt, ncycle;
-        output [1:0] base_sel;
-        output [2:0] aluop;
-        output [2:0] regsel;
-        output [15:0] addr_imm;
+        output reg int_en, in_interrupt, ncycle,
+        output [1:0] base_sel,
+        output [2:0] aluop,
+        output [2:0] regsel,
+        output [15:0] addr_imm
     );
 
     reg [7:0] ir;
@@ -53,7 +53,7 @@ module control(
 
     assign base_sel = (ncycle & instr == 8'b00000110) ? 2'b01
         : (ncycle | ~ir[7]) ? 2'b00
-        : (~ncycle & ir[6:5]) == 1'b00 ? 2'b11
+        : (~ncycle & ir[6:5]) == 2'b00 ? 2'b11
         : 2'b10;
     
     assign aluop = ncycle

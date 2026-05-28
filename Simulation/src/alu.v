@@ -3,16 +3,16 @@ ALU for NANDy CPU. Denoted in red in block diagram.
 */
 
 module alu (
-        input clk;
+        input clk,
 
-        input wr_carry;
-        input ncycle, cmpinv;
-        input [2:0] aluop;
+        input wr_carry,
+        input ncycle, cmpinv,
+        input [2:0] aluop,
 
-        input [7:0] a, b, status;
+        input [7:0] a, b, status,
 
-        output [7:0] q;
-        output reg carry;
+        output [7:0] q,
+        output reg carry
     );
 
     wire [7:0] b_negated = b ^ {8{aluop[0]}};
