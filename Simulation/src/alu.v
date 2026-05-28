@@ -46,7 +46,7 @@ module alu (
         .q(q_cmp)
     );
 
-    wire [8:0] q_both = aluop[0] ? {q_cmp, q_bitwise} : q_arith;
+    wire [8:0] q_both = aluop[0] ? q_arith : {q_cmp, q_bitwise};
     wire q_carry = q_both[8];
     assign q = q_both[7:0];
 

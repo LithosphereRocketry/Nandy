@@ -12,7 +12,7 @@ module tb_system();
 
     // This program is completely non-interactive, so we just set all the
     // interactive elements to 0 or ignore them
-    core #("testcode/fibonacci.txt") testGate(
+    core #("testcode/hellorld.txt") testGate(
         .clk(clk),
         .io_in(8'd12),
         .ints_in(6'b000000),
@@ -27,11 +27,13 @@ module tb_system();
         $dumpfile(`WAVEPATH);
         $dumpvars;
         // Reset the CPU
-        repeat(216) begin
+        clk = 0;
+        #(`DELAY);
+        repeat(3200) begin
+            #(`DELAY);
             clk = 1;
             #(`DELAY);
             clk = 0;
-            #(`DELAY);
         end
         adone.test();
     end

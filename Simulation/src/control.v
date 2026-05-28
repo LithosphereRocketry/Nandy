@@ -9,7 +9,7 @@ module control(
         input carry,
 
         output wr_acc, wr_ph, wr_pl, wr_qh, wr_ql, wr_sp, wr_x, wr_y, wr_io, wr_mem,
-            p_from_addr, n_addr_use_add, n_do_interrupt,  write_pc,
+            p_from_addr, n_addr_use_add, addr_use_imm, n_do_interrupt,  write_pc,
         output reg int_en, in_interrupt, ncycle,
         output [1:0] base_sel,
         output [2:0] aluop,
@@ -51,7 +51,10 @@ module control(
     
     assign n_addr_use_add = ~(~ncycle & ir[7]);
 
-    assign base_sel = (ncycle & instr == 8'b00000110) ? 2'b01
+    assign addr_use_imm = ~ncycle & (ir[7] | ir[6:5] == 2'b10);
+
+    wire n_jri = ~(ncycle & instr == 8'b00000110);
+    assign base_sel = ~n_jri ? 2'b01
         : (ncycle | ~ir[7]) ? 2'b00
         : (~ncycle & ir[6:5]) == 2'b00 ? 2'b11
         : 2'b10;
@@ -64,13 +67,18 @@ module control(
 
     assign addr_imm = ir[7] ? {12'b0, ir[3:0]} : {{5{ir[3]}}, ir[3:1], instr};
 
+    wire int_flag = |{ints_in};
     assign n_do_interrupt = ~{int_en & int_flag & ~in_interrupt}; // invert for free
+
+    assign write_pc = ~{~ncycle & ir[7]};
+
     wire n_keep_interrupt = ~{n_jri & in_interrupt};
     initial in_interrupt = 0;
     wire int_active_next = ~{n_do_interrupt & n_keep_interrupt};
 
     initial int_en = 0;
     wire int_en_next = int_en | (instr == 8'b00000010) & ~(instr == 8'b00000011);
+
 
     always @(posedge clk) begin
         in_interrupt <= int_active_next;

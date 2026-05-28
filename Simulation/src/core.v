@@ -13,12 +13,43 @@ module core #(parameter PATH = "memory.txt") (
     );
 
     wire carry, int_en, int_active;
-    wire wr_acc, wr_ph, wr_pl, wr_qh, wr_ql, wr_sp, wr_x, wr_y, wr_mem,
+    wire wr_acc, wr_ph, wr_pl, wr_qh, wr_ql, wr_sp, wr_x, wr_y, wr_mem, addr_use_imm,
         p_from_addr, ncycle, n_addr_use_add, n_do_interrupt, in_interrupt, write_pc;
     wire [1:0] base_sel;
     wire [2:0] aluop;
     wire [2:0] regsel;
     wire [15:0] addr_imm;
+
+    wire [7:0] mem_out;
+    control ctrl(
+        .clk(clk),
+        .instr(mem_out),
+        .ints_in(ints_in),
+        .carry(carry),
+
+        .wr_acc(wr_acc),
+        .wr_ph(wr_ph),
+        .wr_pl(wr_pl),
+        .wr_qh(wr_qh),
+        .wr_ql(wr_ql),
+        .wr_sp(wr_sp),
+        .wr_x(wr_x),
+        .wr_y(wr_y),
+        .wr_io(wr_io),
+        .wr_mem(wr_mem),
+        .p_from_addr(p_from_addr),
+        .n_addr_use_add(n_addr_use_add),
+        .addr_use_imm(addr_use_imm),
+        .n_do_interrupt(n_do_interrupt),
+        .write_pc(write_pc),
+        .ncycle(ncycle),
+        .int_en(int_en),
+        .in_interrupt(int_active),
+        .base_sel(base_sel),
+        .aluop(aluop),
+        .regsel(regsel),
+        .addr_imm(addr_imm)
+    );
 
     reg [7:0] acc, x, y, sp;
 
@@ -63,6 +94,7 @@ module core #(parameter PATH = "memory.txt") (
 
         .n_use_add(n_addr_use_add), .n_do_interrupt(n_do_interrupt),
         .in_interrupt(in_interrupt), .wr_pc(write_pc),
+        .use_imm(addr_use_imm),
         .base_sel(base_sel),
 
         .immediate(addr_imm),
@@ -72,7 +104,6 @@ module core #(parameter PATH = "memory.txt") (
         .addr(mem_addr)
     );
 
-    wire [7:0] mem_out;
     wire [7:0] alu_b = ncycle ? reg_read : mem_out;
 
     wire [7:0] alu_out;
