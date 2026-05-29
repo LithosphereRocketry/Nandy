@@ -18,24 +18,79 @@ main:
     jr cf_identify_drive
     rdq sector_buf
     jr dump_sector
-    # TODO: ASCII fields on CF cards are byte swapped, for reasons I don't
-    # entirely understand - to get nice printouts we need to swap them back
+    
     rdq namestr
     jr puts
-    rdq sector_buf+54
+    pusha sector_buf+54
+    rdq byteswap_buf
+    rdi 20
+    jr byteswap
+    rdq byteswap_buf
     rdi 40
     jr putbuf_small
-    rdq serstr
+
+    rdq namestr
     jr puts
-    rdq sector_buf+20
+    pusha sector_buf+20
+    rdq byteswap_buf
+    rdi 10
+    jr byteswap
+    rdq byteswap_buf
     rdi 20
     jr putbuf_small
+
     brk
 
 cf_no_card:
     rdq nocardstr
     jr puts
     brk
+
+# Byte swaps source memory into destination
+# Source on stack, destination in q, count/2 in acc
+byteswap:
+    isp -3
+    st sp 0
+    rd pl
+    st sp 1
+    rd ph
+    st sp 2
+
+    cset
+    ld sp 3
+    sbci 2
+    wr pl
+    ld sp 4
+    sbci 0
+    wr ph
+    # source in p, ready for preinc
+    j byteswap_entry
+
+byteswap_loop:
+    subi 1
+    st sp 0
+    ld +p 2
+    st q 1
+    ld p 1
+    st q 0
+    cclr
+    rd ql
+    adci 2
+    wr ql
+    rd qh
+    adci 0
+    wr qh
+byteswap_entry:
+    ld sp 0
+    nzero
+    jc byteswap_loop
+
+    ld sp 2
+    wr ph
+    ld sp 1
+    wr pl
+    isp 3
+    jp
 
 # Based on 8-bit CF interface from waveguide.se
 # https://www.waveguide.se/?article=8-bit-compact-flash-interface
@@ -380,4 +435,5 @@ serstr:
 
 
 @static sector_buf 512
+@static byteswap_buf 40
 

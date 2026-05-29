@@ -9,6 +9,8 @@ nandy-asm
 binconvert
 shuntingyard_test
 
+compile_commands.json
+
 # Racket
 *.bak
 *.rkt~

@@ -144,7 +144,8 @@ bool io_step_compactflash(cpu_state_t* cpu, bool active) {
             tcgetattr(serial_fd, &serial_settings);
             cfsetispeed(&serial_settings, SERIAL_SPEED);
             cfsetospeed(&serial_settings, SERIAL_SPEED);
-            serial_settings.c_cflag &= ~(CSIZE | PARENB);
+            // Disable HUPCL to not have to wait for the arduino to reset
+            serial_settings.c_cflag &= ~(CSIZE | PARENB | HUPCL);
             serial_settings.c_cflag |= CS8 | CLOCAL | CREAD;
             serial_settings.c_lflag &= ~(ICANON | ECHO);
             serial_settings.c_cc[VMIN] = 1;
@@ -153,13 +154,6 @@ bool io_step_compactflash(cpu_state_t* cpu, bool active) {
             // Opening the serial port causes the arduino to reset, which takes
             // a shockingly long time, so wait for it to send us a byte before
             // we start blasting it
-
-            uint8_t ack;
-            read(serial_fd, &ack, 1);
-            if(ack != 0xF0) {
-                fprintf(stderr, "Unexpected serial acknowledge 0x%hhx\n", ack);
-                exit(-1);
-            }
 
         } else if(arg_diskimg.result.value) {
             // To prevent annoying hidden state, don't actually write changes
