@@ -163,18 +163,17 @@ support a full 64KB of memory may choose to ignore upper bits of the address in
 order to satisfy these constraints, but these implementations may require
 modifications to the assembler in order to function correctly.
 
-Memory may be addressed in one of two four modes, each accepting an immediate
+Memory may be addressed in one of four modes, each accepting an immediate
 offset. Immediates for these instructions are unsigned 4-bit values, allowing a
 positive offset of 0 to 15 bytes.
 
 * In stack mode (`sp`), the base address is formed from (0xFE00 | `sp`) or
     (0xFF00 | `sp`) depending on whether the CPU is currently in an interrupt
-    routine.
+    routine. Notably, offsets in this mode wrap within a 256-byte page.
 * In P mode (`p`), the base address is given by `p`.
 * In Q mode (`q`), the base address is given by `q`.
-* In P-postincrement mode (`p+`), the base address is given by `p` and the
-    offset is not applied to the address. Instead, `p` is incremented by the
-    offset after the access is completed.
+* In P-preincrement mode (`+p`), the base address is also given by `p`. The
+  resulting address is saved to `p` after the operation is complete.
 
 Implementations will typically designate some portion of memory as "read-only"
 for the purposes of boot or program ROM. In the reference implementation,
@@ -187,18 +186,17 @@ alignment. In general, it is encouraged to use little-endian representations;
 usefulness of word-alignment varies depending on the application.
 
 #### The Stack
-NANDy has a 256-byte stack, located betweeen addresses 0xFF00 and 0xFFFF. By
-convention the stack grows downwards; the stack pointer should be initialized to
-0x00 and then decremented to allocate space. In order to improve performance, an
-instruction `isp` (and corresponding no-carry version `_isp`) is provided which
-moves the stack pointer by the provided 4-bit immediate in a single cycle.
+NANDy has two 256-byte stacks for use by normal code and interrupt handlers
+respectiely. The main stack is located betweeen addresses 0xFE00 and 0xFEFF,
+while the interrupt stack is located between 0xFF00 and 0xFFFF. By convention
+the stack grows downwards; the stack pointer should be initialized to 0x00 and
+then decremented to allocate space.
 
 Generally speaking, memory addresses below the stack pointer are considered to
 be undefined in the context of stack access, and it should be expected that
-their contents may change at any time. Reading off the top of the stack (offset
-above 0xFEFF or 0xFFFF) is also undefined behavior, and will usually result in
-reading garbage left by a previous interrupt or the first bytes of program
-memory.
+their contents may change at any time. Stack accesses beyond the top of the
+stack are defined to wrap around to the bottom of that particular stack; this
+allows some optimizations for interrupt handlers, detailed later.
 
 Like other registers, the stack pointer has no guaranteed initial value.
 Therefore, it must be initialized before the stack can be used.
@@ -217,6 +215,7 @@ Of note for optimization is that relative jump instructions will always take two
 cycles - this includes when the jump is not taken. Therefore it is usually
 faster to let a loop fall through when it is finished, rather than breaking out
 of it when a condition is met:
+
 ```
 loop:
     # this is fast
@@ -225,6 +224,7 @@ loop:
     jc loop
     # done
 ```
+
 ```
 loop:
     # this is slow
@@ -234,6 +234,7 @@ loop:
     j loop
 done: # done
 ```
+
 For jumps outside relative range, the absolute jump instructions `jp` and `jpr`
 must be used. Both jump to the address in the `p` register; like `jr`, `jpr`
 stores the current address in `p` to allow function returns. `jp` and `jpr` take
@@ -248,7 +249,7 @@ with use of the stack. Which registers are saved versus clobbered and which are
 used as arguments are not specified, except that `p` is always clobbered by the
 return address. Programmers should carefully document the behavior of each
 function. It is encouraged that functions return the stack pointer to its
-original state but it is not required.
+original state but it is not required so long as the behavior is documented.
 
 ### Input/Output
 I/O on the NANDy is handled by a single 8-bit parallel I/O port. Data may be
@@ -256,9 +257,9 @@ written to and read from the port using standard register-move instructions;
 `rd io` retrieves data from the input port, `wr io` writes it to the output
 port, and `sw io` performs both simultaneously, although most devices do not
 support this. Other devices may interface with the I/O port via the signal pins
-`IOWrite` and `IORead`; a positive pulse is transmitted on `IOWrite` whenever
-data is written to the I/O port and on `IORead` whenever data is read from the
-I/O port.
+`IOWrite` and `IORead`; `IOWrite` is high at the rising edge of the system clock
+when data is being written to the IO bus, while `IORead` is high at the rising
+edge of the clock when data is being read.
 
 I/O devices are also provided with the value of the `y` register to use as an
 address.
@@ -274,7 +275,7 @@ following conditions are met:
 multicycle operation)
 * Interrupts are enabled
 * An interrupt service routine is not currently occurring
-* An IO device has asserted the INT signal
+* An IO device has asserted one of the six IRQ lines
 
 Upon triggering an interrupt, the CPU stores the current PC in the hidden IA
 register and then jumps to the adress 0x7F00, denoted by the label ISR.
@@ -306,44 +307,30 @@ their interrupt status to be cleared via some I/O interaction, which may differ
 on a per-device basis.
 
 Interrupts must leave all registers unmodified, including the carry bit. They
-have their own stack region, but not their own stack pointer; this creates a
-slight complication in allocating stack space in interrupts. If the stack
-pointer given to an ISR is very close to 0, decrementing may cause it to wrap
-to the top of the stack space, causing subsequent positive offsets to offset
-past the top of the stack.
+have their own stack region, but not their own stack pointer. However, since
+stack accesses wrap within a 256-byte page, an intterupt handler need not care
+what the starting value of the stack pointer is, so long as it returns the same
+value once it is complete; since all addresses are simply offset mod 256, a
+different stack pointer will change the physical addresses used but not the
+observed behavior of the routine.
 
-This is an example of a correct ISR handler which ensures a reasonable amount
-of stack space:
+All six IRQ lines trigger the same interrupt service routine. To distinguish
+between different interrupt sources, the ISR must use the `ipoll` instruction
+to view the status of individual interrupt lines. This can be combined with
+shift arithmetic to dispatch to the correct interrupt handler:
 
 ```
 @loc ISR
-    st sp 0 # stash accumulator at current SP (no offset is always safe)
-    isp -1 # allocate one more byte
-    slc
-    st sp 0 # stash carry bit in bottom bit of next byte
+    <store processor state>
 
-    isp -1
-    # figure out whether our first two stashes overlap the top of the stack
-    # where we want our stack to start; if SP is in the top half we move it
-    rd sp
-    nsgn
-    # if the top bit is 1 (carry 0), start at 0x7F; otherwise start at 0xFF
-    rdi 0x7F
-    jc isr_low_stack
-    rdi 0xFF
-isr_low_stack:
-    sw sp
-    # store the old stack pointer at the top of our new stack
-    st sp 0    
+    ipoll
+    src
+    jc handler0
+    src
+    jc handler1
     ...
-    # do ISR things, free to use up to about 125 bytes of stack without fear
-    ...
-    # restore the stack to its old position
-    ld sp 0
-    wr sp
-    ld sp 0
-    src # restore carry bit
-    isp 1
-    ld sp 0 # restore acc
-    jxi # exit interrupt
+    
+ISR_done:
+    <load processor state>
+    jxi
 ```

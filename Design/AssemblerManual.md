@@ -100,8 +100,19 @@ Skips static memory reservation forward to a specified memory address.
 These macros generate finite chunks of code in the final executable, and as such
 can be treated as conventional instructions; they do not follow the "@"
 convetion.
-##### `rda <label>`
-Reads the specified label as a 16-bit value into DX and DY as an address.
+##### `move <src> <dest>`
+Copies the value in the source register into the destination register, without
+disturbing the contents of any other registers. Safe to use on the IO register
+in either argument.
+##### `swap <a> <b>`
+Exchanges the contents of the given registers without disturbing any other
+registers. Technically safe to use on the IO register in that it will ensure
+that the IO register is only accessed with one swap, but most IO devices do not
+support `sw io` anyway so this is of dubious importance.
+##### `rdp <label>`
+Reads the specified label as a 16-bit value into the P pointer.
+##### `rdq <label>`
+Reads the specified label into the Q pointer.
 ##### `pusha <label>`
 Decrements the stack pointer by 2 and loads the value of the given label into
 the bottom two positions of the stack, least significant byte lowest.
@@ -109,6 +120,5 @@ the bottom two positions of the stack, least significant byte lowest.
 Calls the function at the specified label; stores return address in DX and DY.
 ##### `goto <label>`
 Jumps to the specified label without a return address. Overwrites DX and DY.
-##### `isp <offset>`, `_isp offset`
-Increases the stack pointer by the given offset, with or without setting the
-carry flag, respectively.
+##### `isp <offset>`
+Increases the stack pointer by the given offset. Does not modify the carry flag.

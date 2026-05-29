@@ -14,10 +14,6 @@ CPU architecture.
 Does nothing.
 ##### `brk`
 Stops program execution. In emulation, exits to the debugger interface.
-##### `bell`
-Plays an audible alert tone.
-##### `eint`, `dint`
-Enables or disables interrupts, respectively.
 ##### `j <label>`
 Jumps to the specified label.
 ##### `jr <label>`
@@ -34,6 +30,17 @@ Jumps to one byte past the address stored in `p`, storing the current PC in `p`.
 ##### `jxi`
 Jumps to the address stored in the hidden `IA` register and clears the interrupt
 flag.
+
+#### Status
+##### `eint`, `dint`
+Enables or disables interrupts, respectively.
+##### `ipoll`
+Polls the processor status and stores the result in the accumulator. Status is
+encoded as follows:
+
+* Bit 7: Interrupt active
+* Bit 6: Interrupts enabled
+* Bits 5-0: IRQ lines 5-0
 
 #### Registers
 ##### `rd <register>`
@@ -100,7 +107,23 @@ previous value of the carry bit at the vacated place, and setting the carry bit
 to the shifted-out value of the result.
 
 ### Memory
-TODO
+#### `ld <mode> <offs>`
+Loads the accumulator from memory at the address defined by the addressing mode
+plus the specified unsigned 16-bit offset. Addressing modes are as follows:
+
+* `sp`: Base address is the stack pointer, with an upper byte of 0xFE if not in
+  an interrupt handler or 0xFF if in an interrupt handler. Unlike other modes,
+  offsets wrap on 256-byte boundary.
+* `q`: Base address is the contents of the `q` pointer register.
+* `p`: Base address is the contents of the `p` pointer register.
+* `+p`: Result address is the same as the `p` addressing mode, except that
+  `p + offs` is stored to `p` after the access.
+
+#### `st <mode> <offs>`
+
+Stores the contents of the accumulator to memory at the address defined by the
+addressing mode plus the specified unsigned 16-bit offset. Addressing modes are
+the same as in the `ld` instruction.
 
 [^1]: At several places in NANDy internals `nop` is referred to as a comparison
     instruction. This is because, internally, it's implemented as "set carry
