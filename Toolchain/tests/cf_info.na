@@ -29,7 +29,7 @@ main:
     rdi 40
     jr putbuf_small
 
-    rdq namestr
+    rdq serstr
     jr puts
     pusha sector_buf+20
     rdq byteswap_buf
@@ -38,6 +38,38 @@ main:
     rdq byteswap_buf
     rdi 20
     jr putbuf_small
+
+    rdq sectorstr
+    jr puts
+
+    rdi CF_LBA_27_24_MODE
+    wr y
+    rdi 0xE0
+    wr io
+    rdi CF_LBA_23_16
+    wr y
+    rdi 0
+    wr io
+    rdi CF_LBA_15_8
+    wr y
+    rdi 0
+    wr io
+    rdi CF_LBA_7_0
+    wr y
+    rdi 0
+    wr io
+    rdi CF_SECTOR_COUNT
+    wr y
+    rdi 1
+    wr io
+
+    jr cf_wait
+    rdi 0x20
+    jr cf_cmd
+    rdq sector_buf
+    jr cf_receive_sector
+    rdq sector_buf
+    jr dump_sector
 
     brk
 
@@ -175,13 +207,15 @@ cf_identify_drive:
 # Wait for CF card to become un-busy
 # clobbers Y, ACC contains status register
 cf_wait:
-    sw y
     rdi CF_STATUS_CMD
-    sw y
+    wr y
 cf_wait_loop:
     rd io
     sgn
     jc cf_wait_loop
+    andi 0x40
+    zero
+    jc cf_wait
     jp
 
 # Send a command to the CF card
@@ -258,6 +292,8 @@ dump_sector:
     st sp 0
     rd ph
     st sp 1
+    rdi 0
+    wr y
 
     # Decrement for preincrement
     cset
@@ -281,8 +317,6 @@ dump_sector_loop:
     swap pl ql
     jr dump_byte
 
-    rdi 0
-    wr y
     rdi ' '
     wr io
 
@@ -293,8 +327,6 @@ dump_sector_loop:
     swap pl ql
     jr dump_byte
 
-    rdi 0
-    wr y
     rdi ' '
     wr io
 
@@ -432,6 +464,8 @@ namestr:
 @string "\nCard model number: "
 serstr:
 @string "\nCard serial number: "
+sectorstr:
+@string "\nFirst sector:\n"
 
 
 @static sector_buf 512

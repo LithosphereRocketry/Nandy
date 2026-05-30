@@ -1,5 +1,6 @@
 #include "nandy_ios.h"
 
+#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -24,7 +25,13 @@ enum cf_registers {
 };
 
 enum cf_status {
-    CF_DRQ = 0b00001000
+    CF_BUSY = 0b10000000,
+    CF_RDY  = 0b01000000,
+    CF_DWF  = 0b00100000,
+    CF_DSC  = 0b00010000,
+    CF_DRQ  = 0b00001000,
+    CF_CORR = 0b00000100,
+    CF_ERR  = 0b00000001
 };
 
 static bool first_access = true;
@@ -38,7 +45,7 @@ static uint8_t registers[8] = {
     [CF_LBA_15_8] = 0,
     [CF_LBA_23_16] = 0,
     [CF_LBA_27_24_MODE] = 0b10100000,// 1, LBA enable, 1, DRV, LBA 27-24
-    [CF_STATUS_CMD] = 0 // BUSY, RDY, WF, SC, DRQ, CORR, IDX(0), ERR / command
+    [CF_STATUS_CMD] = 0b01000000 // BUSY, RDY, WF, SC, DRQ, CORR, IDX(0), ERR / command
 };
 
 static int serial_fd;
@@ -65,6 +72,14 @@ static void put16(char* buf, uint16_t val) {
     buf[1] = val >> 8;
 }
 
+// undefined for len odd
+static void byteswap(char* dst, const char* src, size_t len) {
+    for(size_t i = 0; i < len; i += 2) {
+        dst[i] = src[i+1];
+        dst[i+1] = src[i];
+    }
+}
+
 static char ident_buffer[512];
 static void set_up_ident() {
     size_t n_sectors = disksize/512;
@@ -79,12 +94,12 @@ static void set_up_ident() {
     put16(ident_buffer + 2*5, 512); // bytes/sector
     // TODO sectors/track
     // TODO sectors/card
-    memcpy(ident_buffer + 2*10, "SERIAL_NUMBER_123456", 20);
+    byteswap(ident_buffer + 2*10, "          1234567890", 20);
     put16(ident_buffer + 2*20, 2); // buffer type
     put16(ident_buffer + 2*21, 2); // buffer size
     put16(ident_buffer + 2*22, 4); // ECC bytes on R/W Long
-    memcpy(ident_buffer + 2*23, "FW111111", 8);
-    memcpy(ident_buffer + 2*27, "MODEL_NUMBER_1234567890_ABCDEFG_0000000", 40);
+    byteswap(ident_buffer + 2*23, "FW111111", 8);
+    byteswap(ident_buffer + 2*27, "NANDy Emulated CF Card                  ", 40);
     put16(ident_buffer + 2*47, 1); // max 1 sector on R/W multiple
     put16(ident_buffer + 2*49, 0x0200); // LBA supported
     put16(ident_buffer + 2*51, 0x0200); // PIO mode 2
@@ -106,12 +121,40 @@ static void set_up_ident() {
 static void seek_to(char* buf, size_t size) {
     seek_ptr = buf;
     region_size = size;
-    if(size) registers[CF_STATUS_CMD] |= CF_DRQ;
+    // TODO: more realistic seek timing behavior
+    if(size) {
+        registers[CF_STATUS_CMD] |= CF_DRQ | CF_RDY;
+        registers[CF_STATUS_CMD] &= ~CF_BUSY;
+    }
 }
 
 static void cf_command(uint8_t cmd) {
     error_register = 0;
     switch(cmd) {
+        case 0x20:
+        case 0x21: // read sector
+            if((registers[CF_LBA_27_24_MODE] & 0xF0) != 0xE0) {
+                fprintf(stderr, "Cannot emulate reading sectors in CHS mode!\n");
+                exit(-1);
+            }
+            size_t sector_addr =
+                    ((size_t) registers[CF_LBA_27_24_MODE] & 0xF) << 24
+                |   ((size_t) registers[CF_LBA_23_16]) << 16
+                |   ((size_t) registers[CF_LBA_15_8]) << 8
+                |   ((size_t) registers[CF_LBA_7_0]);
+            size_t byte_addr = sector_addr + 512;
+            size_t byte_size = 512*(size_t) registers[CF_SECTOR_COUNT];
+            if(byte_addr + byte_size > disksize) {
+                // TODO: emulate this behavior better
+                fprintf(stderr, "Going to read off the end of disk\n");
+                exit(-1);
+            }
+            // TODO: actually test the behavior of multi sector reads
+            seek_to(disk + byte_addr, byte_size);
+            break;
+        case 0xEC: // identify drive
+            seek_to(ident_buffer, 512);
+            break;
         case 0xEF: // set feature
             switch(registers[CF_ERROR_FEATURE]) {
                 case 0x01: // enable 8-bit mode
@@ -125,9 +168,6 @@ static void cf_command(uint8_t cmd) {
                         registers[CF_ERROR_FEATURE]);
                     cf_abort();
             }
-            break;
-        case 0xEC: // identify drive
-            seek_to(ident_buffer, 512);
             break;
         default:
             fprintf(stderr, "Received an unknown CF command 0x%hhx", cmd);
@@ -144,9 +184,9 @@ bool io_step_compactflash(cpu_state_t* cpu, bool active) {
             tcgetattr(serial_fd, &serial_settings);
             cfsetispeed(&serial_settings, SERIAL_SPEED);
             cfsetospeed(&serial_settings, SERIAL_SPEED);
-            // Disable HUPCL to not have to wait for the arduino to reset
-            serial_settings.c_cflag &= ~(CSIZE | PARENB | HUPCL);
-            serial_settings.c_cflag |= CS8 | CLOCAL | CREAD;
+            cfmakeraw(&serial_settings);
+            serial_settings.c_cflag &= ~(CSIZE | PARENB);
+            serial_settings.c_cflag |= CS8 | CLOCAL | CREAD | HUPCL;
             serial_settings.c_lflag &= ~(ICANON | ECHO);
             serial_settings.c_cc[VMIN] = 1;
             serial_settings.c_cc[VTIME] = 0;
@@ -154,6 +194,15 @@ bool io_step_compactflash(cpu_state_t* cpu, bool active) {
             // Opening the serial port causes the arduino to reset, which takes
             // a shockingly long time, so wait for it to send us a byte before
             // we start blasting it
+
+            uint8_t ack;
+            read(serial_fd, &ack, 1);
+            if(ack != 0xF0) {
+                fprintf(stderr, "Unexpected serial acknowledge 0x%hhx\n", ack);
+                exit(-1);
+            } else {
+                fprintf(stderr, "Ack received\n");
+            }
 
         } else if(arg_diskimg.result.value) {
             // To prevent annoying hidden state, don't actually write changes
@@ -170,7 +219,6 @@ bool io_step_compactflash(cpu_state_t* cpu, bool active) {
         }
         first_access = false;
     }
-
     if(active) {
         int reg_sel = cpu->y & 0b111;
         
