@@ -1,0 +1,648 @@
+# CompactFlash LBA mode parameters
+@define CF_BASE 8
+@define CF_DATA CF_BASE | 0
+@define CF_ERROR_FEATURE CF_BASE | 1
+@define CF_SECTOR_COUNT CF_BASE | 2
+@define CF_LBA_7_0 CF_BASE | 3
+@define CF_LBA_15_8 CF_BASE | 4
+@define CF_LBA_23_16 CF_BASE | 5
+@define CF_LBA_27_24_MODE CF_BASE | 6
+@define CF_STATUS_CMD CF_BASE | 7
+
+@define MBR_FIRST_PARTITION 0x1BE
+
+main:
+    rdi 0
+    wr sp
+    jr cf_init
+    jc cf_no_card
+
+    # Load the boot sector
+    isp -4
+    rdi 0
+    st sp 0
+    st sp 1
+    st sp 2
+    st sp 3
+    rdq sector_buf
+    jr cf_read_sector
+    
+    rdq sector_buf+MBR_FIRST_PARTITION
+    rdi 4
+locate_fat16_loop:
+    wr x
+    ld q 4
+    # 04, 06, and 0E are all valid non-hidden FAT16 IDs
+    # TODO: it may be more consistent to derive this from the FAT cluster count
+    # but it's much more annoying to do
+    subi 0x04
+    zero
+    jc located_fat16
+    subi 0x02
+    zero
+    jc located_fat16
+    subi 0x08
+    zero
+    jc located_fat16
+    # The structure is one too big to increment with preinc mode so we do this
+    # the old fashioned way
+    cclr
+    rd ql
+    adci 16
+    wr ql
+    rd qh
+    adci 0
+    wr qh
+    rd x
+    subi 1
+    nzero
+    jc locate_fat16_loop
+
+    # If we fall through, there was no FAT16
+    rdq nofat16str
+    jr puts
+    brk
+
+located_fat16:
+    # Load the first sector of the FAT partition into the sector buffer
+    # On disks made with mkfs.fat, this seems to overlap with the MBR for
+    # reasons I don't entirely get
+    ld q 8
+    st sp 0
+    ld q 9
+    st sp 1
+    ld q 0xA
+    st sp 2
+    ld q 0xB
+    st sp 3
+    # We can ignore the size and just assume we won't overrun
+    # Acquire the VBR
+    rdq sector_buf
+    jr cf_read_sector
+
+
+    rdp n_directory_entries
+    rdq sector_buf + 0x11
+    ld q 0
+    st p 0
+    ld q 1
+    st p 1
+
+    # The LBA base on the stack is left unclobbered by cf_read_sector, so take
+    # advantage of that
+    # The first sector after the reserved sectors is the start of the FAT
+    rdq sector_buf + 0x0E
+    rdp fat_sector_addr
+
+    cclr
+    ld q 0
+    wr x
+    ld sp 0
+    adc x
+    st sp 0
+    st p 0
+    ld q 1
+    wr x
+    ld sp 1
+    adc x
+    st sp 1
+    st p 1
+    ld sp 2
+    adci 0
+    st sp 2
+    st p 2
+    ld sp 3
+    adci 0
+    st sp 3
+    st p 3
+
+    # The FAT takes up a given number of sectors, and after that is the root dir
+    # We won't concern ourselves with subdirectories for this project because
+    # I'd rather keep things simple
+    # There are potentially multiple FATs but usually not very many. Multiply
+    # n_fats * sectors_per_fat by repeated addition
+    rdq sector_buf + 0x10
+    ld q 6
+    wr x
+    ld q 7
+    wr y
+    ld q 0
+    # n_fats in acc, sectors_per_fat in {y, x}
+    rdp dir_sector_addr
+    # We have the information we need from the BPB for this stage, so don't feel
+    # bad about overwriting q
+    j compute_root_dir_addr_entry
+
+compute_root_dir_addr_loop:
+    wr ql
+    cclr
+    ld sp 0
+    adc x
+    st sp 0
+    st p 0
+    ld sp 1
+    adc y
+    st sp 1
+    st p 1
+    ld sp 2
+    adci 0
+    st sp 2
+    st p 2
+    ld sp 3
+    adci 0
+    st sp 3
+    st p 3
+
+    rd ql
+    subi 1
+compute_root_dir_addr_entry:
+    nzero
+    jc compute_root_dir_addr_loop
+
+    # Now the sector address we have is naturally pointed at the root dir
+    # but we're going to mess with the stack and break it, oh well
+    isp -2
+    rdi 0
+    st sp 0
+    st sp 1
+    jr print_dirent_entry
+
+print_dirent_loop:
+    # Every multiple of 512/32 = 16 entries, load a new sector
+    ld sp 0
+    andi 0xF
+    nzero
+    jc no_new_sector
+
+    # Need to juggle a little bit to get the sector index argument in the right
+    # place on the stack
+    isp -4
+    ld sp 6
+    st sp 0
+    ld sp 7
+    st sp 1
+    ld sp 8
+    st sp 2
+    ld sp 9
+    st sp 3
+    rdq sector_buf
+    jr cf_read_sector
+    isp 4
+    # Increment sector index to point at next potential sector
+    cclr
+    ld sp 2
+    adci 1
+    st sp 2
+    ld sp 3
+    adci 0
+    st sp 3
+    ld sp 4
+    adci 0
+    st sp 4
+    ld sp 5
+    adci 0
+    st sp 5
+no_new_sector:
+    # Locate the current dirent in the sector buffer
+    # offset = index * 32 mod 512, luckily only 4 bits matter
+    rdq sector_buf
+    ld sp 0
+    sl
+    sl
+    sl
+    sl
+    sl
+    wr x
+    cclr
+    rd ql
+    adc x
+    wr ql
+    ld sp 0
+    sr
+    sr
+    sr
+    andi 1
+    wr x
+    rd qh
+    adc x
+    wr qh
+    # Check if the current entry is deleted or hidden or null-name
+    # if so, skip it
+    ld q 0
+    zero
+    jc hidden_entry
+    subi 0xE5
+    zero
+    jc hidden_entry
+    ld q 11
+    andi 0x02
+    nzero
+    jc hidden_entry
+    # if not, print it
+    rdi 11
+    jr putbuf_small
+    rdi 0
+    # with a nice newline
+    wr y
+    rdi '\n'
+    wr io
+    # either way, advance to the next entry
+hidden_entry:
+    ld sp 0
+    cclr
+    adci 1
+    st sp 0
+    ld sp 1
+    adci 0
+    st sp 1
+print_dirent_entry:
+    # if loop counter != n_directory_entries, continue
+    rdq n_directory_entries
+    ld sp 1
+    wr x
+    ld q 1
+    sub x
+    nzero
+    jc print_dirent_loop
+    ld sp 0
+    wr x
+    ld q 0
+    sub x
+    nzero
+    jc print_dirent_loop
+    brk
+
+cf_no_card:
+    rdq nocardstr
+    jr puts
+    brk
+
+@static sector_buf 512
+
+# We don't actually use these addresses in this program but they're useful for
+# later improvements
+@static fat_sector_addr 4
+@static dir_sector_addr 4
+@static n_directory_entries 2
+
+# Initializes compactflash card in 8 bit mode
+# Sets carry if no card was detected
+cf_init:
+    isp -4
+    st sp 3
+    rd y
+    st sp 2
+    rd ph
+    st sp 1
+    rd pl
+    st sp 0
+
+    rdi CF_ERROR_FEATURE
+    wr y
+    rd io
+    # these bits of the error/feature register are defined as 0, so if any read
+    # as 1, the bus is disconnected and being pulled high
+    andi 0b00101010
+    nzero
+    jc cf_init_end
+    
+    # waveguide.se does a drive reset here with 0x04 but that's not actually
+    # listed as a valid CF command
+    jr cf_wait
+    # Enable LBA mode
+    rdi CF_LBA_27_24_MODE
+    wr y
+    rdi 0xE0
+    wr io
+    # Enable 8-bit access
+    rdi CF_ERROR_FEATURE
+    wr y
+    rdi 0x01
+    wr io
+    rdi 0xEF
+    jr cf_cmd 
+
+    cclr
+cf_init_end:
+    ld sp 0
+    wr pl
+    ld sp 1
+    wr ph
+    ld sp 2
+    wr y
+    ld sp 3
+    isp 4
+    jp
+
+
+# Wait for CF card to become un-busy
+# clobbers Y, ACC contains status register
+cf_wait:
+    rdi CF_STATUS_CMD
+    wr y
+cf_wait_loop:
+    rd io
+    sgn
+    jc cf_wait_loop
+    andi 0x40
+    zero
+    jc cf_wait
+    jp
+
+# Send a command to the CF card
+# Takes input in ACC, clobbers Y
+cf_cmd:
+    sw y
+    rdi CF_STATUS_CMD
+    sw y
+    wr io
+    jp
+
+# Reads a sector from card
+# Buffer in q, sector address on stack in LE order
+cf_read_sector:
+    isp -4
+    st sp 0
+    rd pl
+    st sp 1
+    rd ph
+    st sp 2
+    rd y
+    st sp 3
+
+    rdi CF_LBA_27_24_MODE
+    wr y
+    ld sp 7
+    andi 0x0F
+    ori 0xE0
+    wr io
+    rdi CF_LBA_23_16
+    wr y
+    ld sp 6
+    wr io
+    rdi CF_LBA_15_8
+    wr y
+    ld sp 5
+    wr io
+    rdi CF_LBA_7_0
+    wr y
+    ld sp 4
+    wr io
+    rdi CF_SECTOR_COUNT
+    wr y
+    rdi 1
+    wr io
+
+    jr cf_wait
+    rdi 0x20
+    jr cf_cmd
+    jr cf_receive_sector
+
+    ld sp 3
+    wr y
+    ld sp 2
+    wr ph
+    ld sp 1
+    wr pl
+    ld sp 0
+    isp 4
+    jp
+
+# Read sector into buffer after it is already prompted
+# Sector buffer address passed in q, clobbered
+cf_receive_sector:
+    isp -4
+    st sp 3
+    rd y
+    st sp 2
+    rd ph
+    st sp 1
+    rd pl
+    st sp 0
+
+    jr cf_wait
+    # wait for it to set DRDY
+    rdi CF_STATUS_CMD
+    wr y
+    # move q into p in a ruthless, clobber-y way and decrement it as we go
+    # so that preincrement puts us where we need to be
+    cset
+    rd ql
+    sbci 1
+    wr pl
+    rd qh
+    sbci 0
+    wr ph
+
+    # ql will be our loop counter
+    # qh is free for a potential "read sectors" command down the line, maybe
+    # using acc as parameter?
+    rdi 0
+    wr ql
+    rdi CF_DATA
+    wr y
+
+cf_receive_sector_loop:
+    rd io
+    st +p 1
+    rd io
+    st +p 1
+    rd ql
+    subi 1
+    wr ql
+    nzero
+    jc cf_receive_sector_loop
+
+cf_receive_sector_done:
+    ld sp 0
+    wr pl
+    ld sp 1
+    wr ph
+    ld sp 2
+    wr y
+    ld sp 3
+    isp 4
+    jp
+
+
+# argument in q
+# clobbers q
+puts:
+    isp -2
+    st sp 0
+    rd y
+    st sp 1
+
+    # Decrement for preincrement
+    cset
+    rd ql
+    sbci 1
+    wr ql
+    rd qh
+    sbci 0
+    wr qh
+
+    swap ph qh
+    swap pl ql
+    rdi 0
+    wr y
+    j puts_entry
+
+puts_loop:
+    wr io
+puts_entry:
+    ld +p 1
+    nzero
+    jc puts_loop
+
+puts_done:
+    swap ph qh
+    swap pl ql
+    ld sp 1
+    wr y
+    ld sp 0
+    jp
+
+
+# Prints a 512 byte memory region (must be 2 byte aligned)
+# Sector buffer address passed in q, clobbered
+# clobbers acc, x, y
+dump_sector:
+    isp -3
+    rd pl
+    st sp 0
+    rd ph
+    st sp 1
+    rdi 0
+    wr y
+
+    # Decrement for preincrement
+    cset
+    rd ql
+    sbci 1
+    wr ql
+    rd qh
+    sbci 0
+    wr qh
+
+    rdi 0
+dump_sector_loop:
+    st sp 2
+    # unroll by two because we get a nice 256-cycle loop
+
+    # load byte into acc
+    swap ph qh
+    swap pl ql
+    ld +p 1
+    swap ph qh
+    swap pl ql
+    jr dump_byte
+
+    rdi ' '
+    wr io
+
+    swap ph qh
+    swap pl ql
+    ld +p 1
+    swap ph qh
+    swap pl ql
+    jr dump_byte
+
+    rdi ' '
+    wr io
+
+    ld sp 2
+    subi 1
+    andi 0x7
+    nzero
+    jc dump_sector_no_nl
+    rdi '\r'
+    wr io
+    rdi '\n'
+    wr io
+
+dump_sector_no_nl:
+    ld sp 2
+    subi 1
+    nzero
+    jc dump_sector_loop
+
+    ld sp 0
+    wr pl
+    ld sp 1
+    wr ph
+    isp 3
+    jp
+
+
+# input in acc, clobbers x, expects y already set
+dump_byte:
+    wr x
+    sr
+    sr
+    sr
+    sr
+    subi 10
+    nsgn
+    jc dump_byte_letter
+    addi '0' + 10
+    wr io
+    j dump_byte_chr2
+dump_byte_letter:
+    addi 'a'
+    wr io
+
+dump_byte_chr2:
+    rd x
+    andi 0xF
+
+    subi 10
+    nsgn
+    jc dump_byte_letter2
+    addi '0' + 10
+    wr io
+    j dump_byte_done
+dump_byte_letter2:
+    addi 'a'
+    wr io
+
+dump_byte_done:
+    jp
+
+
+# Count in acc, buffer addr in q (clobbered), clobbers x because I'm lazy
+putbuf_small:
+    # Decrement for preinc
+    cset
+    sw ql
+    sbci 1
+    sw ql
+    sw qh
+    sbci 0
+    sw qh
+
+    swap pl ql
+    swap ph qh
+    
+    j putbuf_small_entry
+
+putbuf_small_loop:
+    wr x
+    ld +p 1
+    wr io
+    rd x
+    subi 1
+putbuf_small_entry:
+    nzero
+    jc putbuf_small_loop
+
+    swap pl ql
+    swap ph qh
+    jp
+
+nocardstr:
+@string "No CF card detected!\n"
+nofat16str:
+@string "No FAT16 partition detected!\n"
+sectorfoundstr:
+@string "Found a FAT16 sector!"

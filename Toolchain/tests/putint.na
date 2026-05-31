@@ -1,0 +1,106 @@
+
+    rdq buffer
+    rdi 0x4
+    st q 0
+    st q 1
+    st q 2
+    st q 3
+    rdi 4
+    jr double_dabble
+
+@static buffer 10
+
+
+# Converts binary to BCD
+# Takes pointer to field in q, number of bytes in acc
+# Field length n + 4*ceil(n/3) bits, little endian, binary number left justified
+# clobbers arguments
+double_dabble:
+    # Implementation heavily derived from https://en.wikipedia.org/wiki/Double_dabble
+    isp -4
+    st sp 0
+    rd pl
+    st sp 1
+    rd ph
+    st sp 2
+    rd x
+    st sp 3
+    rd y
+    st sp 4
+
+    ld sp 0
+    sl
+    sl
+    sl
+    st sp 0
+    # n in acc, &buffer in q
+    wr x
+    rdi 0
+    sw x
+    # n in acc, 0 in x, &buffer in q
+    subi 1
+    j dabble_div_entry
+dabble_div_loop:
+    sw x
+    addi 1
+    sw x
+dabble_div_entry:
+    cset
+    sbci 3
+    jc dabble_div_loop
+
+    ld sp 0
+    # bit count in acc, field size in x, &buffer in q
+    j dabble_loop_entry
+
+dabble_loop:
+    st sp 0
+    move qh ph
+    move ql pl
+    
+    j dabble_increment_entry
+dabble_increment_loop:
+    wr x
+    # if lower nybble is >= 5, increment by 3
+    ld p 0
+    andi 0x0F
+    cset
+    sbci 5
+    # If carry is clear, the number was <5; if carry is set, the number was >=5
+    jc dabble_lsn_gt5
+    subi 3
+dabble_lsn_gt5:
+    addi 8
+
+    st p 0
+
+
+
+dabble_increment_entry:
+    rd x
+    cset
+    sbci 1
+    jc dabble_increment_loop
+
+
+    
+    ld sp 0
+dabble_loop_entry:
+    cset
+    sbci 1
+    jc dabble_loop
+
+
+
+
+
+    ld sp 4
+    wr y
+    ld sp 3
+    wr x
+    ld sp 2
+    wr ph
+    ld sp 1
+    wr pl
+    isp 5
+    jp
