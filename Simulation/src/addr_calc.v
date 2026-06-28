@@ -1,3 +1,5 @@
+`timescale 1ns/1ps
+
 /*
 Address calculation datapath for NANDy CPU. Denoted in purple in block diagram.
 */

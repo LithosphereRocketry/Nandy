@@ -4,3 +4,4 @@ obj/
 waveforms/
 tests/FUZZ.txt
 rom.nb
+*-log.txt

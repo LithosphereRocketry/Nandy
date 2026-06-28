@@ -8,7 +8,7 @@ module tb_system();
     wire wr_io;
     reg [7:0] result;
 
-    assert #("Incorrect value for result") adone(.value(result === 233));
+    vassert #("Incorrect value for result") adone(.value(result === 233));
 
     // This program is completely non-interactive, so we just set all the
     // interactive elements to 0 or ignore them

@@ -12,8 +12,8 @@ module tb_ram();
         .data(data)
     );
 
-    assert #("Memory at addr 0 is wrong") a1(.value(data === 8'h12));
-    assert #("Memory at addr 100 is wrong") a2(.value(data === 8'h34));
+    vassert #("Memory at addr 0 is wrong") a1(.value(data === 8'h12));
+    vassert #("Memory at addr 100 is wrong") a2(.value(data === 8'h34));
     initial begin
         $dumpfile(`WAVEPATH);
         $dumpvars;

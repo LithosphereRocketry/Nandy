@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 
-module assert #(parameter message = "unspecified")
+module vassert #(parameter message = "unspecified")
                (input value);
     task test;
         if (~value) begin

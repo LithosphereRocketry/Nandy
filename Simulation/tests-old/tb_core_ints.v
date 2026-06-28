@@ -10,7 +10,7 @@ module tb_core_ints();
     wire rd;
     wire [7:0] result;
     
-    assert #("Incorrect value for result") adone(.value(result === 15));
+    vassert #("Incorrect value for result") adone(.value(result === 15));
 
     // This program is completely non-interactive, so we just set all the
     // interactive elements to 0 or ignore them

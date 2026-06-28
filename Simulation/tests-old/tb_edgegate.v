@@ -11,8 +11,8 @@ module tb_edgegate();
         .out(tick)
     );
 
-    assert #("Output low, expected high") a_h(.value(tick));
-    assert #("Output high, expected low") a_l(.value(~tick));
+    vassert #("Output low, expected high") a_h(.value(tick));
+    vassert #("Output high, expected low") a_l(.value(~tick));
 
     initial begin
         $dumpfile(`WAVEPATH);

@@ -17,9 +17,9 @@ module tb_ramblock();
         .dout(dout)
     );
 
-    assert #("Value unchanged when it should be written")
+    vassert #("Value unchanged when it should be written")
         a_unch(.value(dout == 8'h00));
-    assert #("Value written when it should have been left alone")
+    vassert #("Value written when it should have been left alone")
         a_updt(.value(dout == 8'h12));
 
     initial begin
