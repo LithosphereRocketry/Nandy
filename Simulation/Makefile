@@ -54,3 +54,8 @@ $(OBJDIR):
 
 clean:
 	rm -rf $(WAVEDIR) $(OBJDIR) $(LOGDIR) $(ERRDIR)
+
+rom.nb:
+	@echo "Copy an assembled NANDy program into rom.nb and try again"
+	@exit -1
+

@@ -3,3 +3,4 @@ error-logs/
 obj/
 waveforms/
 tests/FUZZ.txt
+rom.nb
