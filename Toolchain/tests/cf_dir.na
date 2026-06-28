@@ -29,21 +29,11 @@ main:
     
     rdq sector_buf+MBR_FIRST_PARTITION
     rdi 4
-locate_fat16_loop:
+locate_active_loop:
     wr x
-    ld q 4
-    # 04, 06, and 0E are all valid non-hidden FAT16 IDs
-    # TODO: it may be more consistent to derive this from the FAT cluster count
-    # but it's much more annoying to do
-    subi 0x04
-    zero
-    jc located_fat16
-    subi 0x02
-    zero
-    jc located_fat16
-    subi 0x08
-    zero
-    jc located_fat16
+    ld q 0
+    sgn
+    jc located_active
     # The structure is one too big to increment with preinc mode so we do this
     # the old fashioned way
     cclr
@@ -56,14 +46,18 @@ locate_fat16_loop:
     rd x
     subi 1
     nzero
-    jc locate_fat16_loop
+    jc locate_active_loop
 
-    # If we fall through, there was no FAT16
-    rdq nofat16str
+    # If we fall through, there was no active partition
+    rdq noactivestr
     jr puts
     brk
 
-located_fat16:
+located_active:
+    # Really to be robust we should check if this partition is consistent with
+    # FAT16 but I don't really care enough to add this
+    # Just always put a fat16 card in and nobody gets hurt
+
     # Load the first sector of the FAT partition into the sector buffer
     # On disks made with mkfs.fat, this seems to overlap with the MBR for
     # reasons I don't entirely get
@@ -642,7 +636,5 @@ putbuf_small_entry:
 
 nocardstr:
 @string "No CF card detected!\n"
-nofat16str:
-@string "No FAT16 partition detected!\n"
-sectorfoundstr:
-@string "Found a FAT16 sector!"
+noactivestr:
+@string "No active partition detected!\n"

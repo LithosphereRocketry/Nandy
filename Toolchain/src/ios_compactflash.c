@@ -142,7 +142,7 @@ static void cf_command(uint8_t cmd) {
                 |   ((size_t) registers[CF_LBA_23_16]) << 16
                 |   ((size_t) registers[CF_LBA_15_8]) << 8
                 |   ((size_t) registers[CF_LBA_7_0]);
-            size_t byte_addr = sector_addr + 512;
+            size_t byte_addr = sector_addr * 512;
             size_t byte_size = 512*(size_t) registers[CF_SECTOR_COUNT];
             if(byte_addr + byte_size > disksize) {
                 // TODO: emulate this behavior better

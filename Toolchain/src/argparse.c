@@ -54,6 +54,9 @@ int argparse(argument_t** args, size_t nargs, int argc, char** argv) {
         if(argv[i][0] == ARG_TOKEN) {
             if(argv[i][1] == ARG_TOKEN) {
                 bool found = false;
+                if(!strcmp(argv[i]+2, "help")) {
+                    dohelp(args, nargs);
+                }
                 for(size_t j = 0; j < nargs; j++) {
                     if(args[j]->name != NULL && !strcmp(argv[i] + 2, args[j]->name)) {
                         i = doarg(args[j], i, argc, argv);
