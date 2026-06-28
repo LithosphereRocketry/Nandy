@@ -14,6 +14,8 @@ module tb_system();
     // interactive elements to 0 or ignore them
     core #("testcode/hellorld.txt") testGate(
         .clk(clk),
+        .clken(1'b1),
+        .rst(1'b0),
         .io_in(8'd12),
         .ints_in(6'b000000),
         .io_addr(),

@@ -2,8 +2,10 @@
 Main datapath of NANDy CPU. Denoted in green in block diagram.
 */
 
-module core #(parameter PATH = "memory.txt") (
+module core #(parameter PATH = "memory.txt", parameter RAM_DECODED_BITS = 15) (
         input clk,
+        input clken,
+        input rst,
 
         input [7:0] io_in,
         input [5:0] ints_in,
@@ -23,6 +25,8 @@ module core #(parameter PATH = "memory.txt") (
     wire [7:0] mem_out;
     control ctrl(
         .clk(clk),
+        .clken(clken),
+        .rst(rst),
         .instr(mem_out),
         .ints_in(ints_in),
         .carry(carry),
@@ -79,6 +83,7 @@ module core #(parameter PATH = "memory.txt") (
 
     split_reg regp(
         .clk(clk),
+        .clken(clken),
         .d(p_in),
         .we({wr_ph, wr_pl}),
         .q(p)
@@ -86,6 +91,7 @@ module core #(parameter PATH = "memory.txt") (
 
     split_reg regq(
         .clk(clk),
+        .clken(clken),
         .d({acc, acc}),
         .we({wr_qh, wr_ql}),
         .q(q)
@@ -93,6 +99,8 @@ module core #(parameter PATH = "memory.txt") (
 
     addr_calc addrcalc (
         .clk(clk),
+        .clken(clken),
+        .rst(rst),
 
         .n_use_add(n_addr_use_add), .n_do_interrupt(n_do_interrupt),
         .in_interrupt(in_interrupt), .wr_pc(write_pc),
@@ -111,6 +119,7 @@ module core #(parameter PATH = "memory.txt") (
     wire [7:0] alu_out;
     alu arith(
         .clk(clk),
+        .clken(clken),
         .wr_carry(wr_carry),
         .status_possible(status_possible),
         .cmpinv(regsel[0]),
@@ -122,15 +131,16 @@ module core #(parameter PATH = "memory.txt") (
         .carry(carry)
     );
 
-    memory #(PATH) mem(
+    memory #(PATH, RAM_DECODED_BITS) mem(
         .clk(clk),
+        .clken(clken),
         .addr(mem_addr),
         .din(acc),
         .wr(wr_mem),
         .dout(mem_out)
     );
 
-    always @(posedge clk) begin
+    always @(posedge clk) if(clken) begin
         if(wr_acc) acc <= alu_out;
         if(wr_sp) sp <= acc;
         if(wr_x) x <= acc;

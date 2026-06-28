@@ -11,18 +11,34 @@ module toplevel(
         input usr_btn
     );
 
-    reg [23:0] counter = 0;
-    always @(posedge clk48) counter <= counter+1;
-    assign rgb_led0_r = counter[23];
-    assign rgb_led0_g = 1;
-    assign rgb_led0_b = 1;
+    reg [5:0] cpu_strobe_counter = 0;
+    always @(posedge clk48) cpu_strobe_counter <= cpu_strobe_counter+1;
+    wire cpu_strobe = (cpu_strobe_counter == 0);
+
+    wire [7:0] io_addr, io_out;
+    wire io_wr;
+    wire uart_ready;
+    // only 2K of RAM to save on LUTRAM since our memory is async and therefore
+    // quite expensive on FPGA
+    core #(`ROMPATH, 11) cpu(
+        .clk(clk48),
+        // for now, stop the world when the uart is busy
+        .clken(cpu_strobe & uart_ready),
+        .rst(~usr_btn),
+        
+        .io_in(8'h00),
+        .ints_in(6'h00),
+        .io_addr(io_addr),
+        .io_out(io_out),
+        .wr_io(io_wr)
+    );
 
     uart_tx uart(
         .clk(clk48),
 
-        .data(65),
-        .data_valid(counter[23:16] == 0),
-        .data_ready(),
+        .data(io_out),
+        .data_valid(cpu_strobe & io_wr & io_addr == 8'h00),
+        .data_ready(uart_ready),
 
         .txd(gpio_1)
     );

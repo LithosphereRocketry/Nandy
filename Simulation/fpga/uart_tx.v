@@ -35,6 +35,7 @@ module uart_tx #(
 
     always @(posedge clk) begin
         divider <= divider - 1;
+        /* verilator lint_off WIDTHTRUNC */
         if(state == ST_IDLE) begin
             if(data_valid) begin
                 state <= ST_START;
@@ -54,6 +55,7 @@ module uart_tx #(
             divider <= DIVISOR;
             shift_reg <= shift_reg >> 1;
         end
+        /* verilator lint_on */
     end
 
 endmodule

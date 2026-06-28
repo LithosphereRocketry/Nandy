@@ -4,6 +4,9 @@ Control logic for NANDy CPU; denoted in block diagram in blue
 
 module control(
         input clk,
+        input clken,
+        input rst,
+
         input [7:0] instr,
         input [5:0] ints_in,
         input carry,
@@ -56,10 +59,11 @@ module control(
 
     assign addr_use_imm = ~ncycle & (ir[7] | ir[6:5] == 2'b10);
 
-    wire n_jri = ~(ncycle & instr == 8'b00000110);
+    // wire n_jri = ~(ncycle & instr == 8'b00000110);
+    wire n_jri = 1;
     assign base_sel = ~n_jri ? 2'b01
         : (ncycle | ~ir[7]) ? 2'b00
-        : (~ncycle & ir[6:5]) == 2'b00 ? 2'b11
+        : (~ncycle & (ir[6:5] == 2'b00)) ? 2'b11
         : 2'b10;
     
     assign aluop = ncycle
@@ -69,7 +73,8 @@ module control(
     assign regsel = ncycle ? (instr[5] ? {2'b01, instr[4]} : instr[2:0])
                            : {1'bx, ~ir[6], 1'bx}; 
 
-    assign addr_imm = ir[7] ? {12'b0, ir[3:0]} : {{5{ir[3]}}, ir[3:1], instr};
+    assign addr_imm = ncycle ? 16'hxxxx
+                             : ir[7] ? {12'b0, ir[3:0]} : {{5{ir[3]}}, ir[3:1], instr};
 
     wire int_flag = |{ints_in};
     assign n_do_interrupt = ~{int_en & int_flag & ~in_interrupt}; // invert for free
@@ -88,7 +93,11 @@ module control(
     wire int_en_next = int_en | (ncycle & instr == 8'b00000010) & ~(ncycle & instr == 8'b00000011);
 
 
-    always @(posedge clk) begin
+    always @(posedge clk) if(rst) begin
+        in_interrupt <= 0;
+        int_en <= 0;
+        ncycle <= 1;
+    end else if(clken) begin
         in_interrupt <= int_active_next;
         ncycle <= next_ncycle;
         int_en <= int_en_next;

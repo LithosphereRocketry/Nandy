@@ -4,6 +4,7 @@ ALU for NANDy CPU. Denoted in red in block diagram.
 
 module alu (
         input clk,
+        input clken,
 
         input wr_carry,
         input status_possible, cmpinv,
@@ -50,7 +51,7 @@ module alu (
     wire q_carry = q_both[8];
     assign q = q_both[7:0];
 
-    always @(posedge clk) if(wr_carry) carry <= q_carry;
+    always @(posedge clk) if(clken && wr_carry) carry <= q_carry;
 
 
 endmodule

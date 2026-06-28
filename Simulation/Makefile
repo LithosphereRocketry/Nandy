@@ -37,7 +37,7 @@ $(TEST_OUT): $(LOGDIR)vl_%.txt: $(OBJDIR)/%.vvp $(FUZZFILE) | $(LOGDIR) $(ERRDIR
 	@mv $(ERRDIR)vl_$*.txt $@
 
 $(OBJDIR)/%.vvp: $(TESTDIR)%.v $(SRC) $(SIM_SRC) | $(OBJDIR) $(WAVEDIR)
-	$(VLG) -DWAVEPATH=\"$(WAVEDIR)vl_$*.vcd\" -I$(INCDIR) -s $* -o $@ $< $(SRC)
+	$(VLG) -DWAVEPATH=\"$(WAVEDIR)vl_$*.vcd\" -s $* -o $@ $^
 
 # If the directories don't exist, make them
 $(WAVEDIR):
@@ -53,7 +53,7 @@ $(OBJDIR):
 
 TOPLEVEL = toplevel
 PCF = orangecrab_r0.2.1.pcf
-NEXTPNR_DENSITY = 25k
+NEXTPNR_DENSITY = 85k
 
 rom.nb:
 	@echo "Copy an assembled NANDy program into rom.nb and try again"

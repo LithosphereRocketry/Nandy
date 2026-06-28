@@ -6,6 +6,8 @@ Address calculation datapath for NANDy CPU. Denoted in purple in block diagram.
 
 module addr_calc(
         input clk,
+        input clken,
+        input rst,
 
         input n_use_add, use_imm, n_do_interrupt, in_interrupt, wr_pc,
         input [1:0] base_sel,
@@ -45,7 +47,9 @@ module addr_calc(
 
     wire [15:0] pc_in = n_do_interrupt ? addr_sum : int_vector;
 
-    always @(posedge clk) begin
+    always @(posedge clk) if(rst) begin
+        pc <= 0;
+    end else if(clken) begin
         if(~n_do_interrupt) ia <= pc;
         if(wr_pc) pc <= pc_in;
     end
