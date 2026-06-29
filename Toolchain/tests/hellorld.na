@@ -1,8 +1,9 @@
-rdi 0
-wr sp
-rdq hellostr
-jr puts
-brk
+    rdi 0
+    wr sp
+    rdq hellostr
+    jr puts
+halt:
+    j halt
 
 # argument in q
 # clobbers q
