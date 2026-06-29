@@ -35,6 +35,9 @@ module control(
             | ir[5] & ir[6] // imm alu
         );
     
+    assign p_from_addr = ncycle & instr[7:0] == 8'b00000101 // jpr
+        | ~ncycle & ir[7:5] == 3'b010 & ir[0] & (~ir[4] | carry) // jr/jcr
+        | ~ncycle & ir[7:4] == 4'b1111; // ld +p
     wire [7:0] write_from_move = {8{ncycle & instr[3] & (instr[7:5] == 0)}}
         & (1 << instr[2:0]);
     assign wr_sp = write_from_move[0];
@@ -50,36 +53,36 @@ module control(
 
     assign wr_carry = ncycle & instr[7:5] == 3'b001 & instr[3]
                     | ~ncycle & ir[7:5] == 3'b011 & ir[3];
-
-    assign p_from_addr = ncycle & instr[7:0] == 8'b00000101 // jpr
-        | ~ncycle & ir[7:5] == 3'b010 & ir[0] & (~ir[4] | carry) // jr/jcr
-        | ~ncycle & ir[7:4] == 4'b1111; // ld +p
     
     assign n_addr_use_add = ~(~ncycle & ir[7]);
 
-    assign addr_use_imm = ~ncycle & (ir[7] | ir[6:5] == 2'b10);
+    assign addr_use_imm = ncycle ? instr[7]
+                       : ir[7:5] == 3'b010 & (~ir[4] | carry);
 
-    // wire n_jri = ~(ncycle & instr == 8'b00000110);
-    wire n_jri = 1;
-    assign base_sel = ~n_jri ? 2'b01
-        : (ncycle | ~ir[7]) ? 2'b00
-        : (~ncycle & (ir[6:5] == 2'b00)) ? 2'b11
-        : 2'b10;
+    wire n_jri = ~(ncycle & instr == 8'b00000110);
+    assign base_sel = ~ncycle ? 2'b00
+        : ~n_jri ? 2'b01
+        : (instr[7:5] == 3'b100) ? 2'b11
+        : (instr[7] | instr[7:2] == 6'b000001) ? 2'b10
+        : 2'b00;
     
     assign aluop = ncycle
         ? (instr[5] ? instr[2:0] : 0)
         : (ir[7] ? 0 : ir[2:0]);
 
-    assign regsel = ncycle ? (instr[5] ? {2'b01, instr[4]} : instr[2:0])
-                           : {1'bx, ~ir[6], 1'bx}; 
+    // assign regsel = ncycle ? (instr[5] ? {2'b01, instr[4]} : instr[2:0])
+    //                        : {1'bx, ~ir[6], 1'bx};
+    assign regsel = ~ncycle ? 3'bxxx
+                  : instr[7] ? {1'bx, ~instr[6], 1'bx}
+                  : instr[5] ? {2'b01, instr[4]}
+                  : instr[2:0];
 
-    assign addr_imm = ncycle ? 16'hxxxx
-                             : ir[7] ? {12'b0, ir[3:0]} : {{5{ir[3]}}, ir[3:1], instr};
+    assign addr_imm = ncycle ? {12'b0, instr[3:0]} : {{5{ir[3]}}, ir[3:1], instr};
 
     wire int_flag = |{ints_in};
     assign n_do_interrupt = ~{int_en & int_flag & ~in_interrupt}; // invert for free
 
-    assign write_pc = ~{~ncycle & ir[7]};
+    assign write_pc = ~{ncycle & instr[7]};
 
     // We can't always read the status register on cycle 1, because register
     // moves also use the ALU B path

@@ -51,20 +51,22 @@ $(OBJDIR):
 
 # FPGA nonsense
 
+ROM_PROGRAM = hellorld
+
 TOPLEVEL = toplevel
 PCF = orangecrab_r0.2.1.pcf
 NEXTPNR_DENSITY = 85k
 
-rom.nb:
-	@echo "Copy an assembled NANDy program into rom.nb and try again"
-	@exit -1
+ $(OBJDIR)/%.nb: | $(OBJDIR)
+	make -C ../Toolchain $*.nb
+	cp ../Toolchain/$*.nb $@
 
-$(OBJDIR)/rom.hex: rom.nb | $(OBJDIR)
+%.hex: %.nb
 	xxd -p -c 1 $< > $@
 
-$(OBJDIR)/%.ys: $(FPGA_SRC) $(SRC) $(OBJDIR)/rom.hex | $(OBJDIR)
+$(OBJDIR)/%.ys: $(OBJDIR)/$(ROM_PROGRAM).hex $(FPGA_SRC) $(SRC) | $(OBJDIR)
 	$(file >$@)
-	$(foreach V,$(SRC) $(FPGA_SRC),$(file >>$@,read_verilog -DROMPATH="$(OBJDIR)/rom.hex" -DSYNTH=1 $V))
+	$(foreach V,$(SRC) $(FPGA_SRC),$(file >>$@,read_verilog -DROMPATH="$<" -DSYNTH=1 $V))
 	$(file >>$@,synth_ecp5 -top $*)
 	$(file >>$@,write_json "$(basename $@).json")
 
@@ -72,7 +74,7 @@ $(OBJDIR)/%.json: $(OBJDIR)/%.ys | $(OBJDIR)
 	yosys -s "$<" > yosys-log.txt
 
 $(OBJDIR)/%_out.config $(OBJDIR)/%.pnr.json: $(OBJDIR)/%.json $(PCF) | $(OBJDIR)
-	nextpnr-ecp5 --json $< --textcfg $(OBJDIR)/$*_out.config --$(NEXTPNR_DENSITY) --package CSFBGA285 --lpf $(PCF) --write $(OBJDIR)/$*.pnr.json 2> nextpnr-log.txt
+	nextpnr-ecp5 --speed 8 --json $< --textcfg $(OBJDIR)/$*_out.config --$(NEXTPNR_DENSITY) --package CSFBGA285 --lpf $(PCF) --write $(OBJDIR)/$*.pnr.json 2> nextpnr-log.txt
 
 nextpnrgui: $(OBJDIR)/$(TOPLEVEL).pnr.json
 	nextpnr-ecp5 --json $< --$(NEXTPNR_DENSITY) --package CSFBGA285 --lpf $(PCF) --gui &
@@ -87,8 +89,8 @@ $(OBJDIR)/%.dfu: $(OBJDIR)/%.bit | $(OBJDIR)
 dfu: $(OBJDIR)/$(TOPLEVEL).dfu | $(OBJDIR)
 	dfu-util --alt 0 -D $<
 
-lint: $(FPGA_SRC) $(SRC) $(OBJDIR)/rom.hex
-	verilator --lint-only --top-module $(TOPLEVEL) $(SRC) $(FPGA_SRC) -DROMPATH=\"$(OBJDIR)/rom.hex\"
+lint: $(OBJDIR)/$(ROM_PROGRAM).hex $(FPGA_SRC) $(SRC)
+	verilator --lint-only --top-module $(TOPLEVEL) $(SRC) $(FPGA_SRC) -DROMPATH=\"$<"
 
 clean:
 	rm -rf $(WAVEDIR) $(OBJDIR) $(LOGDIR) $(ERRDIR)

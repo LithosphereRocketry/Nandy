@@ -16,13 +16,14 @@ module addr_calc(
         input [15:0] pq,
         input [7:0] sp,
         
-        output [15:0] addr
+        output reg [15:0] addr
     );
 
     wire [15:0] int_vector = 16'h7F00;
 
     reg [15:0] pc, ia;
     initial pc = 0;
+    initial addr = 0;
 
     wire [15:0] addr_base;
     mux4 muxbase [1:0] (
@@ -42,16 +43,15 @@ module addr_calc(
     wire [7:0] upper_sum = addr_base[15:8] + addr_offset[15:8] + cross_carry;
     wire [15:0] addr_sum = {upper_sum, lower_sum[7:0]};
 
-    // With some major rework it might be possible to optimize away this mux
-    assign addr = n_use_add ? pc : addr_sum;
-
-    wire [15:0] pc_in = n_do_interrupt ? addr_sum : int_vector;
+    wire [15:0] new_addr = n_do_interrupt ? addr_sum : int_vector;
 
     always @(posedge clk) if(rst) begin
         pc <= 0;
+        addr <= 0;
     end else if(clken) begin
         if(~n_do_interrupt) ia <= pc;
-        if(wr_pc) pc <= pc_in;
+        if(wr_pc) pc <= new_addr;
+        addr <= new_addr;
     end
 
 endmodule

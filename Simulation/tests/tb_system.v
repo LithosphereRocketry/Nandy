@@ -12,7 +12,7 @@ module tb_system();
 
     // This program is completely non-interactive, so we just set all the
     // interactive elements to 0 or ignore them
-    core #("testcode/hellorld.txt") testGate(
+    core #("obj/hellorld.hex") testGate(
         .clk(clk),
         .clken(1'b1),
         .rst(1'b0),

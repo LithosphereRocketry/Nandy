@@ -16,7 +16,7 @@ module core #(parameter PATH = "memory.txt", parameter RAM_DECODED_BITS = 15) (
 
     wire carry, int_en, int_active;
     wire wr_acc, wr_ph, wr_pl, wr_qh, wr_ql, wr_sp, wr_x, wr_y, wr_mem, wr_carry, addr_use_imm,
-        p_from_addr, ncycle, n_addr_use_add, n_do_interrupt, in_interrupt, write_pc, status_possible;
+        p_from_addr, ncycle, n_addr_use_add, n_do_interrupt, write_pc, status_possible;
     wire [1:0] base_sel;
     wire [2:0] aluop;
     wire [2:0] regsel;
@@ -103,7 +103,7 @@ module core #(parameter PATH = "memory.txt", parameter RAM_DECODED_BITS = 15) (
         .rst(rst),
 
         .n_use_add(n_addr_use_add), .n_do_interrupt(n_do_interrupt),
-        .in_interrupt(in_interrupt), .wr_pc(write_pc),
+        .in_interrupt(int_active), .wr_pc(write_pc),
         .use_imm(addr_use_imm),
         .base_sel(base_sel),
 
